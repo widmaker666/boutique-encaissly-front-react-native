@@ -21,7 +21,7 @@ export default function LoginScreen() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { setTokens } = useAuthStore();
+  const { setTokens, setUser } = useAuthStore();
   const { request, response, promptAsync } = useGoogleAuth();
 
   //- Récupère le token Google et l'envoie au backend
@@ -29,12 +29,13 @@ export default function LoginScreen() {
     if (response?.type === "success") {
       const googleToken = response.authentication?.accessToken;
       if (!googleToken) return;
-
       setLoading(true);
       authService
         .googleMobile(googleToken)
-        .then(({ accessToken, refreshToken }) => {
+        .then(async ({ accessToken, refreshToken }) => {
           setTokens(accessToken, refreshToken);
+          const user = await authService.getProfile();
+          setUser(user);
           router.replace("/(app)");
         })
         .catch(() => setError("Connexion Google échouée."))
@@ -44,12 +45,10 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     setError("");
-
     if (!email || !password) {
       setError("Veuillez remplir tous les champs.");
       return;
     }
-
     try {
       setLoading(true);
       const { accessToken, refreshToken } = await authService.login(
@@ -57,6 +56,8 @@ export default function LoginScreen() {
         password,
       );
       setTokens(accessToken, refreshToken);
+      const user = await authService.getProfile();
+      setUser(user);
       router.replace("/(app)");
     } catch (e: any) {
       setError(e?.response?.data?.message ?? "Identifiants incorrects.");

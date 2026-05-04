@@ -22,7 +22,7 @@ export default function RegisterScreen() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { setTokens } = useAuthStore();
+  const { setTokens, setUser } = useAuthStore();
   const { request, response, promptAsync } = useGoogleAuth();
 
   //- Récupère le token Google et l'envoie au backend
@@ -30,12 +30,13 @@ export default function RegisterScreen() {
     if (response?.type === "success") {
       const googleToken = response.authentication?.accessToken;
       if (!googleToken) return;
-
       setLoading(true);
       authService
         .googleMobile(googleToken)
-        .then(({ accessToken, refreshToken }) => {
+        .then(async ({ accessToken, refreshToken }) => {
           setTokens(accessToken, refreshToken);
+          const user = await authService.getProfile();
+          setUser(user);
           router.replace("/(app)");
         })
         .catch(() => setError("Connexion Google échouée."))
@@ -45,17 +46,10 @@ export default function RegisterScreen() {
 
   const handleRegister = async () => {
     setError("");
-
     if (!email || !password) {
       setError("Veuillez remplir tous les champs.");
       return;
     }
-
-    if (password.length < 6) {
-      setError("Le mot de passe doit faire au moins 6 caractères.");
-      return;
-    }
-
     try {
       setLoading(true);
       const { accessToken, refreshToken } = await authService.register(
@@ -63,9 +57,11 @@ export default function RegisterScreen() {
         password,
       );
       setTokens(accessToken, refreshToken);
+      const user = await authService.getProfile();
+      setUser(user);
       router.replace("/(app)");
     } catch (e: any) {
-      setError(e?.response?.data?.message ?? "Une erreur est survenue.");
+      setError(e?.response?.data?.message ?? "Identifiants incorrects.");
     } finally {
       setLoading(false);
     }

@@ -4,7 +4,7 @@ import * as Google from "expo-auth-session/providers/google";
 import { API_BASE_URL } from "@/constants/api";
 import { useAuthStore } from "@/stores/auth.store";
 import { makeRedirectUri } from "expo-auth-session";
-
+import { User } from "@/types";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -35,13 +35,12 @@ api.interceptors.response.use(
   },
 );
 
-
 export const useGoogleAuth = () => {
   const redirectUri = makeRedirectUri({
     scheme: "encaissly",
   });
 
-  console.log(redirectUri)
+  console.log(redirectUri);
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
@@ -64,6 +63,11 @@ export const authService = {
 
   register: async (email: string, password: string) => {
     const { data } = await api.post("/auth/register", { email, password });
+    return data;
+  },
+
+  getProfile: async () => {
+    const { data } = await api.get<User>("/user/profile");
     return data;
   },
 
