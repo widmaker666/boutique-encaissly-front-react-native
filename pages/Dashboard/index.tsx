@@ -1,6 +1,6 @@
 import { View, Text, ScrollView } from "react-native";
 import { useQuery } from "@tanstack/react-query";
-import { statsService } from "@/services/api";
+import { statsService, venteService } from "@/services/api";
 import { useAuthStore } from "@/stores/auth.store";
 import { styles } from "@/styles/pages/dashboard.style";
 import { typo } from "@/styles/utils/typography.styles";
@@ -11,6 +11,11 @@ export default function DashboardScreen() {
   const { data, isLoading } = useQuery({
     queryKey: ["stats"],
     queryFn: statsService.getGlobal,
+  });
+
+  const { data: recentVentes } = useQuery({
+    queryKey: ["ventes-recent"],
+    queryFn: venteService.getRecent,
   });
 
   if (isLoading)
@@ -91,6 +96,24 @@ export default function DashboardScreen() {
           </Text>
         </View>
       </View>
+
+      {/* Dernières ventes */}
+      <Text style={[typo.medium, styles.sectionTitle]}>Dernières ventes</Text>
+      {recentVentes?.map((vente: any) => (
+        <View key={vente.id} style={styles.venteRow}>
+          <View>
+            <Text style={[typo.medium, styles.venteName]}>
+              {vente.nomArticle}
+            </Text>
+            <Text style={[typo.light, styles.venteMeta]}>
+              {vente.creatrice.nom} · {vente.modePaiement}
+            </Text>
+          </View>
+          <Text style={[typo.bold, styles.ventePrice]}>
+            {vente.prixVente} €
+          </Text>
+        </View>
+      ))}
     </ScrollView>
   );
 }

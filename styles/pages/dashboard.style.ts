@@ -61,8 +61,7 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     borderRadius: 12,
     padding: 14,
-    width: "47%",    
-    
+    width: "47%",
   },
   cardLabel: {
     color: Colors.textLight,
@@ -86,5 +85,30 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     borderRadius: 12,
     padding: 14,
+  },
+
+  //- Dernière vente
+  venteRow: {
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 8,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "95%",
+  },
+  venteName: {
+    color: Colors.text,
+    fontSize: Fonts.sizes.sm,
+  },
+  venteMeta: {
+    color: Colors.textLight,
+    fontSize: Fonts.sizes.xs,
+    marginTop: 2,
+  },
+  ventePrice: {
+    color: Colors.primary,
+    fontSize: Fonts.sizes.md,
   },
 });

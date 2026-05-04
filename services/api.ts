@@ -100,4 +100,12 @@ export const statsService = {
   },
 };
 
+//- Récupération des dernière ventes
+export const venteService = {
+  getRecent: async () => {
+    const { data } = await api.get('/vente/recent')
+    return data
+  },
+}
+
 export default api;
