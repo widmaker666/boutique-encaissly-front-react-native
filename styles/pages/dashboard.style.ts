@@ -81,7 +81,6 @@ export const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 24,
     width: "95%",
-    
   },
   paiementCard: {
     flex: 1,
@@ -117,5 +116,50 @@ export const styles = StyleSheet.create({
   ventePrice: {
     color: Colors.primary,
     fontSize: Fonts.sizes.md,
+  },
+
+  //- Lockbox passer en PRO
+  lockedBox: {
+    backgroundColor: "#f0e8f7",
+    borderRadius: 12,
+    padding: 14,
+    alignItems: "center",
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: Colors.primaryLight,
+    borderStyle: "dashed",
+    width: "95%",
+  },
+  lockedTxt: {
+    color: Colors.primaryDark,
+    fontSize: Fonts.sizes.sm,
+    fontFamily: Fonts.family.nowMedium,
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  upgradeBtn: {
+    backgroundColor: Colors.primary,
+    borderRadius: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+  },
+  upgradeTxt: {
+    color: Colors.surface,
+    fontSize: Fonts.sizes.sm,
+    fontFamily: Fonts.family.nowMedium,
+  },
+
+  infoBox: {
+    backgroundColor: "#f0e8f7",
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 16,
+    width: "95%",
+  },
+  infoTxt: {
+    color: Colors.primaryDark,
+    fontSize: Fonts.sizes.xs,
+    fontFamily: Fonts.family.nowMedium,
+    textAlign: "center",
   },
 });

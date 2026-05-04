@@ -1,4 +1,4 @@
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { statsService, venteService } from "@/services/api";
 import { useAuthStore } from "@/stores/auth.store";
@@ -7,6 +7,8 @@ import { typo } from "@/styles/utils/typography.styles";
 
 export default function DashboardScreen() {
   const user = useAuthStore((state) => state.user);
+  const isGerante = user?.role === "GERANTE";
+  const isPro = user?.plan === "PRO";
 
   const { data, isLoading } = useQuery({
     queryKey: ["stats"],
@@ -47,6 +49,18 @@ export default function DashboardScreen() {
           </Text>
         </View>
       </View>
+
+      {/* Si gérante 1 boutique 3 créatrice max */}
+      {isGerante && (
+        <View style={styles.infoBox}>
+          <Text style={styles.infoTxt}>
+            🏪{" "}
+            {isPro
+              ? "Multi-boutiques · Stats avancées"
+              : "1 boutique · 3 créatrices max"}
+          </Text>
+        </View>
+      )}
 
       {/* Section cards */}
       <Text style={[typo.medium, styles.sectionTitle]}>Ce mois-ci</Text>
@@ -116,6 +130,18 @@ export default function DashboardScreen() {
           </Text>
         </View>
       ))}
+
+      {/* Historique complet pro */}
+      {!isPro && (
+        <View style={styles.lockedBox}>
+          <Text style={styles.lockedTxt}>
+            🔒 Historique complet disponible en PRO
+          </Text>
+          <TouchableOpacity style={styles.upgradeBtn}>
+            <Text style={styles.upgradeTxt}>✨ Passer à PRO — 9€/mois</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </ScrollView>
   );
 }
