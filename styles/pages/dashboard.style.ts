@@ -162,4 +162,18 @@ export const styles = StyleSheet.create({
     fontFamily: Fonts.family.nowMedium,
     textAlign: "center",
   },
+
+  moisBadge: {
+    backgroundColor: "#fff3e0",
+    borderRadius: 8,
+    padding: 8,
+    marginBottom: 14,
+    alignItems: "center",
+    width: "95%",
+  },
+  moisTxt: {
+    color: "#e65100",
+    fontSize: Fonts.sizes.xs,
+    fontFamily: Fonts.family.nowMedium,
+  },
 });

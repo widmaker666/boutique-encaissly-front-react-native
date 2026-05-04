@@ -1,6 +1,6 @@
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { useQuery } from "@tanstack/react-query";
-import { statsService, venteService } from "@/services/api";
+import { boutiqueService, statsService, venteService } from "@/services/api";
 import { useAuthStore } from "@/stores/auth.store";
 import { styles } from "@/styles/pages/dashboard.style";
 import { typo } from "@/styles/utils/typography.styles";
@@ -18,6 +18,12 @@ export default function DashboardScreen() {
   const { data: recentVentes } = useQuery({
     queryKey: ["ventes-recent"],
     queryFn: venteService.getRecent,
+  });
+
+  const { data: boutiqueStats } = useQuery({
+    queryKey: ["boutique-stats"],
+    queryFn: boutiqueService.getStats,
+    enabled: isGerante,
   });
 
   if (isLoading)
@@ -50,13 +56,27 @@ export default function DashboardScreen() {
         </View>
       </View>
 
-      {/* Si gérante 1 boutique 3 créatrice max */}
+      {/* Badge mois en cours — FREE uniquement */}
+      {!isPro && (
+        <View style={styles.moisBadge}>
+          <Text style={styles.moisTxt}>
+            📅{" "}
+            {new Date().toLocaleDateString("fr-FR", {
+              month: "long",
+              year: "numeric",
+            })}{" "}
+            — mois en cours uniquement
+          </Text>
+        </View>
+      )}
+
+      {/* Info boutique — GERANTE uniquement */}
       {isGerante && (
         <View style={styles.infoBox}>
           <Text style={styles.infoTxt}>
             🏪{" "}
             {isPro
-              ? "Multi-boutiques · Stats avancées"
+              ? "Multi-boutiques · Stats avancées · Historique complet"
               : "1 boutique · 3 créatrices max"}
           </Text>
         </View>
@@ -87,11 +107,22 @@ export default function DashboardScreen() {
         </View>
 
         <View style={styles.card}>
-          <Text style={[typo.light, styles.cardLabel]}>Vente max</Text>
+          <Text style={[typo.light, styles.cardLabel]}>Meilleur vente du mois</Text>
           <Text style={[typo.bold, styles.cardValue]}>
             {data?.stats._max.prixVente ?? 0} €
           </Text>
         </View>
+
+        {/* Card créatrices — GERANTE FREE uniquement */}
+        {isGerante && !isPro && (
+          <View style={styles.card}>
+            <Text style={[typo.light, styles.cardLabel]}>Créatrices</Text>
+            <Text style={[typo.bold, styles.cardValue]}>
+              {boutiqueStats?.nbCreatrices ?? 0}/
+              {boutiqueStats?.maxCreatrices ?? 3}
+            </Text>
+          </View>
+        )}
       </View>
 
       {/* Répartition paiements */}

@@ -103,9 +103,16 @@ export const statsService = {
 //- Récupération des dernière ventes
 export const venteService = {
   getRecent: async () => {
-    const { data } = await api.get('/vente/recent')
-    return data
+    const { data } = await api.get("/vente/recent");
+    return data;
   },
-}
+};
+
+export const boutiqueService = {
+  getStats: async () => {
+    const { data } = await api.get("/boutique/stats");
+    return data;
+  },
+};
 
 export default api;
