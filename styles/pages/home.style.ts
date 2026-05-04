@@ -45,8 +45,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 48,
     borderRadius: 12,
     marginBottom: 12,
-    minWidth: "20%",
-    maxWidth: "50%",
+    width: "100%",
     alignItems: "center",
   },
   btnPrimaryText: {
@@ -61,8 +60,7 @@ export const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 48,
     borderRadius: 12,
-    minWidth: "20%",
-    maxWidth: "50%",
+    width: "100%",
     alignItems: "center",
   },
   btnSecondaryText: {

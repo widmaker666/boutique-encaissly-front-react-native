@@ -83,12 +83,13 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    marginTop: 20,
     gap: 12,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
     borderColor: "#DADCE0",
     paddingVertical: 14,
-    borderRadius: 4,
+    borderRadius: 12,
     width: "100%",
     marginBottom: 12,
     shadowColor: "#000",
@@ -97,6 +98,7 @@ export const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
   },
+
   btnGoogleText: {
     color: "#3C4043",
     fontSize: Fonts.sizes.md,
