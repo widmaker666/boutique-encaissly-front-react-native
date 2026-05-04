@@ -18,6 +18,8 @@ import { AntDesign } from "@expo/vector-icons";
 
 export default function RegisterScreen() {
   const [email, setEmail] = useState("");
+  const [nom, setNom] = useState("");
+  const [prenom, setPrenom] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -50,9 +52,17 @@ export default function RegisterScreen() {
       setError("Veuillez remplir tous les champs.");
       return;
     }
+
+    if (password.length < 8) {
+      setError("Le mot de passe doit faire au moins 8 caractères.");
+      return;
+    }
     try {
       setLoading(true);
-      const { accessToken, refreshToken } = await authService.register(
+      //- Crée le compte
+      await authService.register(email, password, nom, prenom);
+      //- Login pour récupérer les tokens
+      const { accessToken, refreshToken } = await authService.login(
         email,
         password,
       );
@@ -85,6 +95,26 @@ export default function RegisterScreen() {
           autoCapitalize="none"
           value={email}
           onChangeText={setEmail}
+        />
+
+        <Text style={styles.label}>Prénom</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Votre prénom"
+          placeholderTextColor={Colors.textLight}
+          autoCapitalize="words"
+          value={prenom}
+          onChangeText={setPrenom}
+        />
+
+        <Text style={styles.label}>Nom</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Votre nom"
+          placeholderTextColor={Colors.textLight}
+          autoCapitalize="words"
+          value={nom}
+          onChangeText={setNom}
         />
 
         <Text style={styles.label}>Mot de passe</Text>

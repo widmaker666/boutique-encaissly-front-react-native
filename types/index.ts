@@ -6,6 +6,8 @@ export type ModePaiement = "ESPECES" | "CARTE";
 export interface User {
   id: string;
   email: string;
+  nom?: string;
+  prenom?: string;
   plan: Plan;
   role: Role;
   notificationsEmail: boolean;

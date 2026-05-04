@@ -52,6 +52,7 @@ export const useGoogleAuth = () => {
   return { request, response, promptAsync };
 };
 
+//- Service de récupération ID pour google et autre
 export const authService = {
   login: async (email: string, password: string) => {
     const { data } = await api.post<{
@@ -61,8 +62,18 @@ export const authService = {
     return data;
   },
 
-  register: async (email: string, password: string) => {
-    const { data } = await api.post("/auth/register", { email, password });
+  register: async (
+    email: string,
+    password: string,
+    nom?: string,
+    prenom?: string,
+  ) => {
+    const { data } = await api.post("/auth/register", {
+      email,
+      password,
+      nom,
+      prenom,
+    });
     return data;
   },
 
@@ -77,6 +88,14 @@ export const authService = {
       accessToken: string;
       refreshToken: string;
     }>("/auth/google/mobile", { accessToken: googleAccessToken });
+    return data;
+  },
+};
+
+//- Récupération des stats
+export const statsService = {
+  getGlobal: async () => {
+    const { data } = await api.get("/stats");
     return data;
   },
 };
