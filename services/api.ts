@@ -1,6 +1,12 @@
 import axios from "axios";
+import * as WebBrowser from "expo-web-browser";
+import * as Google from "expo-auth-session/providers/google";
 import { API_BASE_URL } from "@/constants/api";
 import { useAuthStore } from "@/stores/auth.store";
+import { makeRedirectUri } from "expo-auth-session";
+
+
+WebBrowser.maybeCompleteAuthSession();
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -9,7 +15,7 @@ const api = axios.create({
   },
 });
 
-//− Injecte automatiquement le token JWT dans chaque requête
+//- Injecte automatiquement le token JWT dans chaque requête
 api.interceptors.request.use((config) => {
   const token = useAuthStore.getState().accessToken;
   if (token) {
@@ -18,7 +24,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-//− Gère les 401 globalement (token expiré)
+//- Gère les 401 globalement (token expiré)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -28,5 +34,47 @@ api.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
+
+export const useGoogleAuth = () => {
+  const redirectUri = makeRedirectUri({
+    scheme: "encaissly",
+  });
+
+  console.log(redirectUri)
+
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
+    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    redirectUri,
+  });
+
+  return { request, response, promptAsync };
+};
+
+export const authService = {
+  login: async (email: string, password: string) => {
+    const { data } = await api.post<{
+      accessToken: string;
+      refreshToken: string;
+    }>("/auth/login", { email, password });
+    return data;
+  },
+
+  register: async (email: string, password: string) => {
+    const { data } = await api.post("/auth/register", { email, password });
+    return data;
+  },
+
+  //- Envoie le token Google au backend pour récupérer les JWT Encaissly
+  googleMobile: async (googleAccessToken: string) => {
+    const { data } = await api.post<{
+      accessToken: string;
+      refreshToken: string;
+    }>("/auth/google/mobile", { accessToken: googleAccessToken });
+    return data;
+  },
+};
 
 export default api;
