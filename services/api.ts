@@ -112,6 +112,7 @@ export const venteService = {
   },
 };
 
+//- Les boutiques
 export const boutiqueService = {
   getStats: async () => {
     const { data } = await api.get("/boutique/stats");
@@ -119,6 +120,44 @@ export const boutiqueService = {
   },
   getAvecStats: async () => {
     const { data } = await api.get("/boutique/avec-stats");
+    return data;
+  },
+  getNbBoutiques: async () => {
+    const { data } = await api.get("/boutique/mes-boutiques/count");
+    return data;
+  },
+};
+
+//- Les évênements
+export const evenementService = {
+  getAll: async (creatriceId?: string) => {
+    const { data } = await api.get("/evenement", {
+      params: creatriceId ? { creatriceId } : {},
+    });
+    return data;
+  },
+  getOne: async (id: string) => {
+    const { data } = await api.get(`/evenement/${id}`);
+    return data;
+  },
+  create: async (dto: {
+    nom: string;
+    dateDebut: string;
+    dateFin?: string;
+    creatriceId: string;
+  }) => {
+    const { data } = await api.post("/evenement", dto);
+    return data;
+  },
+  update: async (
+    id: string,
+    dto: Partial<{ nom: string; dateDebut: string; dateFin?: string }>,
+  ) => {
+    const { data } = await api.patch(`/evenement/${id}`, dto);
+    return data;
+  },
+  remove: async (id: string) => {
+    const { data } = await api.delete(`/evenement/${id}`);
     return data;
   },
 };

@@ -40,6 +40,12 @@ export default function DashboardScreen() {
     enabled: isGerante && isPro,
   });
 
+  const { data: mesBoutiques } = useQuery({
+    queryKey: ["mes-boutiques-count"],
+    queryFn: boutiqueService.getNbBoutiques,
+    enabled: !isGerante,
+  });
+
   if (isLoading)
     return (
       <View style={styles.container}>
@@ -65,11 +71,20 @@ export default function DashboardScreen() {
         </Text>
         <View style={styles.badgeWrap}>
           <Text style={styles.badge}>
-            {user?.role} · {user?.plan}
+            {user?.role} · {user?.plan} {isPro ? "✨" : "🔒"}
           </Text>
         </View>
       </View>
-
+      {!isGerante && (
+        <View style={styles.infoBox}>
+          <Text style={styles.infoTxt}>
+            📊{" "}
+            {mesBoutiques?.nbBoutiques > 0
+              ? `Membre de ${mesBoutiques.nbBoutiques} boutique${mesBoutiques.nbBoutiques > 1 ? "s" : ""}`
+              : "Ventes directes — hors boutique"}
+          </Text>
+        </View>
+      )}
       {/* Badge mois en cours — FREE uniquement */}
       {!isPro && (
         <View style={styles.moisBadge}>
@@ -235,7 +250,10 @@ export default function DashboardScreen() {
       {/* Historique 3 mois — PRO uniquement */}
       {isPro && historique && (
         <>
-<Text style={[typo.medium, styles.sectionTitle, { marginTop: 16 }]}>Historique</Text>          {historique.map((item: any) => (
+          <Text style={[typo.medium, styles.sectionTitle, { marginTop: 16 }]}>
+            Historique
+          </Text>{" "}
+          {historique.map((item: any) => (
             <View key={item.mois} style={styles.historiqueRow}>
               <Text style={[typo.regular, styles.historiqueMois]}>
                 {item.mois}
