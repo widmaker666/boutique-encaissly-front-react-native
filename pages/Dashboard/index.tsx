@@ -37,7 +37,9 @@ export default function DashboardScreen() {
       <View style={styles.header}>
         <Text style={[typo.light, styles.greeting]}>Bonjour 👋</Text>
         <Text style={[typo.title, styles.name]}>
-          {user?.prenom ?? ""} {user?.nom ?? user?.email}
+          {user?.prenom && user?.nom
+            ? `${user.prenom} ${user.nom}`
+            : user?.email}
         </Text>
         <View style={styles.badgeWrap}>
           <Text style={styles.badge}>
