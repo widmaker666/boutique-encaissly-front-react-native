@@ -98,6 +98,10 @@ export const statsService = {
     const { data } = await api.get("/stats");
     return data;
   },
+  getHistorique: async () => {
+    const { data } = await api.get("/stats/historique");
+    return data;
+  },
 };
 
 //- Récupération des dernière ventes
@@ -113,6 +117,9 @@ export const boutiqueService = {
     const { data } = await api.get("/boutique/stats");
     return data;
   },
+  getAvecStats: async () => {
+    const { data } = await api.get("/boutique/avec-stats");
+    return data;
+  },
 };
-
 export default api;

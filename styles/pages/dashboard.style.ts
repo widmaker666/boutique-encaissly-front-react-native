@@ -61,7 +61,7 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     borderRadius: 12,
     padding: 14,
-    width: "47%",
+    width: "49%",
     borderWidth: 2,
     borderColor: Colors.primaryLight,
   },
@@ -80,7 +80,6 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 10,
     marginBottom: 24,
-    width: "95%",
   },
   paiementCard: {
     flex: 1,
@@ -100,7 +99,6 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    width: "95%",
     borderWidth: 2,
     borderColor: Colors.primaryLight,
   },
@@ -125,10 +123,9 @@ export const styles = StyleSheet.create({
     padding: 14,
     alignItems: "center",
     marginBottom: 12,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: Colors.primaryLight,
     borderStyle: "dashed",
-    width: "95%",
   },
   lockedTxt: {
     color: Colors.primaryDark,
@@ -137,6 +134,15 @@ export const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: "center",
   },
+
+  lockedDesc: {
+    color: Colors.textLight,
+    fontSize: Fonts.sizes.xs,
+    fontFamily: Fonts.family.nowLight,
+    textAlign: "center",
+    marginBottom: 10,
+  },
+
   upgradeBtn: {
     backgroundColor: Colors.primary,
     borderRadius: 10,
@@ -154,7 +160,6 @@ export const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     marginBottom: 16,
-    width: "95%",
   },
   infoTxt: {
     color: Colors.primaryDark,
@@ -169,11 +174,63 @@ export const styles = StyleSheet.create({
     padding: 8,
     marginBottom: 14,
     alignItems: "center",
-    width: "95%",
   },
   moisTxt: {
     color: "#e65100",
     fontSize: Fonts.sizes.xs,
     fontFamily: Fonts.family.nowMedium,
+  },
+
+  historiqueRow: {
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 8,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: Colors.primaryLight,
+  },
+  historiqueMois: {
+    color: Colors.text,
+    fontSize: Fonts.sizes.sm,
+    textTransform: "capitalize",
+  },
+  historiqueRight: {
+    alignItems: "flex-end",
+  },
+  historiqueCA: {
+    color: Colors.primary,
+    fontSize: Fonts.sizes.md,
+  },
+  historiqueNb: {
+    color: Colors.textLight,
+    fontSize: Fonts.sizes.xs,
+  },
+
+  boutiqueRow: {
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 8,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: Colors.primaryLight,
+  },
+  boutiqueName: {
+    color: Colors.text,
+    fontSize: Fonts.sizes.sm,
+  },
+  boutiqueMeta: {
+    color: Colors.textLight,
+    fontSize: Fonts.sizes.xs,
+    marginTop: 2,
+  },
+  boutiqueCA: {
+    color: Colors.primary,
+    fontSize: Fonts.sizes.md,
   },
 });

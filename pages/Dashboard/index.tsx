@@ -4,6 +4,8 @@ import { boutiqueService, statsService, venteService } from "@/services/api";
 import { useAuthStore } from "@/stores/auth.store";
 import { styles } from "@/styles/pages/dashboard.style";
 import { typo } from "@/styles/utils/typography.styles";
+import { router } from "expo-router";
+import { Colors } from "@/constants/colors";
 
 export default function DashboardScreen() {
   const user = useAuthStore((state) => state.user);
@@ -24,6 +26,18 @@ export default function DashboardScreen() {
     queryKey: ["boutique-stats"],
     queryFn: boutiqueService.getStats,
     enabled: isGerante,
+  });
+
+  const { data: historique } = useQuery({
+    queryKey: ["historique"],
+    queryFn: statsService.getHistorique,
+    enabled: isPro,
+  });
+
+  const { data: boutiques } = useQuery({
+    queryKey: ["boutiques"],
+    queryFn: boutiqueService.getAvecStats,
+    enabled: isGerante && isPro,
   });
 
   if (isLoading)
@@ -82,6 +96,60 @@ export default function DashboardScreen() {
         </View>
       )}
 
+      {isGerante && !isPro && (
+        <View style={styles.lockedBox}>
+          <Text style={styles.lockedTxt}>
+            🏪 Gérez plusieurs boutiques en PRO
+          </Text>
+          <Text style={styles.lockedDesc}>
+            Créez plusieurs boutiques et consultez les stats de chacune
+            séparément.
+          </Text>
+          <TouchableOpacity style={styles.upgradeBtn}>
+            <Text style={styles.upgradeTxt}>✨ Passer à PRO — 9€/mois</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* Boutiques — GERANTE PRO uniquement */}
+      {isGerante && isPro && boutiques && (
+        <>
+          <Text style={[typo.medium, styles.sectionTitle]}>Mes boutiques</Text>
+          {boutiques.map((boutique: any) => (
+            <TouchableOpacity
+              key={boutique.id}
+              style={styles.boutiqueRow}
+              onPress={() => router.push(`/(app)/boutique/${boutique.id}`)}
+            >
+              <View>
+                <Text style={[typo.medium, styles.boutiqueName]}>
+                  {boutique.nom}
+                </Text>
+                <Text style={[typo.light, styles.boutiqueMeta]}>
+                  {boutique.nbCreatrices} créatrices · {boutique.nbVentes}{" "}
+                  ventes : {boutique.ca} €
+                </Text>
+              </View>
+              <View
+                style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+              >
+                <View
+                  style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+                >
+                  <View
+                    style={{ justifyContent: "center", alignItems: "center" }}
+                  >
+                    <Text style={{ color: Colors.primary, fontSize: 22 }}>
+                      ›
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </>
+      )}
+
       {/* Section cards */}
       <Text style={[typo.medium, styles.sectionTitle]}>Ce mois-ci</Text>
       <View style={styles.cardsGrid}>
@@ -107,7 +175,9 @@ export default function DashboardScreen() {
         </View>
 
         <View style={styles.card}>
-          <Text style={[typo.light, styles.cardLabel]}>Meilleur vente du mois</Text>
+          <Text style={[typo.light, styles.cardLabel]}>
+            Meilleur vente du mois
+          </Text>
           <Text style={[typo.bold, styles.cardValue]}>
             {data?.stats._max.prixVente ?? 0} €
           </Text>
@@ -162,11 +232,35 @@ export default function DashboardScreen() {
         </View>
       ))}
 
+      {/* Historique 3 mois — PRO uniquement */}
+      {isPro && historique && (
+        <>
+<Text style={[typo.medium, styles.sectionTitle, { marginTop: 16 }]}>Historique</Text>          {historique.map((item: any) => (
+            <View key={item.mois} style={styles.historiqueRow}>
+              <Text style={[typo.regular, styles.historiqueMois]}>
+                {item.mois}
+              </Text>
+              <View style={styles.historiqueRight}>
+                <Text style={[typo.bold, styles.historiqueCA]}>
+                  {item.ca} €
+                </Text>
+                <Text style={[typo.light, styles.historiqueNb]}>
+                  {item.nbVentes} ventes
+                </Text>
+              </View>
+            </View>
+          ))}
+        </>
+      )}
+
       {/* Historique complet pro */}
       {!isPro && (
         <View style={styles.lockedBox}>
           <Text style={styles.lockedTxt}>
             🔒 Historique complet disponible en PRO
+          </Text>
+          <Text style={styles.lockedDesc}>
+            Accédez à tout votre historique de ventes, sans limite de période.
           </Text>
           <TouchableOpacity style={styles.upgradeBtn}>
             <Text style={styles.upgradeTxt}>✨ Passer à PRO — 9€/mois</Text>
