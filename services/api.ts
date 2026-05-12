@@ -161,4 +161,44 @@ export const evenementService = {
     return data;
   },
 };
+
+//- Creatrices
+export const creatriceService = {
+  getAll: async () => {
+    const { data } = await api.get("/creatrice");
+    return data;
+  },
+  create: async (dto: {
+    nom: string;
+    email?: string;
+    telephone?: string;
+    tauxDeCommission: number;
+  }) => {
+    const { data } = await api.post("/creatrice", dto);
+    return data;
+  },
+  update: async (
+    id: string,
+    dto: Partial<{
+      nom: string;
+      email?: string;
+      telephone?: string;
+      tauxDeCommission: number;
+    }>,
+  ) => {
+    const { data } = await api.patch(`/creatrice/${id}`, dto);
+    return data;
+  },
+  remove: async (id: string) => {
+    const { data } = await api.delete(`/creatrice/${id}`);
+    return data;
+  },
+  invite: async (id: string, email: string, boutiqueId: string) => {
+    const { data } = await api.post(`/creatrice/${id}/invite`, {
+      email,
+      boutiqueId,
+    });
+    return data;
+  },
+};
 export default api;

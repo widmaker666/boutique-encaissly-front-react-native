@@ -1,8 +1,2 @@
-import { View, Text } from "react-native";
-export default function CreatriceScreen() {
-  return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Text>Créatrices</Text>
-    </View>
-  );
-}
+import CreatriceScreen from '@/pages/Creatrice'
+export default CreatriceScreen
