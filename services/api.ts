@@ -110,6 +110,21 @@ export const venteService = {
     const { data } = await api.get("/vente/recent");
     return data;
   },
+  getAll: async (filters?: { creatriceId?: string; modePaiement?: string }) => {
+    const { data } = await api.get("/vente", { params: filters });
+    return data;
+  },
+  create: async (dto: {
+    nomArticle: string;
+    prixVente: number;
+    modePaiement: "ESPECES" | "CARTE";
+    creatriceId: string;
+    boutiqueId?: string;
+    articleId?: string;
+  }) => {
+    const { data } = await api.post("/vente", dto);
+    return data;
+  },
 };
 
 //- Les boutiques

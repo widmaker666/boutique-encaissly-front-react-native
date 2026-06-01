@@ -1,0 +1,499 @@
+import { StyleSheet } from "react-native";
+import { Colors } from "@/constants/colors";
+import { Fonts } from "@/constants/fonts";
+
+const cardShadow = {
+  shadowColor: "#7a41bb",
+  shadowOffset: { width: 0, height: 3 },
+  shadowOpacity: 0.09,
+  shadowRadius: 8,
+  elevation: 3,
+};
+
+const sheetShadow = {
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: -6 },
+  shadowOpacity: 0.12,
+  shadowRadius: 16,
+  elevation: 12,
+};
+
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: Colors.background,
+  },
+
+  // ── HEADER ──────────────────────────────────────
+  header: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 20,
+    paddingBottom: 24,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+  },
+  titre: {
+    fontFamily: Fonts.family.norwester,
+    fontWeight: "800" as const,
+    fontSize: 30,
+    color: "#FFFFFF",
+    letterSpacing: 2,
+  },
+  headerSub: {
+    fontFamily: Fonts.family.nowLight,
+    fontSize: Fonts.sizes.xs,
+    color: "rgba(255,255,255,0.65)",
+    marginTop: 3,
+    letterSpacing: 0.4,
+  },
+  addBtn: {
+    backgroundColor: "rgba(255,255,255,0.18)",
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.32)",
+  },
+  addBtnTxt: {
+    color: "#FFFFFF",
+    fontSize: 24,
+    lineHeight: 28,
+    fontFamily: Fonts.family.nowLight,
+  },
+
+  // ── FILTRES ─────────────────────────────────────
+  filtersWrapper: {
+    flexDirection: "row",
+    paddingHorizontal: 16,
+    marginTop: 14,
+    marginBottom: 8,
+    gap: 8,
+  },
+  chip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: Colors.surface,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    ...cardShadow,
+    shadowOpacity: 0.05,
+  },
+  chipActive: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  chipTxt: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: Fonts.sizes.xs,
+    color: Colors.textLight,
+    letterSpacing: 0.5,
+  },
+  chipTxtActive: {
+    color: "#FFFFFF",
+  },
+
+  // ── LIST ────────────────────────────────────────
+  list: {
+    paddingHorizontal: 16,
+    paddingTop: 4,
+    paddingBottom: 32,
+  },
+
+  // ── CARD VENTE ──────────────────────────────────
+  card: {
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 10,
+    ...cardShadow,
+  },
+  cardRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  cardLeft: {
+    flex: 1,
+    paddingRight: 12,
+  },
+  cardNomArticle: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: Fonts.sizes.sm,
+    color: Colors.text,
+    marginBottom: 4,
+  },
+  cardCreatrice: {
+    fontFamily: Fonts.family.nowLight,
+    fontSize: Fonts.sizes.xs,
+    color: Colors.textLight,
+  },
+  cardRight: {
+    alignItems: "flex-end",
+  },
+  cardPrix: {
+    fontFamily: Fonts.family.nowBold,
+    fontSize: Fonts.sizes.md,
+    color: Colors.success,
+    marginBottom: 6,
+  },
+  badgePaiement: {
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  badgeEspeces: {
+    backgroundColor: "#FFF3E0",
+  },
+  badgeCarte: {
+    backgroundColor: "#E0EDFF",
+  },
+  badgeTxt: {
+    fontFamily: Fonts.family.nowBold,
+    fontSize: 10,
+    letterSpacing: 0.4,
+  },
+  badgeTxtEspeces: {
+    color: "#C47D00",
+  },
+  badgeTxtCarte: {
+    color: "#2962B8",
+  },
+  cardDate: {
+    fontFamily: Fonts.family.nowLight,
+    fontSize: 11,
+    color: Colors.textLight,
+    marginTop: 8,
+  },
+
+  // ── EMPTY STATE ─────────────────────────────────
+  emptyContainer: {
+    alignItems: "center",
+    marginTop: 60,
+  },
+  emptyIcon: {
+    fontSize: 40,
+    marginBottom: 12,
+  },
+  emptyTxt: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: Fonts.sizes.sm,
+    color: Colors.textLight,
+    marginBottom: 6,
+  },
+  emptySub: {
+    fontFamily: Fonts.family.nowLight,
+    fontSize: Fonts.sizes.xs,
+    color: Colors.textLight,
+    textAlign: "center",
+  },
+
+  // ── BOTTOM SHEET ─────────────────────────────────
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    justifyContent: "flex-end",
+  },
+  sheet: {
+    backgroundColor: Colors.surface,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: "85%",
+    ...sheetShadow,
+  },
+  sheetHandle: {
+    width: 40,
+    height: 4,
+    backgroundColor: Colors.border,
+    borderRadius: 2,
+    alignSelf: "center",
+    marginTop: 12,
+    marginBottom: 4,
+  },
+  sheetHeader: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  sheetTitre: {
+    fontFamily: Fonts.family.norwester,
+    fontSize: 18,
+    color: Colors.primaryDark,
+    letterSpacing: 1,
+  },
+  sheetClose: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: Colors.background,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sheetCloseTxt: {
+    fontFamily: Fonts.family.nowBold,
+    fontSize: 16,
+    color: Colors.textLight,
+    lineHeight: 20,
+  },
+  sheetScroll: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
+
+  // ── STEPS ────────────────────────────────────────
+  stepIndicator: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 18,
+    marginBottom: 16,
+  },
+  stepBubble: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 10,
+  },
+  stepBubbleActive: {
+    backgroundColor: Colors.primary,
+  },
+  stepBubbleInactive: {
+    backgroundColor: Colors.border,
+  },
+  stepNum: {
+    fontFamily: Fonts.family.nowBold,
+    fontSize: 13,
+    color: "#FFFFFF",
+  },
+  stepLabel: {
+    fontFamily: Fonts.family.norwester,
+    fontSize: 14,
+    letterSpacing: 1,
+  },
+  stepLabelActive: {
+    color: Colors.primaryDark,
+  },
+  stepLabelInactive: {
+    color: Colors.textLight,
+  },
+
+  // ── CRÉATRICE ROW ────────────────────────────────
+  creatriceRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  creatriceRowSelected: {
+    backgroundColor: Colors.primaryLight + "12",
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    borderBottomWidth: 0,
+    marginBottom: 2,
+  },
+  creatriceAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+    flexShrink: 0,
+  },
+  creatriceAvatarTxt: {
+    fontFamily: Fonts.family.nowBold,
+    fontSize: 12,
+    color: Colors.primaryDark,
+    letterSpacing: 0.5,
+  },
+  creatriceNom: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: Fonts.sizes.sm,
+    color: Colors.text,
+    flex: 1,
+  },
+  creatriceArrow: {
+    fontFamily: Fonts.family.nowLight,
+    fontSize: 18,
+    color: Colors.primaryLight,
+  },
+
+  // ── ARTICLES ─────────────────────────────────────
+  articlesSection: {
+    marginTop: 16,
+  },
+  articlesSectionTitle: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: Fonts.sizes.xs,
+    color: Colors.textLight,
+    letterSpacing: 0.8,
+    marginBottom: 8,
+    textTransform: "uppercase",
+  },
+  articleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  articleNom: {
+    fontFamily: Fonts.family.nowRegular,
+    fontSize: Fonts.sizes.sm,
+    color: Colors.text,
+    flex: 1,
+  },
+  articlePrix: {
+    fontFamily: Fonts.family.nowBold,
+    fontSize: Fonts.sizes.sm,
+    color: Colors.success,
+    marginRight: 10,
+  },
+  articleSelectBtn: {
+    backgroundColor: Colors.primary,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+  },
+  articleSelectTxt: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: 11,
+    color: "#FFFFFF",
+  },
+  noArticleTxt: {
+    fontFamily: Fonts.family.nowLight,
+    fontSize: Fonts.sizes.xs,
+    color: Colors.textLight,
+    marginTop: 8,
+    textAlign: "center",
+  },
+
+  // ── FORMULAIRE ───────────────────────────────────
+  formGroup: {
+    marginBottom: 18,
+  },
+  formLabel: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: Fonts.sizes.xs,
+    color: Colors.textLight,
+    letterSpacing: 0.8,
+    marginBottom: 7,
+    textTransform: "uppercase",
+  },
+  formInput: {
+    backgroundColor: Colors.background,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 13,
+    fontFamily: Fonts.family.nowRegular,
+    fontSize: Fonts.sizes.sm,
+    color: Colors.text,
+    borderWidth: 1.5,
+    borderColor: "transparent",
+  },
+  formInputFocus: {
+    borderColor: Colors.primary,
+  },
+  modePaiementRow: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  modeChip: {
+    flex: 1,
+    paddingVertical: 13,
+    borderRadius: 12,
+    alignItems: "center",
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    backgroundColor: Colors.surface,
+  },
+  modeChipActive: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primary + "12",
+  },
+  modeChipTxt: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: Fonts.sizes.xs,
+    color: Colors.textLight,
+    letterSpacing: 0.5,
+  },
+  modeChipTxtActive: {
+    color: Colors.primaryDark,
+  },
+
+  // ── SUBMIT ───────────────────────────────────────
+  submitBtn: {
+    backgroundColor: Colors.primary,
+    borderRadius: 14,
+    paddingVertical: 16,
+    alignItems: "center",
+    marginTop: 8,
+    ...cardShadow,
+    shadowOpacity: 0.2,
+  },
+  submitBtnDisabled: {
+    opacity: 0.5,
+  },
+  submitTxt: {
+    fontFamily: Fonts.family.norwester,
+    fontSize: 15,
+    color: "#FFFFFF",
+    letterSpacing: 1.5,
+  },
+  backBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 4,
+    marginTop: 8,
+  },
+  backBtnTxt: {
+    fontFamily: Fonts.family.nowLight,
+    fontSize: Fonts.sizes.xs,
+    color: Colors.primaryLight,
+    marginLeft: 4,
+  },
+
+  // ── INFO CREATRICE SELECTIONNEE ──────────────────
+  selectedCreatriceBanner: {
+    backgroundColor: Colors.primaryLight + "18",
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 18,
+  },
+  selectedCreatriceBannerTxt: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: Fonts.sizes.xs,
+    color: Colors.primaryDark,
+    flex: 1,
+    marginLeft: 8,
+  },
+});
+
+export const AVATAR_COLORS = [
+  "#EDE0F7",
+  "#E0EDFF",
+  "#E0F7EF",
+  "#FFF3E0",
+  "#FCE4EC",
+];
+
+export const getAvatarColor = (index: number) =>
+  AVATAR_COLORS[index % AVATAR_COLORS.length];
