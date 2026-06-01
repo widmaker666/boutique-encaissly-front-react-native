@@ -266,18 +266,21 @@ export default function ArticlesScreen() {
   }, []);
 
   const handleImport = async () => {
+    //- '*/*' nécessaire sur iOS — MIME types Excel/CSV varient selon l'appareil
     const result = await DocumentPicker.getDocumentAsync({
-      type: [
-        "text/csv",
-        "application/vnd.ms-excel",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      ],
+      type: "*/*",
       copyToCacheDirectory: true,
     });
 
     if (result.canceled) return;
 
     const asset = result.assets[0];
+    const ext = asset.name.split(".").pop()?.toLowerCase();
+    if (!ext || !["csv", "xlsx", "xls"].includes(ext)) {
+      Alert.alert("Format invalide", "Seuls les fichiers CSV et Excel (.xlsx, .xls) sont acceptés.");
+      return;
+    }
+
     try {
       const res = await articleService.importFile(
         asset.uri,
@@ -287,8 +290,9 @@ export default function ArticlesScreen() {
       );
       Alert.alert("Import réussi ✓", res.message);
       queryClient.invalidateQueries({ queryKey: ["articles", creatriceId] });
-    } catch {
-      Alert.alert("Erreur", "Impossible d'importer le fichier.");
+    } catch (e: any) {
+      const msg = e?.response?.data?.message ?? "Impossible d'importer le fichier.";
+      Alert.alert("Erreur import", msg);
     }
   };
 
