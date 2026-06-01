@@ -27,6 +27,7 @@ export const typo = StyleSheet.create({
   },
   title: {
     fontFamily: Fonts.family.norwester,
+    fontWeight: "800" as const,
     fontSize: Fonts.sizes.xl,
   },
 });

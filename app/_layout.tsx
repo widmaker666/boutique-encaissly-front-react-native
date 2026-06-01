@@ -14,6 +14,7 @@ export default function RootLayout() {
 
   const [fontsLoaded] = useFonts({
     Norwester: require("@/assets/fonts/norwester.otf"),
+    Urbanist: require("@/assets/fonts/Urbanist-VariableFont_wght.ttf"),
     "Now-Thin": require("@/assets/fonts/Now-Thin.otf"),
     "Now-Light": require("@/assets/fonts/Now-Light.otf"),
     "Now-Regular": require("@/assets/fonts/Now-Regular.otf"),

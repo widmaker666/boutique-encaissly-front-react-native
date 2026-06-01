@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx expo*)",
+      "Bash(npm run start*)",
+      "Bash(npm run build*)",
+      "Bash(npx prisma*)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\Alexandre\\Desktop\\Appli_compta_goodthing\\boutique-backend"
+    ]
+  }
+}

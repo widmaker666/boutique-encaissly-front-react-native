@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Encaissly — Agents & Skills Claude Code</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple: #7a41bb;
+      --purple-light: #b98ae0;
+      --purple-dark: #5a2e8a;
+      --purple-bg: #f5f0ff;
+      --purple-border: #e0d0f5;
+      --text: #1a1a2e;
+      --text-light: #5a5a7a;
+      --surface: #ffffff;
+      --surface-2: #fafafa;
+      --border: #e8e8f0;
+      --green: #00a86b;
+      --green-bg: #f0fff8;
+      --orange: #f07000;
+      --orange-bg: #fff8f0;
+      --red: #cc2222;
+      --red-bg: #fff0f0;
+      --blue: #1a6fc4;
+      --blue-bg: #f0f6ff;
+      --code-bg: #f4f0ff;
+    }
+
+    body {
+      font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+      background: var(--surface-2);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    /* HEADER */
+    header {
+      background: linear-gradient(135deg, var(--purple-dark) 0%, var(--purple) 60%, var(--purple-light) 100%);
+      color: white;
+      padding: 48px 40px 36px;
+    }
+    header .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    header h1 { font-size: 36px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+    header p { font-size: 16px; opacity: 0.85; max-width: 600px; }
+    header .meta { margin-top: 20px; display: flex; gap: 24px; flex-wrap: wrap; }
+    header .meta span { font-size: 13px; opacity: 0.75; }
+    header .meta strong { opacity: 1; font-weight: 600; }
+
+    /* NAV */
+    nav {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+    }
+    nav ul { display: flex; gap: 0; list-style: none; }
+    nav a {
+      display: block;
+      padding: 14px 20px;
+      color: var(--text-light);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    nav a:hover { color: var(--purple); border-bottom-color: var(--purple-light); }
+
+    /* LAYOUT */
+    .container { max-width: 1100px; margin: 0 auto; padding: 40px 40px 80px; }
+
+    /* SECTION */
+    section { margin-bottom: 60px; }
+    section > h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--purple-border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    section > h2 .icon { font-size: 20px; }
+
+    /* CARDS GRID */
+    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+
+    /* AGENT CARD */
+    .card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+    .card:hover { box-shadow: 0 4px 20px rgba(122,65,187,0.12); }
+
+    .card-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .card-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .icon-purple { background: var(--purple-bg); }
+    .icon-green  { background: var(--green-bg); }
+    .icon-red    { background: var(--red-bg); }
+    .icon-blue   { background: var(--blue-bg); }
+    .icon-orange { background: var(--orange-bg); }
+
+    .card-title { flex: 1; }
+    .card-title h3 { font-size: 17px; font-weight: 700; margin-bottom: 3px; }
+    .card-title .subtitle { font-size: 12px; color: var(--text-light); }
+
+    .model-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .model-sonnet { background: var(--purple-bg); color: var(--purple-dark); }
+    .model-opus   { background: var(--red-bg); color: var(--red); }
+    .model-haiku  { background: var(--green-bg); color: var(--green); }
+
+    .card-body { padding: 20px 24px; }
+    .card-body p { color: var(--text-light); font-size: 14px; margin-bottom: 16px; line-height: 1.5; }
+
+    .tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+    .tag {
+      font-size: 12px;
+      background: var(--purple-bg);
+      color: var(--purple-dark);
+      border: 1px solid var(--purple-border);
+      border-radius: 6px;
+      padding: 3px 10px;
+    }
+    .tag.green { background: var(--green-bg); color: var(--green); border-color: #b0f0d8; }
+    .tag.orange { background: var(--orange-bg); color: var(--orange); border-color: #ffd0a0; }
+
+    .rule-list { list-style: none; }
+    .rule-list li {
+      font-size: 13px;
+      color: var(--text);
+      padding: 5px 0 5px 20px;
+      position: relative;
+      border-bottom: 1px solid var(--border);
+    }
+    .rule-list li:last-child { border-bottom: none; }
+    .rule-list li::before { content: "→"; position: absolute; left: 0; color: var(--purple-light); }
+
+    /* SKILL CARDS */
+    .skill-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      transition: box-shadow 0.2s;
+    }
+    .skill-card:hover { box-shadow: 0 4px 20px rgba(122,65,187,0.1); }
+    .skill-icon {
+      width: 40px; height: 40px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .skill-info { flex: 1; }
+    .skill-info h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .skill-info .cmd {
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      background: var(--code-bg);
+      color: var(--purple-dark);
+      padding: 2px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+    .skill-info p { font-size: 13px; color: var(--text-light); line-height: 1.5; }
+
+    /* MCP TABLE */
+    table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+    th { background: var(--purple-bg); color: var(--purple-dark); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; padding: 12px 20px; text-align: left; font-weight: 700; }
+    td { padding: 14px 20px; font-size: 14px; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+    td code {
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      background: var(--code-bg);
+      color: var(--purple-dark);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+    .status-ok { color: var(--green); font-weight: 600; font-size: 13px; }
+    .status-warn { color: var(--orange); font-weight: 600; font-size: 13px; }
+
+    /* ALERT BOXES */
+    .alert {
+      border-radius: 10px;
+      padding: 16px 20px;
+      font-size: 14px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .alert-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .alert-purple { background: var(--purple-bg); border: 1px solid var(--purple-border); color: var(--purple-dark); }
+    .alert-orange { background: var(--orange-bg); border: 1px solid #ffd0a0; color: #7a4000; }
+    .alert-green { background: var(--green-bg); border: 1px solid #b0f0d8; color: #006040; }
+
+    /* WORKFLOW */
+    .workflow {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .workflow-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .workflow-step:last-child { border-bottom: none; }
+    .step-num {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--purple);
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .step-content h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .step-content p { font-size: 13px; color: var(--text-light); }
+    .step-content code {
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      background: var(--code-bg);
+      color: var(--purple-dark);
+      padding: 1px 6px;
+      border-radius: 3px;
+    }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 30px;
+      font-size: 13px;
+      color: var(--text-light);
+      border-top: 1px solid var(--border);
+      background: white;
+    }
+    footer strong { color: var(--purple); }
+
+    @media (max-width: 700px) {
+      header, .container, nav { padding-left: 20px; padding-right: 20px; }
+      .cards { grid-template-columns: 1fr; }
+      header h1 { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="badge">Documentation Claude Code</div>
+  <h1>Encaissly — Agents &amp; Skills</h1>
+  <p>Référence complète des agents spécialisés, skills et serveurs MCP configurés pour le projet Encaissly (mobile + backend).</p>
+  <div class="meta">
+    <span><strong>Projet :</strong> encaissly-mobile + boutique-backend</span>
+    <span><strong>Mis à jour :</strong> Juin 2026</span>
+    <span><strong>Stack :</strong> Expo 54 · NestJS 11 · Prisma 7</span>
+  </div>
+</header>
+
+<nav>
+  <ul>
+    <li><a href="#agents">Agents</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#mcp">Serveurs MCP</a></li>
+    <li><a href="#workflow">Workflow</a></li>
+    <li><a href="#regles">Règles globales</a></li>
+  </ul>
+</nav>
+
+<div class="container">
+
+  <!-- ===== AGENTS ===== -->
+  <section id="agents">
+    <h2><span class="icon">🤖</span> Agents spécialisés</h2>
+
+    <div class="alert alert-purple">
+      <span class="alert-icon">💡</span>
+      <div>Les agents sont définis dans <code>.claude/agents/</code>. Claude Code les sélectionne automatiquement selon le contexte, ou tu peux les cibler avec <strong>@agent-name</strong> dans ton message.</div>
+    </div>
+
+    <div class="cards">
+
+      <!-- NESTJS -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-purple">🏗️</div>
+          <div class="card-title">
+            <h3>nestjs</h3>
+            <div class="subtitle">Expert backend NestJS + Prisma</div>
+          </div>
+          <span class="model-badge model-sonnet">Sonnet 4.6</span>
+        </div>
+        <div class="card-body">
+          <p>Spécialiste du backend <code>boutique-backend</code>. Gère les modules NestJS, services, controllers, DTOs, guards, schéma Prisma et migrations.</p>
+          <div class="tag-list">
+            <span class="tag">NestJS v11</span>
+            <span class="tag">Prisma v7</span>
+            <span class="tag">TypeScript strict</span>
+            <span class="tag">REST API</span>
+            <span class="tag">Guards</span>
+            <span class="tag green">Context7</span>
+          </div>
+          <ul class="rule-list">
+            <li>Chemin backend : <code>boutique-backend/</code></li>
+            <li>Spawne subagents Haiku pour lecture parallèle</li>
+            <li>Vérifie <code>npx tsc --noEmit</code> après chaque modif</li>
+            <li>Style caveman intégré (réponses courtes)</li>
+            <li>Confirmation obligatoire avant commit/push</li>
+            <li>Conventions : <code>private readonly</code>, <code>//-</code> commentaires</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- REACT NATIVE -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-blue">📱</div>
+          <div class="card-title">
+            <h3>react-native</h3>
+            <div class="subtitle">Expert mobile Expo + React Native</div>
+          </div>
+          <span class="model-badge model-sonnet">Sonnet 4.6</span>
+        </div>
+        <div class="card-body">
+          <p>Spécialiste du mobile <code>encaissly-mobile</code>. Gère pages, composants, styles, navigation Expo Router, TanStack Query et store Zustand.</p>
+          <div class="tag-list">
+            <span class="tag">Expo v54</span>
+            <span class="tag">React Native 0.81</span>
+            <span class="tag">Expo Router</span>
+            <span class="tag">TanStack Query</span>
+            <span class="tag">Zustand</span>
+            <span class="tag green">Context7</span>
+            <span class="tag orange">frontend-design</span>
+          </div>
+          <ul class="rule-list">
+            <li>Jamais de styles inline → tout dans <code>styles/pages/</code></li>
+            <li>Tokens : <code>Colors</code>, <code>Fonts</code>, <code>typo</code></li>
+            <li>Active <code>/frontend-design</code> pour les nouveaux écrans</li>
+            <li>Gère les 4 cas : GERANTE/CREATRICE × FREE/PRO</li>
+            <li>Mockup ASCII avant de coder un nouvel écran</li>
+            <li>Confirmation obligatoire avant commit/push</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- SECURITY -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-red">🔐</div>
+          <div class="card-title">
+            <h3>security</h3>
+            <div class="subtitle">Sécurité · RGPD · Auth</div>
+          </div>
+          <span class="model-badge model-opus">Opus 4.8</span>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-orange" style="margin-bottom:14px; padding: 10px 14px; font-size:13px;">
+            <span class="alert-icon">⚠️</span>
+            <div>Modèle Opus — coûteux. Réserver aux features sensibles uniquement.</div>
+          </div>
+          <p>Audit et implémentation des mécanismes d'authentification JWT, autorisation, protection des données et conformité RGPD.</p>
+          <div class="tag-list">
+            <span class="tag">JWT / OAuth</span>
+            <span class="tag">Guards NestJS</span>
+            <span class="tag">RGPD</span>
+            <span class="tag">bcrypt</span>
+            <span class="tag">class-validator</span>
+            <span class="tag">Throttling</span>
+          </div>
+          <ul class="rule-list">
+            <li>Auth, refresh tokens, Google OAuth</li>
+            <li>Guards et rôles GERANTE/CREATRICE</li>
+            <li>Validation inputs (DTO + class-validator)</li>
+            <li>Données sensibles jamais retournées en réponse</li>
+            <li>Rapport : CRITIQUE / ÉLEVÉ / MOYEN / INFO</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- DOC WRITER -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-green">📝</div>
+          <div class="card-title">
+            <h3>doc-writer</h3>
+            <div class="subtitle">Rédacteur documentation projet</div>
+          </div>
+          <span class="model-badge model-haiku">Haiku 4.5</span>
+        </div>
+        <div class="card-body">
+          <p>Met à jour automatiquement <code>docs/agents-skills.html</code> et <code>docs/AGENTS.md</code> quand un agent ou skill est ajouté, modifié ou supprimé.</p>
+          <div class="tag-list">
+            <span class="tag green">Haiku (économique)</span>
+            <span class="tag">HTML</span>
+            <span class="tag">Markdown</span>
+          </div>
+          <ul class="rule-list">
+            <li>Lit les fichiers <code>.claude/agents/</code> et <code>.claude/commands/</code></li>
+            <li>Met à jour les deux docs en parallèle</li>
+            <li>Ne touche pas au code métier</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===== SKILLS ===== -->
+  <section id="skills">
+    <h2><span class="icon">⚡</span> Skills (commandes /)</h2>
+
+    <div class="alert alert-green" style="margin-bottom: 24px;">
+      <span class="alert-icon">✅</span>
+      <div>Les skills s'invoquent avec <strong>/nom-du-skill</strong> dans le chat. Ceux marqués <em>caveman</em> réduisent la consommation de tokens d'environ 75%.</div>
+    </div>
+
+    <h3 style="font-size:16px; font-weight:700; margin-bottom:14px; color:var(--text-light); text-transform:uppercase; letter-spacing:0.5px; font-size:12px;">Skills projet (custom)</h3>
+    <div class="cards" style="margin-bottom:28px;">
+
+      <div class="skill-card">
+        <div class="skill-icon icon-purple">🔍</div>
+        <div class="skill-info">
+          <h3>feature</h3>
+          <span class="cmd">/feature &lt;nom&gt;</span>
+          <p>Spawne 2 subagents Haiku en parallèle : un lit les fichiers mobile (page, style, service), l'autre lit le backend (service, controller, DTOs). Retourne un état des lieux des deux côtés avec les incohérences.</p>
+        </div>
+      </div>
+
+      <div class="skill-card">
+        <div class="skill-icon icon-blue">🔄</div>
+        <div class="skill-info">
+          <h3>sync-types</h3>
+          <span class="cmd">/sync-types</span>
+          <p>Compare <code>types/index.ts</code> mobile avec le schéma Prisma et les DTOs NestJS. Affiche un tableau Markdown par entité avec le statut de chaque champ (✅ ok / ⚠️ manquant / ❌ incompatible).</p>
+        </div>
+      </div>
+
+    </div>
+
+    <h3 style="font-size:12px; font-weight:700; margin-bottom:14px; color:var(--text-light); text-transform:uppercase; letter-spacing:0.5px;">Skills Caveman (économie de tokens)</h3>
+    <div class="cards" style="margin-bottom:28px;">
+
+      <div class="skill-card">
+        <div class="skill-icon icon-orange">🗿</div>
+        <div class="skill-info">
+          <h3>caveman</h3>
+          <span class="cmd">/caveman</span>
+          <p>Active le mode communication ultra-compressé. Niveaux : <code>lite</code>, <code>full</code> (défaut), <code>ultra</code>. Coupe ~75% des tokens. Désactiver avec "stop caveman".</p>
+        </div>
+      </div>
+
+      <div class="skill-card">
+        <div class="skill-icon icon-orange">📝</div>
+        <div class="skill-info">
+          <h3>caveman-commit</h3>
+          <span class="cmd">/caveman-commit</span>
+          <p>Génère des messages de commit Conventional Commits ultra-courts. Sujet ≤ 50 chars, body uniquement si le "pourquoi" n'est pas évident.</p>
+        </div>
+      </div>
+
+      <div class="skill-card">
+        <div class="skill-icon icon-orange">👁️</div>
+        <div class="skill-info">
+          <h3>caveman-review</h3>
+          <span class="cmd">/caveman-review</span>
+          <p>Code review ultra-compressé. Un commentaire = une ligne : localisation + problème + fix. Zéro bruit.</p>
+        </div>
+      </div>
+
+      <div class="skill-card">
+        <div class="skill-icon icon-orange">🗜️</div>
+        <div class="skill-info">
+          <h3>caveman-compress</h3>
+          <span class="cmd">/caveman-compress &lt;fichier&gt;</span>
+          <p>Compresse un fichier mémoire (CLAUDE.md, todos) en format caveman pour réduire les tokens d'entrée. Sauvegarde un backup <code>.original.md</code>.</p>
+        </div>
+      </div>
+
+      <div class="skill-card">
+        <div class="skill-icon icon-orange">👥</div>
+        <div class="skill-info">
+          <h3>cavecrew</h3>
+          <span class="cmd">/cavecrew</span>
+          <p>Guide de délégation aux subagents caveman. Décide quand spawner <code>investigator</code> (localiser du code), <code>builder</code> (éditer 1-2 fichiers) ou <code>reviewer</code> (relire un diff). Output compressé à ~60%.</p>
+        </div>
+      </div>
+
+      <div class="skill-card">
+        <div class="skill-icon icon-orange">📊</div>
+        <div class="skill-info">
+          <h3>caveman-stats</h3>
+          <span class="cmd">/caveman-stats</span>
+          <p>Affiche la consommation réelle de tokens de la session et les économies estimées. Lit directement les logs de session Claude Code.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <h3 style="font-size:12px; font-weight:700; margin-bottom:14px; color:var(--text-light); text-transform:uppercase; letter-spacing:0.5px;">Skills Design (Anthropic official)</h3>
+    <div class="cards">
+      <div class="skill-card">
+        <div class="skill-icon icon-purple">🎨</div>
+        <div class="skill-info">
+          <h3>frontend-design</h3>
+          <span class="cmd">/frontend-design</span>
+          <p>Génère des interfaces production-grade avec une direction artistique forte. Évite les patterns IA génériques (Inter font, gradients violet, layouts clichés). Activé automatiquement par l'agent <code>react-native</code> pour chaque nouvel écran.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MCP ===== -->
+  <section id="mcp">
+    <h2><span class="icon">🔌</span> Serveurs MCP</h2>
+
+    <p style="color:var(--text-light); font-size:14px; margin-bottom:20px;">Configurés dans <code>.mcp.json</code> à la racine du projet. Rechargement requis après modification.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Serveur</th>
+          <th>Package</th>
+          <th>Rôle</th>
+          <th>Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>context7</strong></td>
+          <td><code>@upstash/context7-mcp</code></td>
+          <td>Documentation à jour en temps réel pour Expo, React Native, NestJS, Prisma, TanStack Query. Évite les réponses basées sur des APIs obsolètes.</td>
+          <td><span class="status-ok">✓ Actif</span></td>
+        </tr>
+        <tr>
+          <td><strong>filesystem</strong></td>
+          <td><code>@modelcontextprotocol/server-filesystem</code></td>
+          <td>Accès aux deux projets depuis une seule session Claude Code : <code>encaissly-mobile/</code> et <code>boutique-backend/</code>.</td>
+          <td><span class="status-warn">⟳ Connecting</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ===== WORKFLOW ===== -->
+  <section id="workflow">
+    <h2><span class="icon">🔄</span> Workflow recommandé</h2>
+
+    <p style="color:var(--text-light); font-size:14px; margin-bottom:20px;">Pour chaque nouvelle feature full-stack :</p>
+
+    <div class="workflow">
+      <div class="workflow-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Lancer /feature</h4>
+          <p>Tape <code>/feature &lt;nom&gt;</code> pour avoir un état des lieux complet des deux côtés (mobile + backend) avant de toucher au code.</p>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Backend d'abord (agent nestjs)</h4>
+          <p>Modifie le service/controller backend. L'agent vérifie <code>tsc --noEmit</code> après chaque changement.</p>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Vérifier /sync-types</h4>
+          <p>Lance <code>/sync-types</code> pour s'assurer que les types mobile sont alignés avec les nouveaux DTOs backend.</p>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Mobile ensuite (agent react-native)</h4>
+          <p>Implémente l'écran/composant mobile. L'agent demande un mockup ASCII en premier pour les nouveaux écrans.</p>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h4>Commit avec caveman-commit</h4>
+          <p>L'agent demande confirmation. Utilise <code>/caveman-commit</code> pour un message de commit propre et concis.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== RÈGLES ===== -->
+  <section id="regles">
+    <h2><span class="icon">📋</span> Règles globales de tous les agents</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-red">🚫</div>
+          <div class="card-title"><h3>Jamais sans confirmation</h3></div>
+        </div>
+        <div class="card-body">
+          <ul class="rule-list">
+            <li>Aucun <code>git commit</code> sans validation explicite</li>
+            <li>Aucun <code>git push</code> sans validation explicite</li>
+            <li>Le diff est toujours affiché avant de demander</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-green">✅</div>
+          <div class="card-title"><h3>Vérification TypeScript</h3></div>
+        </div>
+        <div class="card-body">
+          <ul class="rule-list">
+            <li><code>npx tsc --noEmit</code> après chaque modification</li>
+            <li>Zéro erreur TS avant de continuer</li>
+            <li>Si erreur → corrige d'abord, code après</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-orange">💰</div>
+          <div class="card-title"><h3>Économie de tokens</h3></div>
+        </div>
+        <div class="card-body">
+          <ul class="rule-list">
+            <li>Haiku pour lecture de fichiers (subagents)</li>
+            <li>Sonnet pour code et analyse</li>
+            <li>Opus uniquement pour la sécurité</li>
+            <li>Style caveman dans tous les agents</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <p>Documentation générée pour <strong>Encaissly</strong> · Claude Code · Juin 2026</p>
+</footer>
+
+</body>
+</html>

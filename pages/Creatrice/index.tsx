@@ -15,6 +15,7 @@ import { typo } from "@/styles/utils/typography.styles";
 import { Colors } from "@/constants/colors";
 import { styles, getAvatarColor } from "@/styles/pages/creatrice.style";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import ModalCreation from "@/components/Creatrice/ModalCreation";
 
 //- Card animée avec délai
 function AnimCard({
@@ -63,6 +64,7 @@ export default function CreatriceScreen() {
   const isGerante = user?.role === "GERANTE";
   const isPro = user?.plan === "PRO";
   const [search, setSearch] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
 
   const headerAnim = useRef(new Animated.Value(0)).current;
   const searchAnim = useRef(new Animated.Value(0)).current;
@@ -123,13 +125,17 @@ export default function CreatriceScreen() {
         ]}
       >
         <View>
-          <Text style={styles.titre}>CRÉATRICES</Text>
+          <Text style={styles.titre}>CREATRICES</Text>
           <Text style={styles.headerSub}>
             {count} créatrice{count > 1 ? "s" : ""} · {user?.plan ?? "FREE"}
           </Text>
         </View>
         {isGerante && (
-          <TouchableOpacity style={styles.addBtn} activeOpacity={0.8}>
+          <TouchableOpacity
+            style={styles.addBtn}
+            activeOpacity={0.8}
+            onPress={() => setModalVisible(true)}
+          >
             <Text style={styles.addBtnTxt}>+</Text>
           </TouchableOpacity>
         )}
@@ -219,6 +225,11 @@ export default function CreatriceScreen() {
           </AnimCard>
         )}
       </ScrollView>
+
+      <ModalCreation
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+      />
     </View>
   );
 }

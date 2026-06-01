@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Animated,
 } from "react-native";
 import { router } from "expo-router";
 import { styles } from "@/styles/pages/login.style";
@@ -23,6 +24,24 @@ export default function LoginScreen() {
 
   const { setTokens, setUser } = useAuthStore();
   const { request, response, promptAsync } = useGoogleAuth();
+
+  const headerAnim = useRef(new Animated.Value(0)).current;
+  const formAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.stagger(120, [
+      Animated.timing(headerAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(formAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
 
   //- Récupère le token Google et l'envoie au backend
   useEffect(() => {
@@ -66,67 +85,90 @@ export default function LoginScreen() {
     }
   };
 
+  const slideUp = (anim: Animated.Value) => ({
+    opacity: anim,
+    transform: [
+      {
+        translateY: anim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [20, 0],
+        }),
+      },
+    ],
+  });
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <Text style={styles.titre}>Connexion</Text>
-      <Text style={styles.sousTitre}>
-        Bienvenue — connectez-vous à votre boutique.
-      </Text>
+      <Animated.View style={slideUp(headerAnim)}>
+        <Text style={styles.titre}>Connexion</Text>
+        <Text style={styles.sousTitre}>
+          Bienvenue — connectez-vous à votre boutique.
+        </Text>
+      </Animated.View>
 
-      <Text style={styles.label}>Email</Text>
-      <TextInput
-        style={[styles.input, error ? styles.inputError : null]}
-        placeholder="votre@email.com"
-        placeholderTextColor={Colors.textLight}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        value={email}
-        onChangeText={setEmail}
-      />
+      <Animated.View style={slideUp(formAnim)}>
+        <Text style={styles.label}>Email</Text>
+        <TextInput
+          style={[styles.input, error ? styles.inputError : null]}
+          placeholder="votre@email.com"
+          placeholderTextColor={Colors.textLight}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          value={email}
+          onChangeText={setEmail}
+        />
 
-      <Text style={styles.label}>Mot de passe</Text>
-      <TextInput
-        style={[styles.input, error ? styles.inputError : null]}
-        placeholder="••••••••"
-        placeholderTextColor={Colors.textLight}
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+        <Text style={styles.label}>Mot de passe</Text>
+        <TextInput
+          style={[styles.input, error ? styles.inputError : null]}
+          placeholder="••••••••"
+          placeholderTextColor={Colors.textLight}
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+        />
 
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-      <TouchableOpacity
-        style={styles.btnPrimary}
-        onPress={handleLogin}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color={Colors.surface} />
-        ) : (
-          <Text style={styles.btnPrimaryText}>Se connecter</Text>
-        )}
-      </TouchableOpacity>
-
-      {/* Bouton Google */}
-      <TouchableOpacity
-        style={styles.btnGoogle}
-        onPress={() => promptAsync()}
-        disabled={!request || loading}
-      >
-        <AntDesign name="google" size={20} color="#EA4335" />
-        <Text style={styles.btnGoogleText}>Se connecter avec Google</Text>
-      </TouchableOpacity>
-
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>Pas encore de compte ?</Text>
-        <TouchableOpacity onPress={() => router.replace("/(auth)/register")}>
-          <Text style={styles.footerLink}>Créer un compte</Text>
+        <TouchableOpacity
+          style={styles.btnPrimary}
+          onPress={handleLogin}
+          disabled={loading}
+          activeOpacity={0.85}
+        >
+          {loading ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <Text style={styles.btnPrimaryText}>Se connecter</Text>
+          )}
         </TouchableOpacity>
-      </View>
+
+        <View style={styles.divider}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>ou</Text>
+          <View style={styles.dividerLine} />
+        </View>
+
+        <TouchableOpacity
+          style={styles.btnGoogle}
+          onPress={() => promptAsync()}
+          disabled={!request || loading}
+          activeOpacity={0.85}
+        >
+          <AntDesign name="google" size={18} color="#EA4335" />
+          <Text style={styles.btnGoogleText}>Continuer avec Google</Text>
+        </TouchableOpacity>
+
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Pas encore de compte ?</Text>
+          <TouchableOpacity onPress={() => router.replace("/(auth)/register")}>
+            <Text style={styles.footerLink}>Créer un compte</Text>
+          </TouchableOpacity>
+        </View>
+      </Animated.View>
     </KeyboardAvoidingView>
   );
 }

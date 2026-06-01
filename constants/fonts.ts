@@ -1,6 +1,6 @@
 export const Fonts = {
   family: {
-    norwester: "Norwester",
+    norwester: "Urbanist",
     nowThin: "Now-Thin",
     nowLight: "Now-Light",
     nowRegular: "Now-Regular",
