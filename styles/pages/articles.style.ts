@@ -133,6 +133,13 @@ export const styles = StyleSheet.create({
     marginBottom: 6,
     lineHeight: 16,
   },
+  articleStock: {
+    fontFamily: Fonts.family.nowLight,
+    fontSize: Fonts.sizes.xs,
+    color: Colors.textLight,
+    marginTop: 4,
+    letterSpacing: 0.2,
+  },
   prixBadge: {
     alignSelf: "flex-start",
     backgroundColor: Colors.primary + "18",

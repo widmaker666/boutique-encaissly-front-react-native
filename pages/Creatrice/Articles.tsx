@@ -85,6 +85,7 @@ function ArticleModal({
   const [nom, setNom] = useState("");
   const [description, setDescription] = useState("");
   const [prix, setPrix] = useState("");
+  const [quantite, setQuantite] = useState("1");
 
   // Pré-remplit si modification
   useEffect(() => {
@@ -92,10 +93,12 @@ function ArticleModal({
       setNom(article.nom);
       setDescription(article.description ?? "");
       setPrix(article.prixIndicatif != null ? String(article.prixIndicatif) : "");
+      setQuantite(article.quantite != null ? String(article.quantite) : "1");
     } else {
       setNom("");
       setDescription("");
       setPrix("");
+      setQuantite("1");
     }
   }, [article, visible]);
 
@@ -105,6 +108,7 @@ function ArticleModal({
         nom: nom.trim(),
         description: description.trim() || undefined,
         prixIndicatif: prix ? parseFloat(prix.replace(",", ".")) : undefined,
+        quantite: quantite ? parseInt(quantite) : undefined,
         creatriceId,
       }),
     onSuccess: () => {
@@ -122,6 +126,7 @@ function ArticleModal({
         nom: nom.trim(),
         description: description.trim() || undefined,
         prixIndicatif: prix ? parseFloat(prix.replace(",", ".")) : undefined,
+        quantite: quantite ? parseInt(quantite) : undefined,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["articles", creatriceId] });
@@ -187,6 +192,16 @@ function ArticleModal({
             value={prix}
             onChangeText={setPrix}
             keyboardType="decimal-pad"
+          />
+
+          <Text style={styles.inputLabel}>Quantité en stock</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Ex: 5"
+            placeholderTextColor="#b0b0b0"
+            value={quantite}
+            onChangeText={setQuantite}
+            keyboardType="number-pad"
           />
 
           <TouchableOpacity
@@ -396,6 +411,11 @@ export default function ArticlesScreen() {
                       {formatPrix(article.prixIndicatif)}
                     </Text>
                   </View>
+                )}
+                {article.quantite != null && (
+                  <Text style={styles.articleStock}>
+                    {`Stock : ${article.quantite}`}
+                  </Text>
                 )}
               </View>
 

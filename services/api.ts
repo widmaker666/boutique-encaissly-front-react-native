@@ -178,6 +178,7 @@ export const articleService = {
     nom: string;
     description?: string;
     prixIndicatif?: number;
+    quantite?: number;
     creatriceId: string;
   }) => {
     const { data } = await api.post("/article", dto);
@@ -185,7 +186,7 @@ export const articleService = {
   },
   update: async (
     id: string,
-    dto: Partial<{ nom: string; description?: string; prixIndicatif?: number }>,
+    dto: Partial<{ nom: string; description?: string; prixIndicatif?: number; quantite?: number }>,
   ) => {
     const { data } = await api.patch(`/article/${id}`, dto);
     return data;

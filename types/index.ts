@@ -80,6 +80,7 @@ export interface Article {
   nom: string;
   description?: string;
   prixIndicatif?: number;
+  quantite?: number;
   photo?: string;
   createdAt: string;
   creatriceId: string;
