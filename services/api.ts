@@ -207,10 +207,10 @@ export const articleService = {
       name: fileName,
       type: mimeType,
     } as any);
+    //- Ne pas forcer Content-Type — Axios doit générer la boundary automatiquement
     const { data } = await api.post(
       `/article/import?creatriceId=${creatriceId}`,
       formData,
-      { headers: { "Content-Type": "multipart/form-data" } },
     );
     return data as { imported: number; message: string };
   },
