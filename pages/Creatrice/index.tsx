@@ -59,6 +59,9 @@ function AnimCard({
   );
 }
 
+const round2 = (n: number | null | undefined): string =>
+  (Math.round((n ?? 0) * 100) / 100).toFixed(2);
+
 export default function CreatriceScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -198,7 +201,7 @@ export default function CreatriceScreen() {
                 </Text>
                 <Text style={styles.meta} numberOfLines={1}>
                   {creatrice.nbVentes
-                    ? `${creatrice.nbVentes} vente${creatrice.nbVentes > 1 ? "s" : ""} · ${creatrice.ca ?? 0} €`
+                    ? `${creatrice.nbVentes} vente${creatrice.nbVentes > 1 ? "s" : ""} · ${round2(creatrice.ca)} €`
                     : (creatrice.email ?? creatrice.telephone ?? "Aucun contact")}
                 </Text>
               </View>

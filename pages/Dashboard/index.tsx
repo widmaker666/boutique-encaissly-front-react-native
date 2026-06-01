@@ -48,6 +48,9 @@ function AnimCard({
   );
 }
 
+const round2 = (n: number | null | undefined): string =>
+  (Math.round((n ?? 0) * 100) / 100).toFixed(2);
+
 export default function DashboardScreen() {
   const insets = useSafeAreaInsets();
   const user = useAuthStore((state) => state.user);
@@ -207,7 +210,7 @@ export default function DashboardScreen() {
                   <View>
                     <Text style={styles.boutiqueName}>{boutique.nom}</Text>
                     <Text style={styles.boutiqueMeta}>
-                      {boutique.nbCreatrices} créatrices · {boutique.ca} €
+                      {boutique.nbCreatrices} créatrices · {round2(boutique.ca)} €
                     </Text>
                   </View>
                   <Text style={styles.boutiqueArrow}>›</Text>
@@ -221,10 +224,10 @@ export default function DashboardScreen() {
         <Text style={styles.sectionTitle}>Ce mois-ci</Text>
         <View style={styles.cardsGrid}>
           {[
-            { label: "Chiffre d'affaires", value: `${data?.stats._sum.prixVente ?? 0} €` },
+            { label: "Chiffre d'affaires", value: `${round2(data?.stats._sum.prixVente)} €` },
             { label: "Ventes", value: `${data?.stats._count ?? 0}` },
-            { label: "Commissions", value: `${data?.totalCommissions?.toFixed(2) ?? 0} €` },
-            { label: "Meilleure vente", value: `${data?.stats._max.prixVente ?? 0} €` },
+            { label: "Commissions", value: `${round2(data?.totalCommissions)} €` },
+            { label: "Meilleure vente", value: `${round2(data?.stats._max.prixVente)} €` },
             ...(isGerante && !isPro
               ? [{ label: "Créatrices", value: `${boutiqueStats?.nbCreatrices ?? 0}/${boutiqueStats?.maxCreatrices ?? 3}` }]
               : []),
@@ -241,11 +244,11 @@ export default function DashboardScreen() {
         <View style={styles.paiementRow}>
           <AnimCard index={6} style={styles.paiementCard}>
             <Text style={styles.cardLabel}>💵 Espèces</Text>
-            <Text style={styles.cardValue}>{especes?._sum?.prixVente ?? 0} €</Text>
+            <Text style={styles.cardValue}>{round2(especes?._sum?.prixVente)} €</Text>
           </AnimCard>
           <AnimCard index={7} style={styles.paiementCard}>
             <Text style={styles.cardLabel}>💳 Carte</Text>
-            <Text style={styles.cardValue}>{carte?._sum?.prixVente ?? 0} €</Text>
+            <Text style={styles.cardValue}>{round2(carte?._sum?.prixVente)} €</Text>
           </AnimCard>
         </View>
 
@@ -259,7 +262,7 @@ export default function DashboardScreen() {
                 {vente.creatrice.nom} · {vente.modePaiement}
               </Text>
             </View>
-            <Text style={styles.ventePrice}>{vente.prixVente} €</Text>
+            <Text style={styles.ventePrice}>{round2(vente.prixVente)} €</Text>
           </AnimCard>
         ))}
 
@@ -271,7 +274,7 @@ export default function DashboardScreen() {
               <AnimCard key={item.mois} index={i + 13} style={styles.historiqueRow}>
                 <Text style={styles.historiqueMois}>{item.mois}</Text>
                 <View style={styles.historiqueRight}>
-                  <Text style={styles.historiqueCA}>{item.ca} €</Text>
+                  <Text style={styles.historiqueCA}>{round2(item.ca)} €</Text>
                   <Text style={styles.historiqueNb}>{item.nbVentes} ventes</Text>
                 </View>
               </AnimCard>

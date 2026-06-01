@@ -86,7 +86,8 @@ function formatDateFR(dateStr: string): string {
 
 // ─── Formateur montant ────────────────────────────────────────────────────────
 function formatMontant(n: number): string {
-  return n.toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + " €";
+  const rounded = Math.round(n * 100) / 100;
+  return rounded.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
 }
 
 // ─── Écran principal ─────────────────────────────────────────────────────────

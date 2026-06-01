@@ -21,6 +21,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
+function round2(n: number | null | undefined): string {
+  return (Math.round((n ?? 0) * 100) / 100).toFixed(2);
+}
+
 function formatDate(isoString: string): string {
   const d = new Date(isoString);
   return d.toLocaleDateString("fr-FR", {
@@ -424,7 +428,7 @@ function BottomSheetCreation({
                           </Text>
                           {a.prixIndicatif != null && (
                             <Text style={styles.articlePrix}>
-                              {a.prixIndicatif} €
+                              {round2(a.prixIndicatif)} €
                             </Text>
                           )}
                         </View>
