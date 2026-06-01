@@ -598,6 +598,73 @@ export const styles = StyleSheet.create({
     marginLeft: 4,
   },
 
+  // ── ARTICLE MANUEL ──────────────────────────────
+  addManuelBtn: {
+    borderWidth: 1.5,
+    borderColor: Colors.primary,
+    borderStyle: "dashed",
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: "center",
+    marginTop: 14,
+  },
+  addManuelBtnTxt: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: Fonts.sizes.xs,
+    color: Colors.primary,
+    letterSpacing: 0.5,
+  },
+  manuelForm: {
+    backgroundColor: Colors.background,
+    borderRadius: 14,
+    padding: 14,
+    marginTop: 14,
+    borderWidth: 1.5,
+    borderColor: Colors.primary + "40",
+    gap: 10,
+  },
+  manuelFormRow: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  manuelFormInput: {
+    backgroundColor: Colors.surface,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 11,
+    fontFamily: Fonts.family.nowRegular,
+    fontSize: Fonts.sizes.sm,
+    color: Colors.text,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    flex: 1,
+  },
+  manuelFormBtn: {
+    backgroundColor: Colors.primary,
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  manuelFormBtnTxt: {
+    fontFamily: Fonts.family.nowBold,
+    fontSize: Fonts.sizes.xs,
+    color: "#FFFFFF",
+    letterSpacing: 0.5,
+  },
+  articleManuelTag: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: 10,
+    color: Colors.primary,
+    backgroundColor: Colors.primary + "15",
+    borderRadius: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    marginLeft: 6,
+    alignSelf: "center",
+    overflow: "hidden",
+  },
+
   // ── INFO CREATRICE SELECTIONNEE ──────────────────
   selectedCreatriceBanner: {
     backgroundColor: Colors.primaryLight + "18",

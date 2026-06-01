@@ -4,6 +4,7 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
+  TextInput,
   Animated,
   Modal,
   KeyboardAvoidingView,
@@ -115,7 +116,9 @@ function BadgePaiement({ mode }: { mode: ModePaiement }) {
 type Step = 1 | 2 | 3;
 
 interface ArticleSelection {
-  article: Article;
+  article: Article | null;
+  nomManuel?: string;
+  prixManuel?: number;
   quantite: number;
 }
 
@@ -137,6 +140,9 @@ function BottomSheetCreation({
   const [creatrice, setCreatrice] = useState<SelectedCreatrice | null>(null);
   const [selections, setSelections] = useState<ArticleSelection[]>([]);
   const [modePaiement, setModePaiement] = useState<ModePaiement>("ESPECES");
+  const [showManuelForm, setShowManuelForm] = useState(false);
+  const [manuelNom, setManuelNom] = useState("");
+  const [manuelPrix, setManuelPrix] = useState("");
 
   const slideAnim = useRef(new Animated.Value(400)).current;
 
@@ -154,6 +160,9 @@ function BottomSheetCreation({
       setCreatrice(null);
       setSelections([]);
       setModePaiement("ESPECES");
+      setShowManuelForm(false);
+      setManuelNom("");
+      setManuelPrix("");
     }
   }, [visible]);
 
@@ -173,9 +182,9 @@ function BottomSheetCreation({
 
   const toggleArticle = (article: Article) => {
     setSelections((prev) => {
-      const exists = prev.find((s) => s.article.id === article.id);
+      const exists = prev.find((s) => s.article?.id === article.id);
       if (exists) {
-        return prev.filter((s) => s.article.id !== article.id);
+        return prev.filter((s) => s.article?.id !== article.id);
       }
       return [...prev, { article, quantite: 1 }];
     });
@@ -184,7 +193,17 @@ function BottomSheetCreation({
   const setQty = (articleId: string, delta: number) => {
     setSelections((prev) =>
       prev.map((s) => {
-        if (s.article.id !== articleId) return s;
+        if (s.article?.id !== articleId) return s;
+        const next = Math.max(1, s.quantite + delta);
+        return { ...s, quantite: next };
+      })
+    );
+  };
+
+  const setQtyManuel = (idx: number, delta: number) => {
+    setSelections((prev) =>
+      prev.map((s, i) => {
+        if (i !== idx) return s;
         const next = Math.max(1, s.quantite + delta);
         return { ...s, quantite: next };
       })
@@ -192,15 +211,34 @@ function BottomSheetCreation({
   };
 
   const isSelected = (articleId: string) =>
-    selections.some((s) => s.article.id === articleId);
+    selections.some((s) => s.article?.id === articleId);
 
   const getQty = (articleId: string) =>
-    selections.find((s) => s.article.id === articleId)?.quantite ?? 1;
+    selections.find((s) => s.article?.id === articleId)?.quantite ?? 1;
 
-  const totalGeneral = selections.reduce(
-    (acc, s) => acc + (s.article.prixIndicatif ?? 0) * s.quantite,
-    0
-  );
+  const addManuelArticle = () => {
+    const nom = manuelNom.trim();
+    const prix = parseFloat(manuelPrix.replace(",", "."));
+    if (!nom || isNaN(prix) || prix <= 0) return;
+    setSelections((prev) => [
+      ...prev,
+      { article: null, nomManuel: nom, prixManuel: prix, quantite: 1 },
+    ]);
+    setManuelNom("");
+    setManuelPrix("");
+    setShowManuelForm(false);
+  };
+
+  const removeManuel = (idx: number) => {
+    setSelections((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const totalGeneral = selections.reduce((acc, s) => {
+    const prix = s.article != null
+      ? (s.article.prixIndicatif ?? 0)
+      : (s.prixManuel ?? 0);
+    return acc + prix * s.quantite;
+  }, 0);
 
   const [submitError, setSubmitError] = useState(false);
   const [submitPending, setSubmitPending] = useState(false);
@@ -211,16 +249,25 @@ function BottomSheetCreation({
     setSubmitPending(true);
     try {
       await Promise.all(
-        selections.map((s) =>
-          venteService.create({
-            nomArticle: s.article.nom,
-            prixVente: (s.article.prixIndicatif ?? 0) * s.quantite,
+        selections.map((s) => {
+          if (s.article != null) {
+            return venteService.create({
+              nomArticle: s.article.nom,
+              prixVente: (s.article.prixIndicatif ?? 0) * s.quantite,
+              modePaiement,
+              creatriceId: creatrice.id,
+              articleId: s.article.id,
+              quantite: s.quantite,
+            });
+          }
+          return venteService.create({
+            nomArticle: s.nomManuel ?? "Article",
+            prixVente: (s.prixManuel ?? 0) * s.quantite,
             modePaiement,
             creatriceId: creatrice.id,
-            articleId: s.article.id,
             quantite: s.quantite,
-          })
-        )
+          });
+        })
       );
       queryClient.invalidateQueries({ queryKey: ["ventes"] });
       queryClient.invalidateQueries({ queryKey: ["articles", creatrice.id] });
@@ -418,6 +465,49 @@ function BottomSheetCreation({
                   </Text>
                 )}
 
+                {/* Bouton article non répertorié */}
+                {!showManuelForm && (
+                  <TouchableOpacity
+                    style={styles.addManuelBtn}
+                    activeOpacity={0.75}
+                    onPress={() => setShowManuelForm(true)}
+                  >
+                    <Text style={styles.addManuelBtnTxt}>
+                      ＋ Article non répertorié
+                    </Text>
+                  </TouchableOpacity>
+                )}
+
+                {/* Formulaire inline article manuel */}
+                {showManuelForm && (
+                  <View style={styles.manuelForm}>
+                    <TextInput
+                      style={styles.manuelFormInput}
+                      placeholder="Nom de l'article"
+                      placeholderTextColor="#aaa"
+                      value={manuelNom}
+                      onChangeText={setManuelNom}
+                    />
+                    <View style={styles.manuelFormRow}>
+                      <TextInput
+                        style={styles.manuelFormInput}
+                        placeholder="Prix (€)"
+                        placeholderTextColor="#aaa"
+                        value={manuelPrix}
+                        onChangeText={setManuelPrix}
+                        keyboardType="decimal-pad"
+                      />
+                      <TouchableOpacity
+                        style={styles.manuelFormBtn}
+                        activeOpacity={0.85}
+                        onPress={addManuelArticle}
+                      >
+                        <Text style={styles.manuelFormBtnTxt}>Ajouter</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
+
                 <TouchableOpacity
                   style={[
                     styles.submitBtn,
@@ -451,25 +541,33 @@ function BottomSheetCreation({
 
                 {/* Récap articles */}
                 <View style={styles.recapCard}>
-                  {selections.map((s, idx) => (
-                    <View
-                      key={s.article.id}
-                      style={[
-                        styles.recapRow,
-                        idx === selections.length - 1 && styles.recapRowLast,
-                      ]}
-                    >
-                      <Text style={styles.recapArticleNom} numberOfLines={2}>
-                        {s.article.nom} × {s.quantite}
-                      </Text>
-                      <Text style={styles.recapArticlePrix}>
-                        {((s.article.prixIndicatif ?? 0) * s.quantite).toFixed(
-                          2
-                        )}{" "}
-                        €
-                      </Text>
-                    </View>
-                  ))}
+                  {selections.map((s, idx) => {
+                    const nom = s.article != null ? s.article.nom : (s.nomManuel ?? "Article");
+                    const prix = s.article != null
+                      ? (s.article.prixIndicatif ?? 0)
+                      : (s.prixManuel ?? 0);
+                    return (
+                      <View
+                        key={s.article != null ? s.article.id : `manuel-${idx}`}
+                        style={[
+                          styles.recapRow,
+                          idx === selections.length - 1 && styles.recapRowLast,
+                        ]}
+                      >
+                        <View style={{ flex: 1, flexDirection: "row", alignItems: "center", paddingRight: 8 }}>
+                          <Text style={styles.recapArticleNom} numberOfLines={2}>
+                            {nom} × {s.quantite}
+                          </Text>
+                          {s.article == null && (
+                            <Text style={styles.articleManuelTag}>Manuel</Text>
+                          )}
+                        </View>
+                        <Text style={styles.recapArticlePrix}>
+                          {(prix * s.quantite).toFixed(2)} €
+                        </Text>
+                      </View>
+                    );
+                  })}
                 </View>
 
                 {/* Total */}
