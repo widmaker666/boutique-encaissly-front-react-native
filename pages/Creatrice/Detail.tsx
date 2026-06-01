@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,8 @@ import {
   Animated,
   Alert,
 } from "react-native";
+import ModalModifier from "@/components/Creatrice/ModalModifier";
+import ModalInviter from "@/components/Creatrice/ModalInviter";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -79,6 +81,9 @@ export default function CreatriceDetailScreen() {
   const user = useAuthStore((state) => state.user);
   const isGerante = user?.role === "GERANTE";
   const queryClient = useQueryClient();
+
+  const [modalModifier, setModalModifier] = useState(false);
+  const [modalInviter, setModalInviter] = useState(false);
 
   const headerAnim = useRef(new Animated.Value(0)).current;
 
@@ -260,7 +265,7 @@ export default function CreatriceDetailScreen() {
           <TouchableOpacity
             style={[styles.actionBtn, styles.btnModifier]}
             activeOpacity={0.85}
-            onPress={() => console.log("Modifier", id)}
+            onPress={() => setModalModifier(true)}
           >
             <Text style={styles.btnModifierTxt}>Modifier</Text>
           </TouchableOpacity>
@@ -279,12 +284,26 @@ export default function CreatriceDetailScreen() {
           <TouchableOpacity
             style={[styles.actionBtn, styles.btnInviter]}
             activeOpacity={0.85}
-            onPress={() => console.log("Inviter", id)}
+            onPress={() => setModalInviter(true)}
           >
             <Text style={styles.btnInviterTxt}>Inviter</Text>
           </TouchableOpacity>
         </View>
       )}
+
+      {/* ── MODALS ── */}
+      {isGerante && creatrice && (
+        <ModalModifier
+          visible={modalModifier}
+          onClose={() => setModalModifier(false)}
+          creatrice={creatrice}
+        />
+      )}
+      <ModalInviter
+        visible={modalInviter}
+        onClose={() => setModalInviter(false)}
+        creatriceId={id}
+      />
     </View>
   );
 }
