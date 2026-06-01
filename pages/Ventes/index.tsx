@@ -29,6 +29,22 @@ function formatDate(isoString: string): string {
   });
 }
 
+function groupVentes(ventes: Vente[]): (Vente & { quantite: number })[] {
+  const map = new Map<string, Vente & { quantite: number }>();
+  for (const v of ventes) {
+    const creatriceId = v.creatriceId ?? "";
+    const key = `${v.nomArticle}-${creatriceId}-${v.modePaiement}`;
+    if (map.has(key)) {
+      const g = map.get(key)!;
+      g.quantite = g.quantite + ((v as any).quantite ?? 1);
+      g.prixVente += v.prixVente;
+    } else {
+      map.set(key, { ...v, quantite: (v as any).quantite ?? 1 });
+    }
+  }
+  return Array.from(map.values());
+}
+
 // ── AnimCard ──────────────────────────────────────────────────────────────────
 
 function AnimCard({
@@ -626,21 +642,22 @@ export default function VentesScreen() {
           contentContainerStyle={styles.list}
         >
           {ventes && ventes.length > 0 ? (
-            ventes.map((v: Vente, index: number) => (
+            groupVentes(ventes).map((v, index) => (
               <AnimCard key={v.id} index={index} style={styles.card}>
                 <View style={styles.cardRow}>
                   <View style={styles.cardLeft}>
                     <Text style={styles.cardNomArticle} numberOfLines={2}>
                       {v.nomArticle}
+                      {v.quantite > 1 ? `  × ${v.quantite}` : ""}
                     </Text>
                     {v.creatrice?.nom && (
                       <Text style={styles.cardCreatrice} numberOfLines={1}>
-                        {v.creatrice.nom}
+                        {v.creatrice.nom} · {v.modePaiement}
                       </Text>
                     )}
                   </View>
                   <View style={styles.cardRight}>
-                    <Text style={styles.cardPrix}>{v.prixVente} €</Text>
+                    <Text style={styles.cardPrix}>{v.prixVente.toFixed(2)} €</Text>
                     <BadgePaiement mode={v.modePaiement} />
                   </View>
                 </View>

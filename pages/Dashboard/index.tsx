@@ -131,12 +131,12 @@ export default function DashboardScreen() {
           },
         ]}
       >
-        <Text style={styles.greeting}>Bonjour 👋</Text>
         <Text style={styles.name}>
-          {user?.prenom && user?.nom
-            ? `${user.prenom} ${user.nom}`
-            : user?.email}
+          {user?.prenom || user?.nom
+            ? `${user.prenom ?? ""} ${user.nom ?? ""}`.trim()
+            : "Bonjour"}
         </Text>
+        <Text style={styles.greeting}>{user?.email}</Text>
         <View style={styles.badgeWrap}>
           <Text style={styles.badge}>
             {user?.role} · {user?.plan} {isPro ? "✨" : "🔒"}

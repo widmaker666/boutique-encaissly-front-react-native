@@ -58,6 +58,22 @@ function AnimCard({
   );
 }
 
+// ─── Groupement ventes ────────────────────────────────────────────────────────
+function groupVentes(ventes: VenteDetail[]): (VenteDetail & { quantite: number })[] {
+  const map = new Map<string, VenteDetail & { quantite: number }>();
+  for (const v of ventes) {
+    const key = `${v.nomArticle}-${v.modePaiement}`;
+    if (map.has(key)) {
+      const g = map.get(key)!;
+      g.quantite = g.quantite + ((v as any).quantite ?? 1);
+      g.prixVente += v.prixVente;
+    } else {
+      map.set(key, { ...v, quantite: (v as any).quantite ?? 1 });
+    }
+  }
+  return Array.from(map.values());
+}
+
 // ─── Formateur date FR ────────────────────────────────────────────────────────
 function formatDateFR(dateStr: string): string {
   const date = new Date(dateStr);
@@ -247,11 +263,12 @@ export default function CreatriceDetailScreen() {
             <Text style={styles.emptyVentes}>Aucune vente enregistrée.</Text>
           )}
 
-          {creatrice.ventes.map((vente: VenteDetail, i: number) => (
+          {groupVentes(creatrice.ventes).map((vente, i) => (
             <AnimCard key={vente.id} index={4 + i} style={styles.venteCard}>
               <View style={styles.venteLeft}>
                 <Text style={styles.venteArticle} numberOfLines={1}>
                   {vente.nomArticle}
+                  {vente.quantite > 1 ? `  × ${vente.quantite}` : ""}
                 </Text>
                 <Text style={styles.venteDate}>{formatDateFR(vente.createdAt)}</Text>
               </View>
