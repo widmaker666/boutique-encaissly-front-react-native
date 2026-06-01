@@ -68,6 +68,20 @@ export const styles = StyleSheet.create({
     letterSpacing: 0.3,
     marginLeft: 48, // aligne sous le titre (skip backBtn)
   },
+  importBtn: {
+    backgroundColor: "rgba(255,255,255,0.18)",
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.32)",
+    marginRight: 8,
+  },
+  importBtnTxt: {
+    fontSize: 16,
+  },
   addBtn: {
     width: 36,
     height: 36,

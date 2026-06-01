@@ -12,6 +12,7 @@ import {
   Platform,
   ActivityIndicator,
 } from "react-native";
+import * as DocumentPicker from "expo-document-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -249,6 +250,33 @@ export default function ArticlesScreen() {
     }).start();
   }, []);
 
+  const handleImport = async () => {
+    const result = await DocumentPicker.getDocumentAsync({
+      type: [
+        "text/csv",
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      ],
+      copyToCacheDirectory: true,
+    });
+
+    if (result.canceled) return;
+
+    const asset = result.assets[0];
+    try {
+      const res = await articleService.importFile(
+        asset.uri,
+        asset.name,
+        asset.mimeType ?? "text/csv",
+        creatriceId,
+      );
+      Alert.alert("Import réussi ✓", res.message);
+      queryClient.invalidateQueries({ queryKey: ["articles", creatriceId] });
+    } catch {
+      Alert.alert("Erreur", "Impossible d'importer le fichier.");
+    }
+  };
+
   const handleDelete = (article: Article) => {
     Alert.alert(
       "Supprimer",
@@ -315,16 +343,25 @@ export default function ArticlesScreen() {
           </View>
 
           {isGerante && (
-            <TouchableOpacity
-              style={styles.addBtn}
-              onPress={() => {
-                setArticleToEdit(null);
-                setModalVisible(true);
-              }}
-              activeOpacity={0.75}
-            >
-              <Text style={styles.addBtnTxt}>+</Text>
-            </TouchableOpacity>
+            <>
+              <TouchableOpacity
+                style={styles.importBtn}
+                onPress={handleImport}
+                activeOpacity={0.75}
+              >
+                <Text style={styles.importBtnTxt}>📥</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.addBtn}
+                onPress={() => {
+                  setArticleToEdit(null);
+                  setModalVisible(true);
+                }}
+                activeOpacity={0.75}
+              >
+                <Text style={styles.addBtnTxt}>+</Text>
+              </TouchableOpacity>
+            </>
           )}
         </View>
 

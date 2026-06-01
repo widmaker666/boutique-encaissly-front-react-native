@@ -194,6 +194,25 @@ export const articleService = {
     const { data } = await api.delete(`/article/${id}`);
     return data;
   },
+  importFile: async (
+    fileUri: string,
+    fileName: string,
+    mimeType: string,
+    creatriceId: string,
+  ) => {
+    const formData = new FormData();
+    formData.append("file", {
+      uri: fileUri,
+      name: fileName,
+      type: mimeType,
+    } as any);
+    const { data } = await api.post(
+      `/article/import?creatriceId=${creatriceId}`,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } },
+    );
+    return data as { imported: number; message: string };
+  },
 };
 
 //- Creatrices
