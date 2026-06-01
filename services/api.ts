@@ -162,6 +162,40 @@ export const evenementService = {
   },
 };
 
+//- Articles
+export const articleService = {
+  getAll: async (creatriceId?: string) => {
+    const { data } = await api.get("/article", {
+      params: creatriceId ? { creatriceId } : {},
+    });
+    return data;
+  },
+  getOne: async (id: string) => {
+    const { data } = await api.get(`/article/${id}`);
+    return data;
+  },
+  create: async (dto: {
+    nom: string;
+    description?: string;
+    prixIndicatif?: number;
+    creatriceId: string;
+  }) => {
+    const { data } = await api.post("/article", dto);
+    return data;
+  },
+  update: async (
+    id: string,
+    dto: Partial<{ nom: string; description?: string; prixIndicatif?: number }>,
+  ) => {
+    const { data } = await api.patch(`/article/${id}`, dto);
+    return data;
+  },
+  remove: async (id: string) => {
+    const { data } = await api.delete(`/article/${id}`);
+    return data;
+  },
+};
+
 //- Creatrices
 export const creatriceService = {
   getAll: async () => {

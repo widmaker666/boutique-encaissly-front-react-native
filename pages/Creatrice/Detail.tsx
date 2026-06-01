@@ -221,6 +221,22 @@ export default function CreatriceDetailScreen() {
           </View>
         </View>
 
+        {/* Bouton Catalogue */}
+        <View style={styles.section}>
+          <TouchableOpacity
+            style={styles.catalogueBtn}
+            activeOpacity={0.85}
+            onPress={() =>
+              router.push(
+                `/(app)/creatrice/articles?creatriceId=${creatrice.id}&nomCreatrice=${encodeURIComponent(creatrice.nom)}`,
+              )
+            }
+          >
+            <Text style={styles.catalogueBtnTxt}>Voir les articles</Text>
+            <Text style={styles.catalogueBtnArrow}>›</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Liste ventes */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>

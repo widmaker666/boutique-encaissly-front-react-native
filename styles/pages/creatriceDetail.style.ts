@@ -216,6 +216,29 @@ export const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
 
+  // ── CATALOGUE BTN ───────────────────────────────
+  catalogueBtn: {
+    backgroundColor: Colors.surface,
+    borderRadius: 14,
+    padding: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    ...cardShadow,
+  },
+  catalogueBtnTxt: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: Fonts.sizes.sm,
+    color: Colors.primaryDark,
+    letterSpacing: 0.3,
+  },
+  catalogueBtnArrow: {
+    fontFamily: Fonts.family.norwester,
+    fontSize: 22,
+    color: Colors.primaryLight,
+    lineHeight: 24,
+  },
+
   // ── EMPTY VENTES ────────────────────────────────
   emptyVentes: {
     textAlign: "center",

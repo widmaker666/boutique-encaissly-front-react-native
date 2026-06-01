@@ -74,3 +74,13 @@ export interface CreatriceDetail extends Creatrice {
   ventes: VenteDetail[];
   stats: CreatriceStats;
 }
+
+export interface Article {
+  id: string;
+  nom: string;
+  description?: string;
+  prixIndicatif?: number;
+  photo?: string;
+  createdAt: string;
+  creatriceId: string;
+}
