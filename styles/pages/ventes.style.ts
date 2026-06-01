@@ -345,12 +345,44 @@ export const styles = StyleSheet.create({
     marginBottom: 8,
     textTransform: "uppercase",
   },
+  // articleRow : ligne principale (checkbox + infos + qty)
   articleRow: {
-    flexDirection: "row",
-    alignItems: "center",
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
+  },
+  articleRowSelected: {
+    backgroundColor: Colors.primary + "08",
+    borderRadius: 10,
+    borderBottomWidth: 0,
+    marginBottom: 2,
+    paddingHorizontal: 6,
+  },
+  articleRowTop: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  checkbox: {
+    width: 22,
+    height: 22,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: Colors.border,
+    backgroundColor: Colors.surface,
+    marginRight: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  checkboxChecked: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primary,
+  },
+  checkboxTick: {
+    color: "#FFFFFF",
+    fontSize: 13,
+    lineHeight: 16,
+    fontFamily: Fonts.family.nowBold,
   },
   articleNom: {
     fontFamily: Fonts.family.nowRegular,
@@ -362,7 +394,44 @@ export const styles = StyleSheet.create({
     fontFamily: Fonts.family.nowBold,
     fontSize: Fonts.sizes.sm,
     color: Colors.success,
-    marginRight: 10,
+    marginLeft: 8,
+  },
+  articleStock: {
+    fontFamily: Fonts.family.nowLight,
+    fontSize: 11,
+    color: Colors.textLight,
+    marginTop: 3,
+    marginLeft: 32,
+  },
+  // qtyRow : ligne +/-/nombre (visible seulement si sélectionné)
+  qtyRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+    marginLeft: 32,
+  },
+  qtyBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    backgroundColor: Colors.background,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  qtyBtnTxt: {
+    fontFamily: Fonts.family.nowBold,
+    fontSize: 15,
+    color: Colors.primaryDark,
+    lineHeight: 20,
+  },
+  qtyValue: {
+    fontFamily: Fonts.family.nowBold,
+    fontSize: Fonts.sizes.sm,
+    color: Colors.text,
+    minWidth: 30,
+    textAlign: "center",
   },
   articleSelectBtn: {
     backgroundColor: Colors.primary,
@@ -381,6 +450,58 @@ export const styles = StyleSheet.create({
     color: Colors.textLight,
     marginTop: 8,
     textAlign: "center",
+  },
+
+  // ── RÉCAPITULATIF ────────────────────────────────
+  recapCard: {
+    backgroundColor: Colors.background,
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 16,
+  },
+  recapRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  recapRowLast: {
+    borderBottomWidth: 0,
+  },
+  recapArticleNom: {
+    fontFamily: Fonts.family.nowRegular,
+    fontSize: Fonts.sizes.sm,
+    color: Colors.text,
+    flex: 1,
+    paddingRight: 8,
+  },
+  recapArticlePrix: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: Fonts.sizes.sm,
+    color: Colors.text,
+  },
+  totalRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 2,
+    borderTopColor: Colors.primary + "30",
+  },
+  totalLabel: {
+    fontFamily: Fonts.family.norwester,
+    fontSize: 15,
+    color: Colors.primaryDark,
+    letterSpacing: 1,
+  },
+  totalMontant: {
+    fontFamily: Fonts.family.norwester,
+    fontSize: 20,
+    color: Colors.primary,
+    letterSpacing: 0.5,
   },
 
   // ── FORMULAIRE ───────────────────────────────────
@@ -434,6 +555,15 @@ export const styles = StyleSheet.create({
   },
   modeChipTxtActive: {
     color: Colors.primaryDark,
+  },
+
+  // ── ERREUR ───────────────────────────────────────
+  errorTxt: {
+    fontFamily: Fonts.family.nowLight,
+    fontSize: 12,
+    color: Colors.error,
+    marginBottom: 12,
+    textAlign: "center" as const,
   },
 
   // ── SUBMIT ───────────────────────────────────────

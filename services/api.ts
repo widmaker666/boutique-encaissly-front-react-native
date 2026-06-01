@@ -121,6 +121,7 @@ export const venteService = {
     creatriceId: string;
     boutiqueId?: string;
     articleId?: string;
+    quantite?: number;
   }) => {
     const { data } = await api.post("/vente", dto);
     return data;

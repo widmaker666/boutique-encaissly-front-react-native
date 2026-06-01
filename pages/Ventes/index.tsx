@@ -4,19 +4,17 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  TextInput,
   Animated,
   Modal,
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
 } from "react-native";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { venteService, creatriceService, articleService } from "@/services/api";
 import { useAuthStore } from "@/stores/auth.store";
 import type { Vente, Creatrice, Article, ModePaiement } from "@/types";
 import { Colors } from "@/constants/colors";
-import { Fonts } from "@/constants/fonts";
 import { styles, getAvatarColor } from "@/styles/pages/ventes.style";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -98,15 +96,16 @@ function BadgePaiement({ mode }: { mode: ModePaiement }) {
 
 // ── BottomSheetCreation ───────────────────────────────────────────────────────
 
-type Step = 1 | 2;
+type Step = 1 | 2 | 3;
 
-interface FormState {
-  nomArticle: string;
-  prixVente: string;
-  modePaiement: ModePaiement;
-  creatriceId: string;
-  creatriceNom: string;
-  articleId?: string;
+interface ArticleSelection {
+  article: Article;
+  quantite: number;
+}
+
+interface SelectedCreatrice {
+  id: string;
+  nom: string;
 }
 
 function BottomSheetCreation({
@@ -119,17 +118,9 @@ function BottomSheetCreation({
   const queryClient = useQueryClient();
   const insets = useSafeAreaInsets();
   const [step, setStep] = useState<Step>(1);
-  const [selectedCreatriceId, setSelectedCreatriceId] = useState<string | null>(
-    null
-  );
-  const [form, setForm] = useState<FormState>({
-    nomArticle: "",
-    prixVente: "",
-    modePaiement: "ESPECES",
-    creatriceId: "",
-    creatriceNom: "",
-    articleId: undefined,
-  });
+  const [creatrice, setCreatrice] = useState<SelectedCreatrice | null>(null);
+  const [selections, setSelections] = useState<ArticleSelection[]>([]);
+  const [modePaiement, setModePaiement] = useState<ModePaiement>("ESPECES");
 
   const slideAnim = useRef(new Animated.Value(400)).current;
 
@@ -143,17 +134,10 @@ function BottomSheetCreation({
       }).start();
     } else {
       slideAnim.setValue(400);
-      // reset on close
       setStep(1);
-      setSelectedCreatriceId(null);
-      setForm({
-        nomArticle: "",
-        prixVente: "",
-        modePaiement: "ESPECES",
-        creatriceId: "",
-        creatriceNom: "",
-        articleId: undefined,
-      });
+      setCreatrice(null);
+      setSelections([]);
+      setModePaiement("ESPECES");
     }
   }, [visible]);
 
@@ -164,57 +148,80 @@ function BottomSheetCreation({
   });
 
   const { data: articles, isLoading: loadingArticles } = useQuery({
-    queryKey: ["articles", selectedCreatriceId],
-    queryFn: () => articleService.getAll(selectedCreatriceId!),
-    enabled: !!selectedCreatriceId,
+    queryKey: ["articles", creatrice?.id],
+    queryFn: () => articleService.getAll(creatrice!.id),
+    enabled: !!creatrice?.id && step === 2,
   });
 
-  const mutation = useMutation({
-    mutationFn: venteService.create,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ventes"] });
-      queryClient.invalidateQueries({ queryKey: ["articles", form.creatriceId] });
-      queryClient.invalidateQueries({ queryKey: ["stats"] });
-      onClose();
-    },
-  });
+  // ── Helpers sélection ────────────────────────────────────────────────────────
 
-  const handleSelectCreatrice = (c: Creatrice) => {
-    setSelectedCreatriceId(c.id);
-  };
-
-  const handleSelectArticle = (a: Article) => {
-    setForm((prev) => ({
-      ...prev,
-      nomArticle: a.nom,
-      prixVente: a.prixIndicatif ? String(a.prixIndicatif) : "",
-      articleId: a.id,
-      creatriceId: selectedCreatriceId!,
-      creatriceNom:
-        creatrices?.find((c: Creatrice) => c.id === selectedCreatriceId)?.nom ??
-        "",
-    }));
-    setStep(2);
-  };
-
-  const handleSubmit = () => {
-    const prix = parseFloat(form.prixVente);
-    if (!form.nomArticle.trim() || isNaN(prix) || prix <= 0 || !form.creatriceId)
-      return;
-    mutation.mutate({
-      nomArticle: form.nomArticle.trim(),
-      prixVente: prix,
-      modePaiement: form.modePaiement,
-      creatriceId: form.creatriceId,
-      articleId: form.articleId,
+  const toggleArticle = (article: Article) => {
+    setSelections((prev) => {
+      const exists = prev.find((s) => s.article.id === article.id);
+      if (exists) {
+        return prev.filter((s) => s.article.id !== article.id);
+      }
+      return [...prev, { article, quantite: 1 }];
     });
   };
 
-  const canSubmit =
-    form.nomArticle.trim().length > 0 &&
-    parseFloat(form.prixVente) > 0 &&
-    form.creatriceId.length > 0 &&
-    !mutation.isPending;
+  const setQty = (articleId: string, delta: number) => {
+    setSelections((prev) =>
+      prev.map((s) => {
+        if (s.article.id !== articleId) return s;
+        const next = Math.max(1, s.quantite + delta);
+        return { ...s, quantite: next };
+      })
+    );
+  };
+
+  const isSelected = (articleId: string) =>
+    selections.some((s) => s.article.id === articleId);
+
+  const getQty = (articleId: string) =>
+    selections.find((s) => s.article.id === articleId)?.quantite ?? 1;
+
+  const totalGeneral = selections.reduce(
+    (acc, s) => acc + (s.article.prixIndicatif ?? 0) * s.quantite,
+    0
+  );
+
+  const [submitError, setSubmitError] = useState(false);
+  const [submitPending, setSubmitPending] = useState(false);
+
+  const handleSubmitSafe = async () => {
+    if (!creatrice || selections.length === 0 || submitPending) return;
+    setSubmitError(false);
+    setSubmitPending(true);
+    try {
+      await Promise.all(
+        selections.map((s) =>
+          venteService.create({
+            nomArticle: s.article.nom,
+            prixVente: (s.article.prixIndicatif ?? 0) * s.quantite,
+            modePaiement,
+            creatriceId: creatrice.id,
+            articleId: s.article.id,
+            quantite: s.quantite,
+          })
+        )
+      );
+      queryClient.invalidateQueries({ queryKey: ["ventes"] });
+      queryClient.invalidateQueries({ queryKey: ["articles", creatrice.id] });
+      queryClient.invalidateQueries({ queryKey: ["stats"] });
+      onClose();
+    } catch {
+      setSubmitError(true);
+    } finally {
+      setSubmitPending(false);
+    }
+  };
+
+  const stepLabel: Record<Step, string> = {
+    1: "CRÉATRICE",
+    2: "ARTICLES",
+    3: "RÉCAPITULATIF",
+  };
 
   return (
     <Modal
@@ -250,123 +257,60 @@ function BottomSheetCreation({
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            {/* ── ÉTAPE 1 : Sélection créatrice + article ── */}
+            {/* ── Indicateur d'étape ── */}
+            <View style={styles.stepIndicator}>
+              <View style={[styles.stepBubble, styles.stepBubbleActive]}>
+                <Text style={styles.stepNum}>{step}</Text>
+              </View>
+              <Text style={[styles.stepLabel, styles.stepLabelActive]}>
+                {stepLabel[step]}
+              </Text>
+            </View>
+
+            {/* ── ÉTAPE 1 : Sélection créatrice ── */}
             {step === 1 && (
               <>
-                {/* Indicateur étape 1 */}
-                <View style={styles.stepIndicator}>
-                  <View style={[styles.stepBubble, styles.stepBubbleActive]}>
-                    <Text style={styles.stepNum}>1</Text>
-                  </View>
-                  <Text style={[styles.stepLabel, styles.stepLabelActive]}>
-                    CRÉATRICE ET ARTICLE
-                  </Text>
-                </View>
-
                 {loadingCreatrices ? (
                   <ActivityIndicator color={Colors.primary} />
                 ) : (
                   creatrices?.map((c: Creatrice, idx: number) => {
-                    const isSelected = selectedCreatriceId === c.id;
+                    const isActive = creatrice?.id === c.id;
                     return (
-                      <View key={c.id}>
-                        <TouchableOpacity
+                      <TouchableOpacity
+                        key={c.id}
+                        style={[
+                          styles.creatriceRow,
+                          isActive && styles.creatriceRowSelected,
+                        ]}
+                        activeOpacity={0.75}
+                        onPress={() => {
+                          setCreatrice({ id: c.id, nom: c.nom });
+                          setSelections([]);
+                          setStep(2);
+                        }}
+                      >
+                        <View
                           style={[
-                            styles.creatriceRow,
-                            isSelected && styles.creatriceRowSelected,
+                            styles.creatriceAvatar,
+                            { backgroundColor: getAvatarColor(idx) },
                           ]}
-                          activeOpacity={0.75}
-                          onPress={() => handleSelectCreatrice(c)}
                         >
-                          <View
-                            style={[
-                              styles.creatriceAvatar,
-                              { backgroundColor: getAvatarColor(idx) },
-                            ]}
-                          >
-                            <Text style={styles.creatriceAvatarTxt}>
-                              {c.nom.substring(0, 2).toUpperCase()}
-                            </Text>
-                          </View>
-                          <Text style={styles.creatriceNom}>{c.nom}</Text>
-                          <Text style={styles.creatriceArrow}>
-                            {isSelected ? "▾" : "›"}
+                          <Text style={styles.creatriceAvatarTxt}>
+                            {c.nom.substring(0, 2).toUpperCase()}
                           </Text>
-                        </TouchableOpacity>
-
-                        {/* Articles de la créatrice sélectionnée */}
-                        {isSelected && (
-                          <View style={styles.articlesSection}>
-                            <Text style={styles.articlesSectionTitle}>
-                              Articles de {c.nom}
-                            </Text>
-                            {loadingArticles ? (
-                              <ActivityIndicator
-                                color={Colors.primary}
-                                size="small"
-                              />
-                            ) : articles && articles.length > 0 ? (
-                              articles.map((a: Article) => (
-                                <View key={a.id} style={styles.articleRow}>
-                                  <Text
-                                    style={styles.articleNom}
-                                    numberOfLines={1}
-                                  >
-                                    {a.nom}
-                                  </Text>
-                                  {a.prixIndicatif != null && (
-                                    <Text style={styles.articlePrix}>
-                                      {a.prixIndicatif} €
-                                    </Text>
-                                  )}
-                                  <TouchableOpacity
-                                    style={styles.articleSelectBtn}
-                                    activeOpacity={0.8}
-                                    onPress={() => handleSelectArticle(a)}
-                                  >
-                                    <Text style={styles.articleSelectTxt}>
-                                      Choisir
-                                    </Text>
-                                  </TouchableOpacity>
-                                </View>
-                              ))
-                            ) : (
-                              <Text style={styles.noArticleTxt}>
-                                Aucun article pour cette créatrice
-                              </Text>
-                            )}
-
-                            {/* Continuer sans article */}
-                            <TouchableOpacity
-                              style={[styles.submitBtn, { marginTop: 16 }]}
-                              activeOpacity={0.85}
-                              onPress={() => {
-                                setForm((prev) => ({
-                                  ...prev,
-                                  creatriceId: c.id,
-                                  creatriceNom: c.nom,
-                                  articleId: undefined,
-                                }));
-                                setStep(2);
-                              }}
-                            >
-                              <Text style={styles.submitTxt}>
-                                SAISIR MANUELLEMENT ›
-                              </Text>
-                            </TouchableOpacity>
-                          </View>
-                        )}
-                      </View>
+                        </View>
+                        <Text style={styles.creatriceNom}>{c.nom}</Text>
+                        <Text style={styles.creatriceArrow}>›</Text>
+                      </TouchableOpacity>
                     );
                   })
                 )}
               </>
             )}
 
-            {/* ── ÉTAPE 2 : Formulaire vente ── */}
+            {/* ── ÉTAPE 2 : Multi-sélection articles ── */}
             {step === 2 && (
               <>
-                {/* Retour */}
                 <TouchableOpacity
                   style={styles.backBtn}
                   onPress={() => setStep(1)}
@@ -374,59 +318,154 @@ function BottomSheetCreation({
                   <Text style={styles.backBtnTxt}>‹ Changer de créatrice</Text>
                 </TouchableOpacity>
 
-                {/* Indicateur étape 2 */}
-                <View style={styles.stepIndicator}>
-                  <View style={[styles.stepBubble, styles.stepBubbleActive]}>
-                    <Text style={styles.stepNum}>2</Text>
-                  </View>
-                  <Text style={[styles.stepLabel, styles.stepLabelActive]}>
-                    DÉTAILS DE LA VENTE
-                  </Text>
-                </View>
-
-                {/* Banner créatrice sélectionnée */}
-                {form.creatriceNom.length > 0 && (
+                {creatrice && (
                   <View style={styles.selectedCreatriceBanner}>
-                    <Text style={{ fontSize: 16 }}>👤</Text>
                     <Text style={styles.selectedCreatriceBannerTxt}>
-                      {form.creatriceNom}
+                      {creatrice.nom}
                     </Text>
                   </View>
                 )}
 
-                {/* Nom article */}
-                <View style={styles.formGroup}>
-                  <Text style={styles.formLabel}>Nom de l'article</Text>
-                  <TextInput
-                    style={styles.formInput}
-                    value={form.nomArticle}
-                    onChangeText={(v) =>
-                      setForm((prev) => ({ ...prev, nomArticle: v }))
-                    }
-                    placeholder="Ex : Boucles dorées"
-                    placeholderTextColor={Colors.textLight}
-                    returnKeyType="next"
-                  />
+                {loadingArticles ? (
+                  <ActivityIndicator color={Colors.primary} />
+                ) : articles && articles.length > 0 ? (
+                  articles.map((a: Article) => {
+                    const selected = isSelected(a.id);
+                    const qty = getQty(a.id);
+                    return (
+                      <TouchableOpacity
+                        key={a.id}
+                        activeOpacity={0.85}
+                        style={[
+                          styles.articleRow,
+                          selected && styles.articleRowSelected,
+                        ]}
+                        onPress={() => toggleArticle(a)}
+                      >
+                        <View style={styles.articleRowTop}>
+                          <View
+                            style={[
+                              styles.checkbox,
+                              selected && styles.checkboxChecked,
+                            ]}
+                          >
+                            {selected && (
+                              <Text style={styles.checkboxTick}>✓</Text>
+                            )}
+                          </View>
+                          <Text
+                            style={styles.articleNom}
+                            numberOfLines={1}
+                          >
+                            {a.nom}
+                          </Text>
+                          {a.prixIndicatif != null && (
+                            <Text style={styles.articlePrix}>
+                              {a.prixIndicatif} €
+                            </Text>
+                          )}
+                        </View>
+                        {a.quantite != null && (
+                          <Text style={styles.articleStock}>
+                            Stock : {a.quantite}
+                          </Text>
+                        )}
+                        {selected && (
+                          <View style={styles.qtyRow}>
+                            <TouchableOpacity
+                              style={styles.qtyBtn}
+                              onPress={(e) => {
+                                e.stopPropagation?.();
+                                setQty(a.id, -1);
+                              }}
+                            >
+                              <Text style={styles.qtyBtnTxt}>−</Text>
+                            </TouchableOpacity>
+                            <Text style={styles.qtyValue}>{qty}</Text>
+                            <TouchableOpacity
+                              style={styles.qtyBtn}
+                              onPress={(e) => {
+                                e.stopPropagation?.();
+                                setQty(a.id, +1);
+                              }}
+                            >
+                              <Text style={styles.qtyBtnTxt}>+</Text>
+                            </TouchableOpacity>
+                          </View>
+                        )}
+                      </TouchableOpacity>
+                    );
+                  })
+                ) : (
+                  <Text style={styles.noArticleTxt}>
+                    Aucun article pour cette créatrice
+                  </Text>
+                )}
+
+                <TouchableOpacity
+                  style={[
+                    styles.submitBtn,
+                    selections.length === 0 && styles.submitBtnDisabled,
+                    { marginTop: 20 },
+                  ]}
+                  activeOpacity={0.85}
+                  disabled={selections.length === 0}
+                  onPress={() => setStep(3)}
+                >
+                  <Text style={styles.submitTxt}>
+                    SUIVANT
+                    {selections.length > 0
+                      ? ` (${selections.length} article${selections.length > 1 ? "s" : ""})`
+                      : ""}
+                    {" ›"}
+                  </Text>
+                </TouchableOpacity>
+              </>
+            )}
+
+            {/* ── ÉTAPE 3 : Récapitulatif + mode paiement ── */}
+            {step === 3 && (
+              <>
+                <TouchableOpacity
+                  style={styles.backBtn}
+                  onPress={() => setStep(2)}
+                >
+                  <Text style={styles.backBtnTxt}>‹ Modifier la sélection</Text>
+                </TouchableOpacity>
+
+                {/* Récap articles */}
+                <View style={styles.recapCard}>
+                  {selections.map((s, idx) => (
+                    <View
+                      key={s.article.id}
+                      style={[
+                        styles.recapRow,
+                        idx === selections.length - 1 && styles.recapRowLast,
+                      ]}
+                    >
+                      <Text style={styles.recapArticleNom} numberOfLines={2}>
+                        {s.article.nom} × {s.quantite}
+                      </Text>
+                      <Text style={styles.recapArticlePrix}>
+                        {((s.article.prixIndicatif ?? 0) * s.quantite).toFixed(
+                          2
+                        )}{" "}
+                        €
+                      </Text>
+                    </View>
+                  ))}
                 </View>
 
-                {/* Prix */}
-                <View style={styles.formGroup}>
-                  <Text style={styles.formLabel}>Prix de vente (€)</Text>
-                  <TextInput
-                    style={styles.formInput}
-                    value={form.prixVente}
-                    onChangeText={(v) =>
-                      setForm((prev) => ({ ...prev, prixVente: v }))
-                    }
-                    placeholder="0.00"
-                    placeholderTextColor={Colors.textLight}
-                    keyboardType="decimal-pad"
-                    returnKeyType="done"
-                  />
+                {/* Total */}
+                <View style={styles.totalRow}>
+                  <Text style={styles.totalLabel}>TOTAL</Text>
+                  <Text style={styles.totalMontant}>
+                    {totalGeneral.toFixed(2)} €
+                  </Text>
                 </View>
 
                 {/* Mode paiement */}
-                <View style={styles.formGroup}>
+                <View style={[styles.formGroup, { marginTop: 20 }]}>
                   <Text style={styles.formLabel}>Mode de paiement</Text>
                   <View style={styles.modePaiementRow}>
                     {(["ESPECES", "CARTE"] as ModePaiement[]).map((m) => (
@@ -434,17 +473,15 @@ function BottomSheetCreation({
                         key={m}
                         style={[
                           styles.modeChip,
-                          form.modePaiement === m && styles.modeChipActive,
+                          modePaiement === m && styles.modeChipActive,
                         ]}
                         activeOpacity={0.8}
-                        onPress={() =>
-                          setForm((prev) => ({ ...prev, modePaiement: m }))
-                        }
+                        onPress={() => setModePaiement(m)}
                       >
                         <Text
                           style={[
                             styles.modeChipTxt,
-                            form.modePaiement === m && styles.modeChipTxtActive,
+                            modePaiement === m && styles.modeChipTxtActive,
                           ]}
                         >
                           {m === "ESPECES" ? "ESPECES" : "CARTE"}
@@ -454,17 +491,9 @@ function BottomSheetCreation({
                   </View>
                 </View>
 
-                {/* Erreur mutation */}
-                {mutation.isError && (
-                  <Text
-                    style={{
-                      fontFamily: Fonts.family.nowLight,
-                      fontSize: 12,
-                      color: Colors.error,
-                      marginBottom: 12,
-                      textAlign: "center",
-                    }}
-                  >
+                {/* Erreur */}
+                {submitError && (
+                  <Text style={styles.errorTxt}>
                     Erreur lors de l'enregistrement. Réessaye.
                   </Text>
                 )}
@@ -473,16 +502,18 @@ function BottomSheetCreation({
                 <TouchableOpacity
                   style={[
                     styles.submitBtn,
-                    !canSubmit && styles.submitBtnDisabled,
+                    submitPending && styles.submitBtnDisabled,
                   ]}
                   activeOpacity={0.85}
-                  onPress={handleSubmit}
-                  disabled={!canSubmit}
+                  onPress={handleSubmitSafe}
+                  disabled={submitPending}
                 >
-                  {mutation.isPending ? (
+                  {submitPending ? (
                     <ActivityIndicator color="#FFFFFF" />
                   ) : (
-                    <Text style={styles.submitTxt}>ENREGISTRER LA VENTE</Text>
+                    <Text style={styles.submitTxt}>
+                      ENREGISTRER LES VENTES
+                    </Text>
                   )}
                 </TouchableOpacity>
               </>

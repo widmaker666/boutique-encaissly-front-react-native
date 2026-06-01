@@ -44,6 +44,7 @@ export interface Vente {
   creatrice?: Pick<Creatrice, "nom" | "tauxDeCommission">;
   montantCommission: number;
   netCreatrice: number;
+  quantite?: number;
 }
 
 export interface Boutique {
