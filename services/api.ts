@@ -207,10 +207,12 @@ export const articleService = {
       name: fileName,
       type: mimeType,
     } as any);
-    //- Ne pas forcer Content-Type — Axios doit générer la boundary automatiquement
+    //- Supprimer Content-Type global (application/json) pour que FormData définisse
+    //- lui-même multipart/form-data avec la boundary correcte
     const { data } = await api.post(
       `/article/import?creatriceId=${creatriceId}`,
       formData,
+      { headers: { "Content-Type": undefined } },
     );
     return data as { imported: number; message: string };
   },
