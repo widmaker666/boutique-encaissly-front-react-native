@@ -8,6 +8,7 @@ import {
   Animated,
 } from "react-native";
 import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
 import { creatriceService } from "@/services/api";
 import { useAuthStore } from "@/stores/auth.store";
 import type { Creatrice } from "@/types";
@@ -60,6 +61,7 @@ function AnimCard({
 
 export default function CreatriceScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const isGerante = user?.role === "GERANTE";
   const isPro = user?.plan === "PRO";
@@ -177,6 +179,7 @@ export default function CreatriceScreen() {
             <TouchableOpacity
               style={{ flexDirection: "row", alignItems: "center", flex: 1 }}
               activeOpacity={0.75}
+              onPress={() => router.push(`/(app)/creatrice/${creatrice.id}`)}
             >
               <View
                 style={[

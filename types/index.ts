@@ -54,3 +54,23 @@ export interface Boutique {
   createdAt: string;
   geranteId: string;
 }
+
+export interface VenteDetail {
+  id: string;
+  nomArticle: string;
+  prixVente: number;
+  modePaiement: ModePaiement;
+  createdAt: string;
+}
+
+export interface CreatriceStats {
+  nbVentes: number;
+  ca: number;
+  totalCommission: number;
+  netCreatrice: number;
+}
+
+export interface CreatriceDetail extends Creatrice {
+  ventes: VenteDetail[];
+  stats: CreatriceStats;
+}
