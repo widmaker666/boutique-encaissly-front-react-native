@@ -207,14 +207,22 @@ export const articleService = {
       name: fileName,
       type: mimeType,
     } as any);
-    //- Supprimer Content-Type global (application/json) pour que FormData définisse
-    //- lui-même multipart/form-data avec la boundary correcte
-    const { data } = await api.post(
-      `/article/import?creatriceId=${creatriceId}`,
-      formData,
-      { headers: { "Content-Type": undefined } },
+    //- fetch natif au lieu d'Axios — seul moyen fiable sur React Native pour
+    //- envoyer un FormData avec fichier sans conflit avec Content-Type: application/json global
+    const token = useAuthStore.getState().accessToken;
+    const response = await fetch(
+      `${API_BASE_URL}/article/import?creatriceId=${creatriceId}`,
+      {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      },
     );
-    return data as { imported: number; message: string };
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw { response: { data: err } };
+    }
+    return response.json() as Promise<{ imported: number; message: string }>;
   },
 };
 
