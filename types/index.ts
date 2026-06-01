@@ -28,6 +28,8 @@ export interface Creatrice {
   tauxDeCommission: number;
   createdAt: string;
   userId?: string;
+  nbVentes?: number;
+  ca?: number;
 }
 
 export interface Vente {
