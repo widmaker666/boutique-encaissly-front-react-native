@@ -17,8 +17,9 @@ import { Colors } from "@/constants/colors";
 import { styles, getAvatarColor } from "@/styles/pages/creatrice.style";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ModalCreation from "@/components/Creatrice/ModalCreation";
+import EventFiche from "@/pages/Creatrice/EventFiche";
+import PersonnelRecap from "@/pages/Creatrice/PersonnelRecap";
 
-//- Card animée avec délai
 function AnimCard({
   children,
   index,
@@ -67,13 +68,23 @@ export default function CreatriceScreen() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const isGerante = user?.role === "GERANTE";
-  const isPro = user?.plan === "PRO";
+  const activeEvenementId = useAuthStore((state) => state.activeEvenementId);
+  const activeEvenementNom = useAuthStore((state) => state.activeEvenementNom);
   const [search, setSearch] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
 
   const headerAnim = useRef(new Animated.Value(0)).current;
   const searchAnim = useRef(new Animated.Value(0)).current;
 
+  // ── CREATRICE : EventFiche ou PersonnelRecap selon le contexte actif
+  if (!isGerante) {
+    if (activeEvenementId) {
+      return <EventFiche evenementId={activeEvenementId} evenementNom={activeEvenementNom ?? ""} />;
+    }
+    return <PersonnelRecap />;
+  }
+
+  // ── GERANTE : liste des créatrices
   const { data: creatrices, isLoading } = useQuery({
     queryKey: ["creatrices"],
     queryFn: creatriceService.getAll,
@@ -111,7 +122,6 @@ export default function CreatriceScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header animé */}
       <Animated.View
         style={[
           styles.header,
@@ -135,18 +145,15 @@ export default function CreatriceScreen() {
             {count} créatrice{count > 1 ? "s" : ""} · {user?.plan ?? "FREE"}
           </Text>
         </View>
-        {isGerante && (
-          <TouchableOpacity
-            style={styles.addBtn}
-            activeOpacity={0.8}
-            onPress={() => setModalVisible(true)}
-          >
-            <Text style={styles.addBtnTxt}>+</Text>
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity
+          style={styles.addBtn}
+          activeOpacity={0.8}
+          onPress={() => setModalVisible(true)}
+        >
+          <Text style={styles.addBtnTxt}>+</Text>
+        </TouchableOpacity>
       </Animated.View>
 
-      {/* Search animée */}
       <Animated.View
         style={[
           styles.searchWrapper,
@@ -221,7 +228,7 @@ export default function CreatriceScreen() {
           <Text style={styles.emptyTxt}>Aucune créatrice trouvée</Text>
         )}
 
-        {isGerante && !isPro && (
+        {!user?.plan?.includes("PRO") && (
           <AnimCard index={(filtered?.length ?? 0) + 1} style={styles.lockedBox}>
             <Text style={styles.lockedEmoji}>🔒</Text>
             <Text style={styles.lockedTxt}>3 créatrices max en FREE</Text>

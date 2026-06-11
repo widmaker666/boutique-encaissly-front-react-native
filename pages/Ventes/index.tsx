@@ -140,6 +140,9 @@ function BottomSheetCreation({
 }) {
   const queryClient = useQueryClient();
   const insets = useSafeAreaInsets();
+  const user = useAuthStore((state) => state.user);
+  const isGerante = user?.role === "GERANTE";
+  const activeEvenementId = useAuthStore((state) => state.activeEvenementId);
   const [step, setStep] = useState<Step>(1);
   const [creatrice, setCreatrice] = useState<SelectedCreatrice | null>(null);
   const [selections, setSelections] = useState<ArticleSelection[]>([]);
@@ -176,11 +179,25 @@ function BottomSheetCreation({
     enabled: visible,
   });
 
+  //- Auto-sélection pour CREATRICE avec une seule fiche — saute directement aux articles
+  useEffect(() => {
+    if (!isGerante && creatrices?.length === 1 && step === 1 && !creatrice) {
+      const c = creatrices[0];
+      setCreatrice({ id: c.id, nom: c.nom });
+      setStep(2);
+    }
+  }, [creatrices]);
+
   const { data: articles, isLoading: loadingArticles } = useQuery({
-    queryKey: ["articles", creatrice?.id],
-    queryFn: () => articleService.getAll(creatrice!.id),
+    queryKey: ["articles", activeEvenementId ?? creatrice?.id],
+    queryFn: () =>
+      activeEvenementId
+        ? articleService.getAll({ evenementId: activeEvenementId })
+        : articleService.getAll({ creatriceId: creatrice!.id }),
     enabled: !!creatrice?.id && step === 2,
   });
+
+  const articlesFiltered: Article[] = articles ?? [];
 
   // ── Helpers sélection ────────────────────────────────────────────────────────
 
@@ -252,6 +269,7 @@ function BottomSheetCreation({
     setSubmitError(false);
     setSubmitPending(true);
     try {
+      const evenementId = activeEvenementId ?? undefined;
       await Promise.all(
         selections.map((s) => {
           if (s.article != null) {
@@ -262,6 +280,7 @@ function BottomSheetCreation({
               creatriceId: creatrice.id,
               articleId: s.article.id,
               quantite: s.quantite,
+              evenementId,
             });
           }
           return venteService.create({
@@ -270,12 +289,14 @@ function BottomSheetCreation({
             modePaiement,
             creatriceId: creatrice.id,
             quantite: s.quantite,
+            evenementId,
           });
         })
       );
       queryClient.invalidateQueries({ queryKey: ["ventes"] });
-      queryClient.invalidateQueries({ queryKey: ["articles", creatrice.id] });
+      queryClient.invalidateQueries({ queryKey: ["articles"] });
       queryClient.invalidateQueries({ queryKey: ["stats"] });
+      queryClient.invalidateQueries({ queryKey: ["articles-event"] });
       onClose();
     } catch {
       setSubmitError(true);
@@ -339,6 +360,10 @@ function BottomSheetCreation({
               <>
                 {loadingCreatrices ? (
                   <ActivityIndicator color={Colors.primary} />
+                ) : !creatrices?.length ? (
+                  <Text style={styles.noArticleTxt}>
+                    Aucune fiche créatrice. Crée ta boutique dans l'onglet Profil pour pouvoir vendre.
+                  </Text>
                 ) : (
                   creatrices?.map((c: Creatrice, idx: number) => {
                     const isActive = creatrice?.id === c.id;
@@ -378,12 +403,14 @@ function BottomSheetCreation({
             {/* ── ÉTAPE 2 : Multi-sélection articles ── */}
             {step === 2 && (
               <>
-                <TouchableOpacity
-                  style={styles.backBtn}
-                  onPress={() => setStep(1)}
-                >
-                  <Text style={styles.backBtnTxt}>‹ Changer de créatrice</Text>
-                </TouchableOpacity>
+                {(isGerante || (creatrices?.length ?? 0) > 1) && (
+                  <TouchableOpacity
+                    style={styles.backBtn}
+                    onPress={() => setStep(1)}
+                  >
+                    <Text style={styles.backBtnTxt}>‹ Changer de créatrice</Text>
+                  </TouchableOpacity>
+                )}
 
                 {creatrice && (
                   <View style={styles.selectedCreatriceBanner}>
@@ -395,8 +422,8 @@ function BottomSheetCreation({
 
                 {loadingArticles ? (
                   <ActivityIndicator color={Colors.primary} />
-                ) : articles && articles.length > 0 ? (
-                  articles.map((a: Article) => {
+                ) : articlesFiltered.length > 0 ? (
+                  articlesFiltered.map((a: Article) => {
                     const selected = isSelected(a.id);
                     const qty = getQty(a.id);
                     return (
@@ -465,7 +492,9 @@ function BottomSheetCreation({
                   })
                 ) : (
                   <Text style={styles.noArticleTxt}>
-                    Aucun article pour cette créatrice
+                    {activeEvenementId
+                      ? "Aucun article en stock pour cet événement — ajoute des articles dans Ma fiche"
+                      : "Aucun article pour cette créatrice"}
                   </Text>
                 )}
 
@@ -653,6 +682,8 @@ type FilterMode = "TOUT" | "ESPECES" | "CARTE";
 export default function VentesScreen() {
   const insets = useSafeAreaInsets();
   const user = useAuthStore((state) => state.user);
+  const activeEvenementId = useAuthStore((state) => state.activeEvenementId);
+  const activeEvenementNom = useAuthStore((state) => state.activeEvenementNom);
   const [filter, setFilter] = useState<FilterMode>("TOUT");
   const [sheetVisible, setSheetVisible] = useState(false);
 
@@ -666,11 +697,13 @@ export default function VentesScreen() {
     }).start();
   }, []);
 
-  const queryFilters =
-    filter === "TOUT" ? {} : { modePaiement: filter };
+  const queryFilters = {
+    ...(filter !== "TOUT" ? { modePaiement: filter } : {}),
+    ...(activeEvenementId ? { evenementId: activeEvenementId } : {}),
+  };
 
   const { data: ventes, isLoading } = useQuery<Vente[]>({
-    queryKey: ["ventes", filter],
+    queryKey: ["ventes", filter, activeEvenementId ?? "personal"],
     queryFn: () => venteService.getAll(queryFilters),
   });
 
@@ -701,18 +734,16 @@ export default function VentesScreen() {
         <View>
           <Text style={styles.titre}>VENTES</Text>
           <Text style={styles.headerSub}>
-            {count} vente{count > 1 ? "s" : ""} · {user?.plan ?? "FREE"}
+            {activeEvenementNom ? `🎪 ${activeEvenementNom}` : `${count} vente${count > 1 ? "s" : ""} · ${user?.plan ?? "FREE"}`}
           </Text>
         </View>
-        {isGerante && (
-          <TouchableOpacity
-            style={styles.addBtn}
-            activeOpacity={0.8}
-            onPress={() => setSheetVisible(true)}
-          >
-            <Text style={styles.addBtnTxt}>+</Text>
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity
+          style={[styles.addBtn, !isGerante && !activeEvenementId && { opacity: 0.35 }]}
+          activeOpacity={0.8}
+          onPress={() => { if (isGerante || activeEvenementId) setSheetVisible(true); }}
+        >
+          <Text style={styles.addBtnTxt}>+</Text>
+        </TouchableOpacity>
       </Animated.View>
 
       {/* Filtres chips */}
@@ -743,6 +774,15 @@ export default function VentesScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.list}
         >
+          {!isGerante && !activeEvenementId && (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyIcon}>🎪</Text>
+              <Text style={styles.emptyTxt}>Aucun événement actif</Text>
+              <Text style={styles.emptySub}>
+                Sélectionne un événement depuis le Dashboard pour commencer à vendre
+              </Text>
+            </View>
+          )}
           {ventes && ventes.length > 0 ? (
             groupVentes(ventes).map((v, index) => (
               <AnimCard key={v.id} index={index} style={styles.card}>
@@ -752,9 +792,9 @@ export default function VentesScreen() {
                       {v.nomArticle}
                       {v.quantite > 1 ? `  × ${v.quantite}` : ""}
                     </Text>
-                    {v.creatrice?.nom && (
+                    {(v.evenement?.nom || v.creatrice?.nom) && (
                       <Text style={styles.cardCreatrice} numberOfLines={1}>
-                        {v.creatrice.nom} · {v.modePaiement}
+                        {v.evenement?.nom ?? v.creatrice?.nom} · {v.modePaiement}
                       </Text>
                     )}
                   </View>
@@ -773,9 +813,7 @@ export default function VentesScreen() {
               <Text style={styles.emptySub}>
                 {filter !== "TOUT"
                   ? `Aucune vente en ${filter}`
-                  : isGerante
-                  ? "Appuie sur + pour enregistrer la première vente"
-                  : "Aucune vente enregistrée pour le moment"}
+                  : "Appuie sur + pour enregistrer la première vente"}
               </Text>
             </View>
           )}

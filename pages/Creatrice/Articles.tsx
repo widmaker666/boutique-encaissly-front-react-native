@@ -243,7 +243,7 @@ export default function ArticlesScreen() {
 
   const { data: articles = [], isLoading } = useQuery<Article[]>({
     queryKey: ["articles", creatriceId],
-    queryFn: () => articleService.getAll(creatriceId),
+    queryFn: () => articleService.getAll({ creatriceId }),
     enabled: !!creatriceId,
   });
 
@@ -286,7 +286,7 @@ export default function ArticlesScreen() {
         asset.uri,
         asset.name,
         asset.mimeType ?? "text/csv",
-        creatriceId,
+        { creatriceId },
       );
       Alert.alert("Import réussi ✓", res.message);
       queryClient.invalidateQueries({ queryKey: ["articles", creatriceId] });
@@ -361,27 +361,25 @@ export default function ArticlesScreen() {
             <Text style={styles.headerTitle}>ARTICLES</Text>
           </View>
 
-          {isGerante && (
-            <>
-              <TouchableOpacity
-                style={styles.importBtn}
-                onPress={handleImport}
-                activeOpacity={0.75}
-              >
-                <Text style={styles.importBtnTxt}>📥</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.addBtn}
-                onPress={() => {
-                  setArticleToEdit(null);
-                  setModalVisible(true);
-                }}
-                activeOpacity={0.75}
-              >
-                <Text style={styles.addBtnTxt}>+</Text>
-              </TouchableOpacity>
-            </>
-          )}
+          <>
+            <TouchableOpacity
+              style={styles.importBtn}
+              onPress={handleImport}
+              activeOpacity={0.75}
+            >
+              <Text style={styles.importBtnTxt}>📥</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.addBtn}
+              onPress={() => {
+                setArticleToEdit(null);
+                setModalVisible(true);
+              }}
+              activeOpacity={0.75}
+            >
+              <Text style={styles.addBtnTxt}>+</Text>
+            </TouchableOpacity>
+          </>
         </View>
 
         {!!nomCreatrice && (
@@ -423,24 +421,22 @@ export default function ArticlesScreen() {
                 )}
               </View>
 
-              {isGerante && (
-                <View style={styles.articleActions}>
-                  <TouchableOpacity
-                    style={styles.editBtn}
-                    onPress={() => handleEdit(article)}
-                    activeOpacity={0.75}
-                  >
-                    <Text style={styles.editBtnTxt}>✎</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.deleteBtn}
-                    onPress={() => handleDelete(article)}
-                    activeOpacity={0.75}
-                  >
-                    <Text style={styles.deleteBtnTxt}>×</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
+              <View style={styles.articleActions}>
+                <TouchableOpacity
+                  style={styles.editBtn}
+                  onPress={() => handleEdit(article)}
+                  activeOpacity={0.75}
+                >
+                  <Text style={styles.editBtnTxt}>✎</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.deleteBtn}
+                  onPress={() => handleDelete(article)}
+                  activeOpacity={0.75}
+                >
+                  <Text style={styles.deleteBtnTxt}>×</Text>
+                </TouchableOpacity>
+              </View>
             </AnimCard>
           ))
         )}

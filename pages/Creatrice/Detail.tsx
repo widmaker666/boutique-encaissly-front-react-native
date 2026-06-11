@@ -183,14 +183,20 @@ export default function CreatriceDetailScreen() {
         ]}
       >
         <View style={styles.headerTop}>
-          <TouchableOpacity
-            style={styles.backBtn}
-            onPress={() => router.back()}
-            activeOpacity={0.75}
-          >
-            <Text style={styles.backTxt}>‹</Text>
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>FICHE CRÉATRICE</Text>
+          {isGerante ? (
+            <TouchableOpacity
+              style={styles.backBtn}
+              onPress={() => router.back()}
+              activeOpacity={0.75}
+            >
+              <Text style={styles.backTxt}>‹</Text>
+            </TouchableOpacity>
+          ) : (
+            <View style={styles.backBtn} />
+          )}
+          <Text style={styles.headerTitle}>
+            {isGerante ? "FICHE CRÉATRICE" : "MA FICHE"}
+          </Text>
         </View>
 
         <View style={styles.headerCenter}>
@@ -199,13 +205,6 @@ export default function CreatriceDetailScreen() {
           </View>
 
           <Text style={styles.nom}>{creatrice.nom}</Text>
-
-          {!!creatrice.email && (
-            <Text style={styles.contactLine}>{creatrice.email}</Text>
-          )}
-          {!!creatrice.telephone && (
-            <Text style={styles.contactLine}>{creatrice.telephone}</Text>
-          )}
 
           <View style={styles.commissionBadge}>
             <Text style={styles.commissionTxt}>
@@ -220,7 +219,7 @@ export default function CreatriceDetailScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Stats 2×2 */}
+        {/* Stats globales */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>STATISTIQUES</Text>
           <View style={styles.statsGrid}>
@@ -254,38 +253,28 @@ export default function CreatriceDetailScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Liste ventes */}
+        {/* Ventes globales */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
             VENTES ({creatrice.ventes.length})
           </Text>
-
           {creatrice.ventes.length === 0 && (
             <Text style={styles.emptyVentes}>Aucune vente enregistrée.</Text>
           )}
-
           {groupVentes(creatrice.ventes).map((vente, i) => (
             <AnimCard key={vente.id} index={4 + i} style={styles.venteCard}>
               <View style={styles.venteLeft}>
                 <Text style={styles.venteArticle} numberOfLines={1}>
-                  {vente.nomArticle}
-                  {vente.quantite > 1 ? `  × ${vente.quantite}` : ""}
+                  {vente.nomArticle}{vente.quantite > 1 ? `  × ${vente.quantite}` : ""}
                 </Text>
                 <Text style={styles.venteDate}>{formatDateFR(vente.createdAt)}</Text>
               </View>
-
               <View style={styles.venteRight}>
-                <Text style={styles.ventePrix}>
-                  {formatMontant(vente.prixVente)}
-                </Text>
+                <Text style={styles.ventePrix}>{formatMontant(vente.prixVente)}</Text>
                 {vente.modePaiement === "ESPECES" ? (
-                  <View style={styles.badgeEspeces}>
-                    <Text style={styles.badgeEspecesTxt}>ESPECES</Text>
-                  </View>
+                  <View style={styles.badgeEspeces}><Text style={styles.badgeEspecesTxt}>ESPECES</Text></View>
                 ) : (
-                  <View style={styles.badgeCarte}>
-                    <Text style={styles.badgeCarteTxt}>CARTE</Text>
-                  </View>
+                  <View style={styles.badgeCarte}><Text style={styles.badgeCarteTxt}>CARTE</Text></View>
                 )}
               </View>
             </AnimCard>

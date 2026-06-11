@@ -94,23 +94,31 @@ export const authService = {
 
 //- Récupération des stats
 export const statsService = {
-  getGlobal: async () => {
-    const { data } = await api.get("/stats");
+  getGlobal: async (evenementId?: string) => {
+    const { data } = await api.get("/stats", { params: evenementId ? { evenementId } : {} });
     return data;
   },
-  getHistorique: async () => {
-    const { data } = await api.get("/stats/historique");
+  getHistorique: async (evenementId?: string) => {
+    const { data } = await api.get("/stats/historique", { params: evenementId ? { evenementId } : {} });
+    return data;
+  },
+  getTopArticles: async (evenementId?: string) => {
+    const { data } = await api.get("/stats/top-articles", { params: evenementId ? { evenementId } : {} });
+    return data;
+  },
+  getParCreatrice: async () => {
+    const { data } = await api.get("/stats/par-creatrice");
     return data;
   },
 };
 
 //- Récupération des dernière ventes
 export const venteService = {
-  getRecent: async () => {
-    const { data } = await api.get("/vente/recent");
+  getRecent: async (evenementId?: string) => {
+    const { data } = await api.get("/vente/recent", { params: evenementId ? { evenementId } : {} });
     return data;
   },
-  getAll: async (filters?: { creatriceId?: string; modePaiement?: string }) => {
+  getAll: async (filters?: { creatriceId?: string; modePaiement?: string; evenementId?: string }) => {
     const { data } = await api.get("/vente", { params: filters });
     return data;
   },
@@ -119,7 +127,7 @@ export const venteService = {
     prixVente: number;
     modePaiement: "ESPECES" | "CARTE";
     creatriceId: string;
-    boutiqueId?: string;
+    evenementId?: string;
     articleId?: string;
     quantite?: number;
   }) => {
@@ -142,6 +150,14 @@ export const boutiqueService = {
     const { data } = await api.get("/boutique/mes-boutiques/count");
     return data;
   },
+  getMesBoutiques: async () => {
+    const { data } = await api.get("/boutique");
+    return data;
+  },
+  creerMaBoutique: async (nom: string) => {
+    const { data } = await api.post("/boutique/ma-boutique", { nom });
+    return data;
+  },
 };
 
 //- Les évênements
@@ -150,6 +166,11 @@ export const evenementService = {
     const { data } = await api.get("/evenement", {
       params: creatriceId ? { creatriceId } : {},
     });
+    return data;
+  },
+  //- Crée un événement pour la CREATRICE authentifiée (plan check côté back)
+  creerMonEvenement: async (nom: string) => {
+    const { data } = await api.post("/evenement/mon-evenement", { nom });
     return data;
   },
   getOne: async (id: string) => {
@@ -180,10 +201,8 @@ export const evenementService = {
 
 //- Articles
 export const articleService = {
-  getAll: async (creatriceId?: string) => {
-    const { data } = await api.get("/article", {
-      params: creatriceId ? { creatriceId } : {},
-    });
+  getAll: async (params?: { creatriceId?: string; evenementId?: string }) => {
+    const { data } = await api.get("/article", { params: params ?? {} });
     return data;
   },
   getOne: async (id: string) => {
@@ -195,7 +214,8 @@ export const articleService = {
     description?: string;
     prixIndicatif?: number;
     quantite?: number;
-    creatriceId: string;
+    creatriceId?: string;
+    evenementId?: string;
   }) => {
     const { data } = await api.post("/article", dto);
     return data;
@@ -215,19 +235,16 @@ export const articleService = {
     fileUri: string,
     fileName: string,
     mimeType: string,
-    creatriceId: string,
+    scope: { creatriceId?: string; evenementId?: string },
   ) => {
     const formData = new FormData();
-    formData.append("file", {
-      uri: fileUri,
-      name: fileName,
-      type: mimeType,
-    } as any);
-    //- fetch natif au lieu d'Axios — seul moyen fiable sur React Native pour
-    //- envoyer un FormData avec fichier sans conflit avec Content-Type: application/json global
+    formData.append("file", { uri: fileUri, name: fileName, type: mimeType } as any);
     const token = useAuthStore.getState().accessToken;
+    const params = new URLSearchParams();
+    if (scope.creatriceId) params.set("creatriceId", scope.creatriceId);
+    if (scope.evenementId) params.set("evenementId", scope.evenementId);
     const response = await fetch(
-      `${API_BASE_URL}/article/import?creatriceId=${creatriceId}`,
+      `${API_BASE_URL}/article/import?${params.toString()}`,
       {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
@@ -285,4 +302,38 @@ export const creatriceService = {
     return data;
   },
 };
+//- User profile
+export const userService = {
+  updateProfile: (dto: { nom?: string; prenom?: string }) =>
+    api.patch('/user/profile', dto).then((r) => r.data),
+  updateNotifications: (enabled: boolean) =>
+    api.patch('/user/notifications', { notificationsEmail: enabled }).then((r) => r.data),
+  updatePlan: (plan: 'FREE' | 'PRO') =>
+    api.patch('/user/plan', { plan }).then((r) => r.data),
+  uploadAvatar: async (imageUri: string, mimeType: string) => {
+    const formData = new FormData();
+    const filename = imageUri.split('/').pop() ?? 'avatar.jpg';
+    formData.append('file', { uri: imageUri, name: filename, type: mimeType } as any);
+    const token = useAuthStore.getState().accessToken;
+    const response = await fetch(`${API_BASE_URL}/user/avatar`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw { response: { data: err } };
+    }
+    return response.json();
+  },
+};
+
+//- Notifications
+export const notificationService = {
+  getAll: () => api.get('/notification').then((r) => r.data),
+  getUnreadCount: () => api.get('/notification/unread-count').then((r) => r.data),
+  markAllAsRead: () => api.patch('/notification/read-all').then((r) => r.data),
+  markAsRead: (id: string) => api.patch(`/notification/${id}/read`).then((r) => r.data),
+};
+
 export default api;

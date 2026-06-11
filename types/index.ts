@@ -13,6 +13,7 @@ export interface User {
   notificationsEmail: boolean;
   lastExportData: string | null;
   createdAt: string;
+  avatar?: string | null;
 }
 
 export interface AuthTokens {
@@ -42,6 +43,7 @@ export interface Vente {
   boutiqueId?: string;
   createdAt: string;
   creatrice?: Pick<Creatrice, "nom" | "tauxDeCommission">;
+  evenement?: { nom: string } | null;
   montantCommission: number;
   netCreatrice: number;
   quantite?: number;
