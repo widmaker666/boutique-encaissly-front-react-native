@@ -491,11 +491,16 @@ function BottomSheetCreation({
                     );
                   })
                 ) : (
-                  <Text style={styles.noArticleTxt}>
-                    {activeEvenementId
-                      ? "Aucun article en stock pour cet événement — ajoute des articles dans Ma fiche"
-                      : "Aucun article pour cette créatrice"}
-                  </Text>
+                  <View style={{ alignItems: "center", paddingVertical: 16 }}>
+                    <Text style={styles.noArticleTxt}>
+                      {activeEvenementId
+                        ? "Aucun article configuré pour cet événement"
+                        : "Aucun article pour cette créatrice"}
+                    </Text>
+                    <Text style={[styles.noArticleTxt, { marginTop: 4, color: Colors.primary }]}>
+                      Tu peux quand même vendre via "Article non répertorié" ↓
+                    </Text>
+                  </View>
                 )}
 
                 {/* Bouton article non répertorié */}
@@ -738,11 +743,15 @@ export default function VentesScreen() {
           </Text>
         </View>
         <TouchableOpacity
-          style={[styles.addBtn, !isGerante && !activeEvenementId && { opacity: 0.35 }]}
+          style={[
+            styles.addBtn,
+            { width: "auto", paddingHorizontal: 14, borderRadius: 20, height: 38 },
+            !isGerante && !activeEvenementId && { opacity: 0.35 },
+          ]}
           activeOpacity={0.8}
           onPress={() => { if (isGerante || activeEvenementId) setSheetVisible(true); }}
         >
-          <Text style={styles.addBtnTxt}>+</Text>
+          <Text style={[styles.addBtnTxt, { fontSize: 13, lineHeight: 38 }]}>＋ Ajouter une vente</Text>
         </TouchableOpacity>
       </Animated.View>
 
