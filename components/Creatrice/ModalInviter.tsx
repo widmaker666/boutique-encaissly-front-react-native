@@ -169,14 +169,29 @@ export default function ModalInviter({ visible, onClose, creatriceId }: Props) {
                     onSubmitEditing={handleInvite}
                   />
 
-                  {/* Sélection boutique — uniquement si plusieurs */}
+                  {/* Boutique — chargement */}
                   {loadingBoutiques && (
-                    <ActivityIndicator
-                      color={Colors.primary}
-                      style={localStyles.loader}
-                    />
+                    <ActivityIndicator color={Colors.primary} style={localStyles.loader} />
                   )}
 
+                  {/* Pas de boutique → message bloquant */}
+                  {!loadingBoutiques && boutiques?.length === 0 && (
+                    <View style={localStyles.noBoutiqueBox}>
+                      <Text style={localStyles.noBoutiqueTxt}>
+                        Vous n'avez pas encore de boutique.{"\n"}Créez-en une depuis le Dashboard avant d'inviter.
+                      </Text>
+                    </View>
+                  )}
+
+                  {/* 1 seule boutique → auto-sélectionnée, affichée en lecture seule */}
+                  {!loadingBoutiques && boutiques?.length === 1 && (
+                    <View style={localStyles.autoBoutiqueBox}>
+                      <Text style={localStyles.autoBoutiqueLabel}>BOUTIQUE</Text>
+                      <Text style={localStyles.autoBoutiqueName}>{boutiques[0].nom}</Text>
+                    </View>
+                  )}
+
+                  {/* Plusieurs boutiques → picker */}
                   {showBoutiquePicker && (
                     <>
                       <Text style={[s.label, localStyles.labelBoutique]}>
@@ -187,8 +202,7 @@ export default function ModalInviter({ visible, onClose, creatriceId }: Props) {
                           key={b.id}
                           style={[
                             localStyles.boutiqueRow,
-                            selectedBoutiqueId === b.id &&
-                              localStyles.boutiqueRowSelected,
+                            selectedBoutiqueId === b.id && localStyles.boutiqueRowSelected,
                           ]}
                           activeOpacity={0.75}
                           onPress={() => setSelectedBoutiqueId(b.id)}
@@ -196,15 +210,13 @@ export default function ModalInviter({ visible, onClose, creatriceId }: Props) {
                           <View
                             style={[
                               localStyles.radio,
-                              selectedBoutiqueId === b.id &&
-                                localStyles.radioSelected,
+                              selectedBoutiqueId === b.id && localStyles.radioSelected,
                             ]}
                           />
                           <Text
                             style={[
                               localStyles.boutiqueName,
-                              selectedBoutiqueId === b.id &&
-                                localStyles.boutiqueNameSelected,
+                              selectedBoutiqueId === b.id && localStyles.boutiqueNameSelected,
                             ]}
                           >
                             {b.nom}
@@ -287,6 +299,43 @@ const localStyles = StyleSheet.create({
   boutiqueNameSelected: {
     color: Colors.primaryDark,
     fontFamily: Fonts.family.nowMedium,
+  },
+  noBoutiqueBox: {
+    backgroundColor: "#fff3cd",
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginTop: 16,
+    borderWidth: 1,
+    borderColor: "#ffc10740",
+  },
+  noBoutiqueTxt: {
+    fontFamily: Fonts.family.nowRegular,
+    fontSize: Fonts.sizes.xs,
+    color: "#856404",
+    lineHeight: 18,
+    textAlign: "center",
+  },
+  autoBoutiqueBox: {
+    backgroundColor: Colors.primary + "0d",
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    marginTop: 16,
+    borderWidth: 1,
+    borderColor: Colors.primary + "30",
+  },
+  autoBoutiqueLabel: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: 10,
+    color: Colors.primary,
+    letterSpacing: 0.8,
+    marginBottom: 2,
+  },
+  autoBoutiqueName: {
+    fontFamily: Fonts.family.nowBold,
+    fontSize: Fonts.sizes.sm,
+    color: Colors.text,
   },
   successBox: {
     backgroundColor: "#16a34a15",
