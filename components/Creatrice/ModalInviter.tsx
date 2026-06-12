@@ -45,12 +45,8 @@ export default function ModalInviter({ visible, onClose, creatriceId }: Props) {
     enabled: visible,
   });
 
-  // Auto-sélection si 1 seule boutique
-  useEffect(() => {
-    if (boutiques && boutiques.length === 1) {
-      setSelectedBoutiqueId(boutiques[0].id);
-    }
-  }, [boutiques]);
+  // Boutique résolue : sélection manuelle OU auto si 1 seule boutique disponible
+  const effectiveBoutiqueId = selectedBoutiqueId ?? (boutiques?.length === 1 ? boutiques[0].id : null);
 
   useEffect(() => {
     if (visible) {
@@ -75,7 +71,7 @@ export default function ModalInviter({ visible, onClose, creatriceId }: Props) {
 
   const { mutate, isPending } = useMutation({
     mutationFn: () =>
-      creatriceService.invite(creatriceId, email.trim(), selectedBoutiqueId!),
+      creatriceService.invite(creatriceId, email.trim(), effectiveBoutiqueId!),
     onSuccess: () => {
       setSuccessMsg("Invitation envoyée ✓");
       setTimeout(() => {
@@ -99,7 +95,7 @@ export default function ModalInviter({ visible, onClose, creatriceId }: Props) {
       setErrorMsg("L'email est obligatoire.");
       return;
     }
-    if (!selectedBoutiqueId) {
+    if (!effectiveBoutiqueId) {
       setErrorMsg("Sélectionnez une boutique.");
       return;
     }
@@ -116,7 +112,7 @@ export default function ModalInviter({ visible, onClose, creatriceId }: Props) {
     outputRange: [500, 0],
   });
 
-  const canSubmit = email.trim().length > 0 && !!selectedBoutiqueId && !isPending;
+  const canSubmit = email.trim().length > 0 && !!effectiveBoutiqueId && !isPending;
   const showBoutiquePicker = boutiques && boutiques.length > 1;
 
   return (
