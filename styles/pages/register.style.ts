@@ -103,6 +103,44 @@ export const styles = StyleSheet.create({
     fontFamily: Fonts.family.nowMedium,
     fontSize: Fonts.sizes.sm,
   },
+  roleRow: {
+    flexDirection: "row",
+    gap: 12,
+    marginBottom: 24,
+  },
+  roleCard: {
+    flex: 1,
+    backgroundColor: Colors.surface,
+    borderRadius: 14,
+    padding: 16,
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: Colors.border,
+    ...inputShadow,
+  },
+  roleCardSelected: {
+    borderColor: Colors.primary,
+    backgroundColor: "#f3eaff",
+  },
+  roleIcon: {
+    fontSize: 28,
+    marginBottom: 8,
+  },
+  roleTitle: {
+    fontFamily: Fonts.family.nowBold,
+    fontSize: 14,
+    color: Colors.text,
+    marginBottom: 4,
+  },
+  roleTitleSelected: {
+    color: Colors.primary,
+  },
+  roleDesc: {
+    fontFamily: Fonts.family.nowLight,
+    fontSize: 11,
+    color: Colors.textLight,
+    textAlign: "center",
+  },
   footer: {
     flexDirection: "row",
     justifyContent: "center",

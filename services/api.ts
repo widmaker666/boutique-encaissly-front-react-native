@@ -67,12 +67,14 @@ export const authService = {
     password: string,
     nom?: string,
     prenom?: string,
+    role?: "GERANTE" | "CREATRICE",
   ) => {
     const { data } = await api.post("/auth/register", {
       email,
       password,
       nom,
       prenom,
+      ...(role ? { role } : {}),
     });
     return data;
   },

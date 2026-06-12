@@ -10,7 +10,7 @@ import {
   ScrollView,
   Animated,
 } from "react-native";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { styles } from "@/styles/pages/register.style";
 import { Colors } from "@/constants/colors";
 import { authService, useGoogleAuth } from "@/services/api";
@@ -18,7 +18,11 @@ import { useAuthStore } from "@/stores/auth.store";
 import { AntDesign } from "@expo/vector-icons";
 
 export default function RegisterScreen() {
-  const [email, setEmail] = useState("");
+  const params = useLocalSearchParams<{ email?: string; role?: string }>();
+  const [role, setRole] = useState<"GERANTE" | "CREATRICE" | null>(
+    params.role === "GERANTE" || params.role === "CREATRICE" ? params.role : null
+  );
+  const [email, setEmail] = useState(params.email ?? "");
   const [nom, setNom] = useState("");
   const [prenom, setPrenom] = useState("");
   const [password, setPassword] = useState("");
@@ -67,6 +71,10 @@ export default function RegisterScreen() {
 
   const handleRegister = async () => {
     setError("");
+    if (!role) {
+      setError("Veuillez choisir votre type de compte.");
+      return;
+    }
     if (!email || !password) {
       setError("Veuillez remplir tous les champs.");
       return;
@@ -77,7 +85,7 @@ export default function RegisterScreen() {
     }
     try {
       setLoading(true);
-      await authService.register(email, password, nom, prenom);
+      await authService.register(email, password, nom, prenom, role);
       const { accessToken, refreshToken } = await authService.login(
         email,
         password,
@@ -116,10 +124,36 @@ export default function RegisterScreen() {
       >
         <Animated.View style={slideUp(headerAnim)}>
           <Text style={styles.titre}>Inscription</Text>
-          <Text style={styles.sousTitre}>Créez votre compte boutique.</Text>
+          <Text style={styles.sousTitre}>Créez votre compte.</Text>
         </Animated.View>
 
         <Animated.View style={slideUp(formAnim)}>
+          <Text style={styles.label}>Je suis...</Text>
+          <View style={styles.roleRow}>
+            {(
+              [
+                { key: "GERANTE", icon: "🏪", title: "Gérante", desc: "Je gère une boutique" },
+                { key: "CREATRICE", icon: "🎨", title: "Créatrice", desc: "Je vends mes créations" },
+              ] as const
+            ).map((item) => {
+              const selected = role === item.key;
+              return (
+                <TouchableOpacity
+                  key={item.key}
+                  style={[styles.roleCard, selected && styles.roleCardSelected]}
+                  onPress={() => setRole(item.key)}
+                  activeOpacity={0.85}
+                >
+                  <Text style={styles.roleIcon}>{item.icon}</Text>
+                  <Text style={[styles.roleTitle, selected && styles.roleTitleSelected]}>
+                    {item.title}
+                  </Text>
+                  <Text style={styles.roleDesc}>{item.desc}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
           <Text style={styles.label}>Email</Text>
           <TextInput
             style={[styles.input, error ? styles.inputError : null]}

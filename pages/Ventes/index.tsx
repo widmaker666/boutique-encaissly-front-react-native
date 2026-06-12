@@ -788,7 +788,7 @@ export default function VentesScreen() {
               <Text style={styles.emptyIcon}>🎪</Text>
               <Text style={styles.emptyTxt}>Aucun événement actif</Text>
               <Text style={styles.emptySub}>
-                Sélectionne un événement depuis le Dashboard pour commencer à vendre
+                Va dans l'onglet <Text style={{ fontFamily: "Now-Bold" }}>Ma fiche</Text> pour activer ou créer un événement, puis reviens ici pour vendre.
               </Text>
             </View>
           )}
@@ -816,15 +816,17 @@ export default function VentesScreen() {
               </AnimCard>
             ))
           ) : (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyIcon}>🧾</Text>
-              <Text style={styles.emptyTxt}>Aucune vente</Text>
-              <Text style={styles.emptySub}>
-                {filter !== "TOUT"
-                  ? `Aucune vente en ${filter}`
-                  : "Appuie sur + pour enregistrer la première vente"}
-              </Text>
-            </View>
+            !isGerante && !activeEvenementId ? null : (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyIcon}>🧾</Text>
+                <Text style={styles.emptyTxt}>Aucune vente</Text>
+                <Text style={styles.emptySub}>
+                  {filter !== "TOUT"
+                    ? `Aucune vente en ${filter}`
+                    : "Appuie sur + pour enregistrer la première vente"}
+                </Text>
+              </View>
+            )
           )}
         </ScrollView>
       )}
