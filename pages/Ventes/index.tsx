@@ -295,8 +295,13 @@ function BottomSheetCreation({
       );
       queryClient.invalidateQueries({ queryKey: ["ventes"] });
       queryClient.invalidateQueries({ queryKey: ["articles"] });
-      queryClient.invalidateQueries({ queryKey: ["stats"] });
       queryClient.invalidateQueries({ queryKey: ["articles-event"] });
+      queryClient.invalidateQueries({ queryKey: ["stats"] });
+      queryClient.invalidateQueries({ queryKey: ["stats-global"] });
+      queryClient.invalidateQueries({ queryKey: ["stats-top-articles"] });
+      queryClient.invalidateQueries({ queryKey: ["stats-historique"] });
+      queryClient.invalidateQueries({ queryKey: ["stats-par-creatrice"] });
+      queryClient.invalidateQueries({ queryKey: ["ventes-recent"] });
       onClose();
     } catch {
       setSubmitError(true);
