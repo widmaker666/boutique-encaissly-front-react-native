@@ -134,7 +134,10 @@ export default function NotificationsScreen() {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
       queryClient.invalidateQueries({ queryKey: ["notifications-count"] });
     },
-    onError: () => Alert.alert("Erreur", "Impossible de rejoindre la boutique."),
+    onError: (err: any) => {
+      const msg = err?.response?.data?.message ?? err?.message ?? "Impossible de rejoindre la boutique.";
+      Alert.alert("Erreur", typeof msg === "string" ? msg : JSON.stringify(msg));
+    },
   });
 
   const markAllMutation = useMutation({
