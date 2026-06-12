@@ -98,6 +98,10 @@ export const statsService = {
     const { data } = await api.get("/stats", { params: evenementId ? { evenementId } : {} });
     return data;
   },
+  getGlobalBoutique: async (boutiqueId: string) => {
+    const { data } = await api.get("/stats", { params: { boutiqueId } });
+    return data;
+  },
   getHistorique: async (evenementId?: string) => {
     const { data } = await api.get("/stats/historique", { params: evenementId ? { evenementId } : {} });
     return data;

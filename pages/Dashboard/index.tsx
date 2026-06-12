@@ -280,7 +280,7 @@ export default function DashboardScreen() {
             {boutiques.map((boutique: any, i: number) => (
               <AnimCard key={boutique.id} index={i} style={styles.boutiqueRow}>
                 <TouchableOpacity
-                  onPress={() => router.push(`/(app)/boutique/${boutique.id}`)}
+                  onPress={() => router.push(`/(app)/boutique/${boutique.id}?nom=${encodeURIComponent(boutique.nom)}`)}
                   style={{ flex: 1, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
                   activeOpacity={0.75}
                 >
