@@ -76,21 +76,15 @@ export default function CreatriceScreen() {
   const headerAnim = useRef(new Animated.Value(0)).current;
   const searchAnim = useRef(new Animated.Value(0)).current;
 
-  // ── CREATRICE : EventFiche ou PersonnelRecap selon le contexte actif
-  if (!isGerante) {
-    if (activeEvenementId) {
-      return <EventFiche evenementId={activeEvenementId} evenementNom={activeEvenementNom ?? ""} />;
-    }
-    return <PersonnelRecap />;
-  }
-
-  // ── GERANTE : liste des créatrices
+  // Hooks toujours appelés (avant tout return conditionnel)
   const { data: creatrices, isLoading } = useQuery({
     queryKey: ["creatrices"],
     queryFn: creatriceService.getAll,
+    enabled: isGerante,
   });
 
   useEffect(() => {
+    if (!isGerante) return;
     Animated.stagger(80, [
       Animated.timing(headerAnim, {
         toValue: 1,
@@ -103,7 +97,15 @@ export default function CreatriceScreen() {
         useNativeDriver: true,
       }),
     ]).start();
-  }, []);
+  }, [isGerante]);
+
+  // ── CREATRICE : EventFiche ou PersonnelRecap selon le contexte actif
+  if (!isGerante) {
+    if (activeEvenementId) {
+      return <EventFiche evenementId={activeEvenementId} evenementNom={activeEvenementNom ?? ""} />;
+    }
+    return <PersonnelRecap />;
+  }
 
   if (isLoading)
     return (
