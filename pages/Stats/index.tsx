@@ -166,6 +166,20 @@ export default function StatsScreen() {
   const carteMontant: number = carte?._sum?.prixVente ?? 0;
   const paiementsTotal = especesMontant + carteMontant;
 
+  // KPI dérivés
+  const currentCA: number = globalData?.stats?._sum?.prixVente ?? 0;
+  const nbVentes: number = globalData?.stats?._count ?? 0;
+  const totalCommissions: number = globalData?.totalCommissions ?? 0;
+  const ticketMoyen: number = nbVentes > 0 ? currentCA / nbVentes : 0;
+  const netCreatrice: number = currentCA - totalCommissions;
+  const cretricesActives: number =
+    (parCreatriceData as any[])?.filter((c: any) => c.nbVentes > 0).length ?? 0;
+
+  // Évolution vs période précédente
+  const previousCA: number = (globalData as any)?.previousPeriodCA ?? 0;
+  const evolution: number | null =
+    previousCA > 0 ? ((currentCA - previousCA) / previousCA) * 100 : null;
+
   const historique: any[] = historiqueData ?? [];
   const caMax = historique.reduce(
     (max: number, item: any) => (item.ca > max ? item.ca : max),
@@ -224,29 +238,51 @@ export default function StatsScreen() {
         {/* ── 2. KPIs grille 2×2 ── */}
         <Text style={st.sectionTitle}>Résumé</Text>
         <View style={st.cardsGrid}>
-          {[
-            {
-              label: "Chiffre d'affaires",
-              value: `${round2(globalData?.stats?._sum?.prixVente)} €`,
-            },
-            {
-              label: "Ventes",
-              value: `${globalData?.stats?._count ?? 0}`,
-            },
-            {
-              label: "Commissions",
-              value: `${round2(globalData?.totalCommissions)} €`,
-            },
-            {
-              label: "Meilleure vente",
-              value: `${round2(globalData?.stats?._max?.prixVente)} €`,
-            },
-          ].map((item, i) => (
-            <AnimCard key={item.label} index={i} style={st.card}>
-              <Text style={st.cardLabel}>{item.label}</Text>
-              <Text style={st.cardValue}>{item.value}</Text>
+          {/* Carte CA avec badge évolution */}
+          <AnimCard key="ca" index={0} style={st.card}>
+            <Text style={st.cardLabel}>
+              {isGerante ? "CA boutique" : "Chiffre d'affaires"}
+            </Text>
+            <Text style={st.cardValue}>{round2(currentCA)} €</Text>
+            {evolution !== null && (
+              <Text
+                style={evolution >= 0 ? st.evolutionUp : st.evolutionDown}
+              >
+                {evolution >= 0
+                  ? `▲ +${evolution.toFixed(1)}%`
+                  : `▼ ${evolution.toFixed(1)}%`}
+              </Text>
+            )}
+          </AnimCard>
+
+          {/* Ventes (CREATRICE) ou Créatrices actives (GERANTE) */}
+          {isGerante ? (
+            <AnimCard key="creatrice-actives" index={1} style={st.card}>
+              <Text style={st.cardLabel}>Créatrices actives</Text>
+              <Text style={st.cardValue}>{cretricesActives}</Text>
             </AnimCard>
-          ))}
+          ) : (
+            <AnimCard key="ventes" index={1} style={st.card}>
+              <Text style={st.cardLabel}>Ventes</Text>
+              <Text style={st.cardValue}>{nbVentes}</Text>
+            </AnimCard>
+          )}
+
+          {/* Commissions reçues (GERANTE, vert) ou Net à percevoir (CREATRICE, vert) */}
+          <AnimCard key="net" index={2} style={st.card}>
+            <Text style={st.cardLabel}>
+              {isGerante ? "Commissions reçues" : "Net à percevoir"}
+            </Text>
+            <Text style={st.cardValueGreen}>
+              {isGerante ? round2(totalCommissions) : round2(netCreatrice)} €
+            </Text>
+          </AnimCard>
+
+          {/* Ticket moyen */}
+          <AnimCard key="ticket-moyen" index={3} style={st.card}>
+            <Text style={st.cardLabel}>Ticket moyen</Text>
+            <Text style={st.cardValue}>{round2(ticketMoyen)} €</Text>
+          </AnimCard>
         </View>
 
         {/* ── 3. Répartition paiements ── */}
@@ -826,5 +862,25 @@ const st = StyleSheet.create({
     fontFamily: Fonts.family.nowLight,
     fontSize: Fonts.sizes.xs,
     color: Colors.textLight,
+  },
+
+  // ── Évolution & valeur verte ──────────────────────────────────────────────────
+  evolutionUp: {
+    color: '#16a34a',
+    fontFamily: 'Now-Medium',
+    fontSize: 10,
+    marginTop: 2,
+  },
+  evolutionDown: {
+    color: '#dc2626',
+    fontFamily: 'Now-Medium',
+    fontSize: 10,
+    marginTop: 2,
+  },
+  cardValueGreen: {
+    fontFamily: 'Norwester',
+    color: '#16a34a',
+    fontSize: Fonts.sizes.lg,
+    letterSpacing: 0.5,
   },
 });
