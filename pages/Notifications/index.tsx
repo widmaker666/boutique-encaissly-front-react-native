@@ -133,6 +133,7 @@ export default function NotificationsScreen() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
       queryClient.invalidateQueries({ queryKey: ["notifications-count"] });
+      Alert.alert("Invitation acceptée", "Tu fais maintenant partie de la boutique !");
     },
     onError: (err: any) => {
       const msg = err?.response?.data?.message ?? err?.message ?? "Impossible de rejoindre la boutique.";
