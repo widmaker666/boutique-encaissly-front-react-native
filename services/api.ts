@@ -307,6 +307,10 @@ export const creatriceService = {
     });
     return data;
   },
+  acceptInvitation: async (creatriceId: string, boutiqueId: string) => {
+    const { data } = await api.post(`/creatrice/${creatriceId}/accept-invitation`, { boutiqueId });
+    return data;
+  },
 };
 //- User profile
 export const userService = {

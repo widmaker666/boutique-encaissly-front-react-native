@@ -7,9 +7,10 @@ import {
   Animated,
   StyleSheet,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { notificationService } from "@/services/api";
+import { notificationService, creatriceService } from "@/services/api";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "@/constants/colors";
 
@@ -20,6 +21,11 @@ interface Notification {
   userId: string;
   type: string;
   message: string;
+  metadata?: {
+    creatriceId?: string;
+    boutiqueId?: string;
+    boutiqueName?: string;
+  };
   read: boolean;
   createdAt: string;
 }
@@ -121,6 +127,16 @@ export default function NotificationsScreen() {
 
   const unreadCount = notifications?.filter((n) => !n.read).length ?? 0;
 
+  const { mutate: acceptInvitation, isPending: isAccepting } = useMutation({
+    mutationFn: ({ creatriceId, boutiqueId }: { creatriceId: string; boutiqueId: string }) =>
+      creatriceService.acceptInvitation(creatriceId, boutiqueId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      queryClient.invalidateQueries({ queryKey: ["notifications-count"] });
+    },
+    onError: () => Alert.alert("Erreur", "Impossible de rejoindre la boutique."),
+  });
+
   const markAllMutation = useMutation({
     mutationFn: notificationService.markAllAsRead,
     onSuccess: () => {
@@ -211,6 +227,26 @@ export default function NotificationsScreen() {
                   ]}>
                     {notif.message}
                   </Text>
+                  {notif.type === "INVITATION_BOUTIQUE" && notif.metadata?.creatriceId && (
+                    <View style={styles.actionRow}>
+                      <Text style={styles.inviteTxt}>
+                        Boutique : {notif.metadata.boutiqueName}
+                      </Text>
+                      <TouchableOpacity
+                        style={styles.joinBtn}
+                        disabled={isAccepting}
+                        activeOpacity={0.8}
+                        onPress={() =>
+                          acceptInvitation({
+                            creatriceId: notif.metadata!.creatriceId!,
+                            boutiqueId: notif.metadata!.boutiqueId ?? "",
+                          })
+                        }
+                      >
+                        <Text style={styles.joinBtnTxt}>Rejoindre</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
                 </View>
               </View>
             </AnimCard>
@@ -346,5 +382,32 @@ const styles = StyleSheet.create({
   },
   cardMessageRead: {
     color: Colors.textLight,
+  },
+  actionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: "#f0eaf8",
+  },
+  inviteTxt: {
+    fontFamily: "Now-Light",
+    fontSize: 12,
+    color: "#7a7a7a",
+    flex: 1,
+  },
+  joinBtn: {
+    backgroundColor: "#7a41bb",
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    marginLeft: 10,
+  },
+  joinBtnTxt: {
+    fontFamily: "Now-Bold",
+    fontSize: 12,
+    color: "#fff",
   },
 });
