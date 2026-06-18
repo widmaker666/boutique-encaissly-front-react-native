@@ -637,7 +637,60 @@ export default function ProfilScreen() {
                 </Text>
               </TouchableOpacity>
             </View>
+          ) : isDuo ? (
+            /* GERANTE_CREATRICE FREE → upgrade DUO uniquement */
+            <View style={s.freeBlock}>
+              <Text style={s.freeTitle}>Plan FREE</Text>
+              <Text style={s.freeDesc}>
+                Accédez aux fonctionnalités Gérante ET Créatrice avec un seul abonnement DUO.
+              </Text>
+              <View style={s.divider} />
+              <Text style={s.upgradeLabel}>Débloquez tout avec DUO</Text>
+              <View style={s.upgradeFeatures}>
+                {[
+                  "Gérante + Créatrice sur un seul compte",
+                  "Multi-boutiques · Stats avancées",
+                  "Historique complet · Exports illimités",
+                ].map((f) => (
+                  <View key={f} style={s.featureRow}>
+                    <AntDesign name="check-circle" size={13} color="#eb7f45" style={{ marginRight: 6 }} />
+                    <Text style={s.featureTxt}>{f}</Text>
+                  </View>
+                ))}
+              </View>
+              <View style={s.periodToggle}>
+                <TouchableOpacity
+                  style={[s.periodBtn, billingPeriod === "monthly" && s.periodBtnActive]}
+                  onPress={() => setBillingPeriod("monthly")}
+                  activeOpacity={0.8}
+                >
+                  <Text style={[s.periodTxt, billingPeriod === "monthly" && s.periodTxtActive]}>
+                    Mensuel · 15€
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[s.periodBtn, billingPeriod === "annual" && s.periodBtnActive]}
+                  onPress={() => setBillingPeriod("annual")}
+                  activeOpacity={0.8}
+                >
+                  <Text style={[s.periodTxt, billingPeriod === "annual" && s.periodTxtActive]}>
+                    Annuel · 129€ 🏷️
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <TouchableOpacity
+                style={[s.duoBtn, isUpgradingDuo && { opacity: 0.6 }]}
+                onPress={() => upgradeDuo()}
+                disabled={isUpgradingDuo}
+                activeOpacity={0.85}
+              >
+                <Text style={s.duoBtnTxt}>
+                  {isUpgradingDuo ? "Ouverture..." : billingPeriod === "annual" ? "Passer en DUO — 129€/an" : "Passer en DUO — 15€/mois"}
+                </Text>
+              </TouchableOpacity>
+            </View>
           ) : (
+            /* GERANTE ou CREATRICE FREE → upgrade PRO uniquement */
             <View style={s.freeBlock}>
               <Text style={s.freeTitle}>Plan FREE</Text>
               <Text style={s.freeDesc}>
@@ -659,7 +712,6 @@ export default function ProfilScreen() {
                   </View>
                 ))}
               </View>
-              {/* Toggle mensuel / annuel */}
               <View style={s.periodToggle}>
                 <TouchableOpacity
                   style={[s.periodBtn, billingPeriod === "monthly" && s.periodBtnActive]}
@@ -680,7 +732,6 @@ export default function ProfilScreen() {
                   </Text>
                 </TouchableOpacity>
               </View>
-
               <TouchableOpacity
                 style={[s.upgradeBtn, isUpgradingPro && { opacity: 0.6 }]}
                 onPress={() => upgradePro()}
@@ -695,34 +746,6 @@ export default function ProfilScreen() {
             </View>
           )}
         </AnimCard>
-
-        {/* ── Compte DUO (visible si pas encore GERANTE_CREATRICE ou plan != DUO) ── */}
-        {!isPlanDuo && (
-          <AnimCard index={cardIdx(3)} style={s.duoCard}>
-            <View style={s.duoHeader}>
-              <Text style={s.duoTitle}>Compte DUO</Text>
-              {isDuo && (
-                <View style={[s.proActiveBadge, { backgroundColor: "#fdf0e8" }]}>
-                  <Text style={[s.proActiveTxt, { color: "#eb7f45" }]}>Role actif</Text>
-                </View>
-              )}
-            </View>
-            <Text style={s.duoDesc}>
-              Gérez votre boutique ET vendez vos créations — un seul abonnement
-            </Text>
-              {/* Le toggle mensuel/annuel est partagé avec la section PRO ci-dessus */}
-            <TouchableOpacity
-              style={[s.duoBtn, isUpgradingDuo && { opacity: 0.6 }]}
-              onPress={() => upgradeDuo()}
-              disabled={isUpgradingDuo}
-              activeOpacity={0.85}
-            >
-              <Text style={s.duoBtnTxt}>
-                {isUpgradingDuo ? "Ouverture..." : billingPeriod === "annual" ? "Passer en DUO — 129€/an" : "Passer en DUO — 15€/mois"}
-              </Text>
-            </TouchableOpacity>
-          </AnimCard>
-        )}
 
         {/* ── Aide & FAQ ── */}
         <Text style={s.sectionTitle}>Aide & FAQ</Text>
