@@ -233,7 +233,7 @@ export default function ArticlesScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const user = useAuthStore((state) => state.user);
-  const isGerante = user?.role === "GERANTE";
+  const isGerante = user?.role === "GERANTE" || user?.role === "GERANTE_CREATRICE";
   const queryClient = useQueryClient();
 
   const [modalVisible, setModalVisible] = useState(false);

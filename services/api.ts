@@ -95,21 +95,19 @@ export const authService = {
 };
 
 //- Récupération des stats
+export type StatsParams = { evenementId?: string; boutiqueId?: string };
+
 export const statsService = {
-  getGlobal: async (evenementId?: string) => {
-    const { data } = await api.get("/stats", { params: evenementId ? { evenementId } : {} });
+  getGlobal: async (params?: StatsParams) => {
+    const { data } = await api.get("/stats", { params: params ?? {} });
     return data;
   },
-  getGlobalBoutique: async (boutiqueId: string) => {
-    const { data } = await api.get("/stats", { params: { boutiqueId } });
+  getHistorique: async (params?: StatsParams) => {
+    const { data } = await api.get("/stats/historique", { params: params ?? {} });
     return data;
   },
-  getHistorique: async (evenementId?: string) => {
-    const { data } = await api.get("/stats/historique", { params: evenementId ? { evenementId } : {} });
-    return data;
-  },
-  getTopArticles: async (evenementId?: string) => {
-    const { data } = await api.get("/stats/top-articles", { params: evenementId ? { evenementId } : {} });
+  getTopArticles: async (params?: StatsParams) => {
+    const { data } = await api.get("/stats/top-articles", { params: params ?? {} });
     return data;
   },
   getParCreatrice: async () => {
@@ -318,8 +316,6 @@ export const userService = {
     api.patch('/user/profile', dto).then((r) => r.data),
   updateNotifications: (enabled: boolean) =>
     api.patch('/user/notifications', { notificationsEmail: enabled }).then((r) => r.data),
-  updatePlan: (plan: 'FREE' | 'PRO') =>
-    api.patch('/user/plan', { plan }).then((r) => r.data),
   uploadAvatar: async (imageUri: string, mimeType: string) => {
     const formData = new FormData();
     const filename = imageUri.split('/').pop() ?? 'avatar.jpg';
@@ -335,6 +331,22 @@ export const userService = {
       throw { response: { data: err } };
     }
     return response.json();
+  },
+};
+
+//- Stripe
+export const stripeService = {
+  createCheckoutSession: async (priceId: string) => {
+    const { data } = await api.post('/stripe/checkout', { priceId });
+    return data as { url: string };
+  },
+  cancelSubscription: async () => {
+    const { data } = await api.post('/stripe/cancel');
+    return data;
+  },
+  upgradeDuo: async () => {
+    const { data } = await api.patch('/user/upgrade-duo');
+    return data as import('@/types').User;
   },
 };
 

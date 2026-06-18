@@ -1,5 +1,5 @@
-export type Plan = "FREE" | "PRO";
-export type Role = "GERANTE" | "CREATRICE";
+export type Plan = "FREE" | "PRO" | "DUO";
+export type Role = "GERANTE" | "CREATRICE" | "GERANTE_CREATRICE";
 export type Status = "ACTIVE" | "INVITE" | "SUSPENDUE";
 export type ModePaiement = "ESPECES" | "CARTE";
 

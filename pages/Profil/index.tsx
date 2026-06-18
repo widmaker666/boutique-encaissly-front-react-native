@@ -14,7 +14,9 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuthStore } from "@/stores/auth.store";
-import { boutiqueService, evenementService, userService } from "@/services/api";
+import * as WebBrowser from "expo-web-browser";
+import { authService, boutiqueService, evenementService, userService, stripeService } from "@/services/api";
+import { DuoModeToggle } from "@/components/DuoModeToggle";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { Colors } from "@/constants/colors";
@@ -118,13 +120,30 @@ export default function ProfilScreen() {
 
   const [notifEmail, setNotifEmail] = useState(user?.notificationsEmail ?? false);
   const [isEditing, setIsEditing] = useState(false);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [editPrenom, setEditPrenom] = useState(user?.prenom ?? "");
   const [editNom, setEditNom] = useState(user?.nom ?? "");
   const [showCreateBoutique, setShowCreateBoutique] = useState(false);
   const [boutiqueNom, setBoutiqueNom] = useState("");
+  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "annual">("monthly");
+
+  //- Rafraîchit le profil à chaque ouverture de l'onglet pour refléter les changements de plan Stripe
+  useQuery({
+    queryKey: ["profil-sync"],
+    queryFn: async () => {
+      const updatedUser = await authService.getProfile();
+      setUser(updatedUser);
+      return updatedUser;
+    },
+    refetchOnMount: true,
+    staleTime: 0,
+  });
 
   const isPro = user?.plan === "PRO";
-  const isGerante = user?.role === "GERANTE";
+  const isDuo = user?.role === "GERANTE_CREATRICE";
+  const isPlanDuo = user?.plan === "DUO";
+  const duoMode = useAuthStore((s) => s.duoMode);
+  const isGerante = user?.role === "GERANTE" || (isDuo && duoMode === "GERANTE");
 
   const headerAnim = useRef(new Animated.Value(0)).current;
   useEffect(() => {
@@ -189,16 +208,54 @@ export default function ProfilScreen() {
   });
 
   const { mutate: cancelPlan, isPending: isCancelling } = useMutation({
-    mutationFn: () => userService.updatePlan("FREE"),
-    onSuccess: (data) => {
-      if (user) setUser({ ...user, plan: data.plan });
+    mutationFn: () => stripeService.cancelSubscription(),
+    onSuccess: async () => {
+      const updatedUser = await authService.getProfile();
+      setUser(updatedUser);
+    },
+    onError: () => {
+      Alert.alert("Erreur", "Impossible de résilier l'abonnement. Veuillez réessayer.");
     },
   });
 
-  const { mutate: upgradePlan, isPending: isUpgrading } = useMutation({
-    mutationFn: () => userService.updatePlan("PRO"),
-    onSuccess: (data) => {
-      if (user) setUser({ ...user, plan: data.plan });
+  const { mutate: upgradePro, isPending: isUpgradingPro } = useMutation({
+    mutationFn: async () => {
+      const priceId = billingPeriod === "annual"
+        ? (process.env.EXPO_PUBLIC_STRIPE_PRICE_PRO_ANNUAL ?? "")
+        : (process.env.EXPO_PUBLIC_STRIPE_PRICE_PRO_MONTHLY ?? "");
+      const { url } = await stripeService.createCheckoutSession(priceId);
+      await WebBrowser.openBrowserAsync(url);
+    },
+    onSuccess: async () => {
+      await new Promise((r) => setTimeout(r, 2000));
+      const updatedUser = await authService.getProfile();
+      setUser(updatedUser);
+    },
+    onError: () => {
+      Alert.alert("Erreur", "Impossible d'ouvrir la page de paiement.");
+    },
+  });
+
+  const { mutate: upgradeDuo, isPending: isUpgradingDuo } = useMutation({
+    mutationFn: async () => {
+      // Si pas encore GERANTE_CREATRICE, on upgrade le role d'abord
+      if (user?.role !== "GERANTE_CREATRICE") {
+        const updatedUser = await stripeService.upgradeDuo();
+        setUser(updatedUser);
+      }
+      const priceId = billingPeriod === "annual"
+        ? (process.env.EXPO_PUBLIC_STRIPE_PRICE_DUO_ANNUAL ?? "")
+        : (process.env.EXPO_PUBLIC_STRIPE_PRICE_DUO_MONTHLY ?? "");
+      const { url } = await stripeService.createCheckoutSession(priceId);
+      await WebBrowser.openBrowserAsync(url);
+    },
+    onSuccess: async () => {
+      await new Promise((r) => setTimeout(r, 2000));
+      const updatedUser = await authService.getProfile();
+      setUser(updatedUser);
+    },
+    onError: () => {
+      Alert.alert("Erreur", "Impossible d'ouvrir la page de paiement DUO.");
     },
   });
 
@@ -336,10 +393,17 @@ export default function ProfilScreen() {
           <View style={[s.badge, { backgroundColor: isGerante ? Colors.primary : "#eb7f45" }]}>
             <Text style={s.badgeTxt}>{isGerante ? "Gérante" : "Créatrice"}</Text>
           </View>
-          <View style={[s.badge, { backgroundColor: isPro ? "#1a7a4a" : "#666" }]}>
-            <Text style={s.badgeTxt}>{isPro ? "✨ PRO" : "FREE"}</Text>
-          </View>
+          {isPlanDuo ? (
+            <View style={[s.badge, { backgroundColor: "#eb7f45" }]}>
+              <Text style={s.badgeTxt}>DUO</Text>
+            </View>
+          ) : (
+            <View style={[s.badge, { backgroundColor: isPro ? "#1a7a4a" : "#666" }]}>
+              <Text style={s.badgeTxt}>{isPro ? "✨ PRO" : "FREE"}</Text>
+            </View>
+          )}
         </View>
+        {isDuo && <DuoModeToggle />}
       </Animated.View>
 
       <View style={s.body}>
@@ -527,7 +591,30 @@ export default function ProfilScreen() {
         <Text style={s.sectionTitle}>Abonnement</Text>
 
         <AnimCard index={cardIdx(2)} style={s.card}>
-          {isPro ? (
+          {isPlanDuo ? (
+            <View style={s.proBlock}>
+              <View style={s.proHeader}>
+                <Text style={[s.proTitle, { color: "#eb7f45" }]}>DUO</Text>
+                <View style={[s.proActiveBadge, { backgroundColor: "#fdf0e8" }]}>
+                  <Text style={[s.proActiveTxt, { color: "#eb7f45" }]}>Actif</Text>
+                </View>
+              </View>
+              <Text style={s.proDesc}>
+                Boutique + Créatrice · Multi-boutiques · Stats avancées · Historique complet
+              </Text>
+              <View style={s.divider} />
+              <TouchableOpacity
+                style={s.resilierBtn}
+                onPress={handleResilier}
+                disabled={isCancelling}
+                activeOpacity={0.75}
+              >
+                <Text style={s.resilierTxt}>
+                  {isCancelling ? "Résiliation en cours..." : "Résilier l'abonnement"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : isPro ? (
             <View style={s.proBlock}>
               <View style={s.proHeader}>
                 <Text style={s.proTitle}>✨ Plan PRO</Text>
@@ -572,23 +659,112 @@ export default function ProfilScreen() {
                   </View>
                 ))}
               </View>
+              {/* Toggle mensuel / annuel */}
+              <View style={s.periodToggle}>
+                <TouchableOpacity
+                  style={[s.periodBtn, billingPeriod === "monthly" && s.periodBtnActive]}
+                  onPress={() => setBillingPeriod("monthly")}
+                  activeOpacity={0.8}
+                >
+                  <Text style={[s.periodTxt, billingPeriod === "monthly" && s.periodTxtActive]}>
+                    Mensuel · 9€
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[s.periodBtn, billingPeriod === "annual" && s.periodBtnActive]}
+                  onPress={() => setBillingPeriod("annual")}
+                  activeOpacity={0.8}
+                >
+                  <Text style={[s.periodTxt, billingPeriod === "annual" && s.periodTxtActive]}>
+                    Annuel · 79€ 🏷️
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
               <TouchableOpacity
-                style={[s.upgradeBtn, isUpgrading && { opacity: 0.6 }]}
-                onPress={() => upgradePlan()}
-                disabled={isUpgrading}
+                style={[s.upgradeBtn, isUpgradingPro && { opacity: 0.6 }]}
+                onPress={() => upgradePro()}
+                disabled={isUpgradingPro}
                 activeOpacity={0.85}
               >
                 <AntDesign name="star" size={14} color="#fff" style={{ marginRight: 6 }} />
                 <Text style={s.upgradeBtnTxt}>
-                  {isUpgrading ? "Activation..." : "Passer à PRO — 9€/mois"}
+                  {isUpgradingPro ? "Ouverture..." : billingPeriod === "annual" ? "Passer à PRO — 79€/an" : "Passer à PRO — 9€/mois"}
                 </Text>
               </TouchableOpacity>
             </View>
           )}
         </AnimCard>
 
+        {/* ── Compte DUO (visible si pas encore GERANTE_CREATRICE ou plan != DUO) ── */}
+        {!isPlanDuo && (
+          <AnimCard index={cardIdx(3)} style={s.duoCard}>
+            <View style={s.duoHeader}>
+              <Text style={s.duoTitle}>Compte DUO</Text>
+              {isDuo && (
+                <View style={[s.proActiveBadge, { backgroundColor: "#fdf0e8" }]}>
+                  <Text style={[s.proActiveTxt, { color: "#eb7f45" }]}>Role actif</Text>
+                </View>
+              )}
+            </View>
+            <Text style={s.duoDesc}>
+              Gérez votre boutique ET vendez vos créations — un seul abonnement
+            </Text>
+              {/* Le toggle mensuel/annuel est partagé avec la section PRO ci-dessus */}
+            <TouchableOpacity
+              style={[s.duoBtn, isUpgradingDuo && { opacity: 0.6 }]}
+              onPress={() => upgradeDuo()}
+              disabled={isUpgradingDuo}
+              activeOpacity={0.85}
+            >
+              <Text style={s.duoBtnTxt}>
+                {isUpgradingDuo ? "Ouverture..." : billingPeriod === "annual" ? "Passer en DUO — 129€/an" : "Passer en DUO — 15€/mois"}
+              </Text>
+            </TouchableOpacity>
+          </AnimCard>
+        )}
+
+        {/* ── Aide & FAQ ── */}
+        <Text style={s.sectionTitle}>Aide & FAQ</Text>
+        <AnimCard index={cardIdx(4)} style={s.card}>
+          {[
+            { q: "Comment enregistrer une vente ?", a: "Allez dans l'onglet Ventes, appuyez sur le bouton +, renseignez l'article, le prix et le mode de paiement, puis validez." },
+            { q: "Comment inviter une créatrice ?", a: "Dans l'onglet Créatrices, appuyez sur + et saisissez l'email de la créatrice. Elle recevra une invitation par email." },
+            { q: "Quelle différence entre Gérante et Créatrice ?", a: "La Gérante gère la boutique, ses créatrices et les stats globales. La Créatrice voit uniquement ses propres ventes et commissions." },
+            { q: "C'est quoi le mode DUO ?", a: "Le mode DUO vous permet d'être à la fois Gérante et Créatrice avec un seul compte. Vous pouvez basculer entre les deux vues via le toggle dans chaque onglet." },
+            { q: "Puis-je avoir plusieurs boutiques ?", a: "Oui avec le plan PRO. En plan FREE, vous êtes limité à 1 boutique et 3 créatrices." },
+            { q: "Comment exporter mes ventes ?", a: "Depuis l'onglet Stats, un bouton d'export vous permet de télécharger un PDF ou CSV. L'export sans filigrane est réservé au plan PRO." },
+            { q: "Comment modifier mon email ?", a: "La modification d'email n'est pas disponible dans l'app pour l'instant. Contactez-nous à support@encaissly.fr." },
+            { q: "Comment résilier mon abonnement ?", a: "Dans cet onglet Profil, section Abonnement, appuyez sur « Résilier l'abonnement ». Vous repasserez immédiatement en plan FREE." },
+          ].map((item, i) => (
+            <View key={i}>
+              {i > 0 && <View style={s.divider} />}
+              <TouchableOpacity
+                style={s.faqQuestion}
+                onPress={() => setOpenFaq(openFaq === i ? null : i)}
+                activeOpacity={0.75}
+              >
+                <Text style={s.faqQuestionTxt}>{item.q}</Text>
+                <AntDesign name={openFaq === i ? "up" : "down"} size={12} color={Colors.textLight} />
+              </TouchableOpacity>
+              {openFaq === i && (
+                <Text style={s.faqAnswer}>{item.a}</Text>
+              )}
+            </View>
+          ))}
+          <View style={s.divider} />
+          <TouchableOpacity
+            style={s.legalLink}
+            onPress={() => router.push("/(auth)/legal")}
+            activeOpacity={0.75}
+          >
+            <AntDesign name="file1" size={13} color={Colors.primary} style={{ marginRight: 6 }} />
+            <Text style={s.legalLinkTxt}>CGU & Politique de confidentialité</Text>
+          </TouchableOpacity>
+        </AnimCard>
+
         {/* ── Déconnexion ── */}
-        <AnimCard index={cardIdx(3)} style={{ marginTop: 8 }}>
+        <AnimCard index={cardIdx(5)} style={{ marginTop: 8 }}>
           <TouchableOpacity style={s.logoutBtn} onPress={handleLogout} activeOpacity={0.85}>
             <AntDesign name="logout" size={16} color={Colors.error} style={{ marginRight: 8 }} />
             <Text style={s.logoutTxt}>Se déconnecter</Text>
@@ -928,6 +1104,31 @@ const s = StyleSheet.create({
     fontSize: 13,
     color: Colors.text,
   },
+  periodToggle: {
+    flexDirection: "row",
+    backgroundColor: "#f0eaf8",
+    borderRadius: 10,
+    padding: 3,
+    marginBottom: 12,
+  },
+  periodBtn: {
+    flex: 1,
+    paddingVertical: 7,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  periodBtnActive: {
+    backgroundColor: Colors.primary,
+  },
+  periodTxt: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: 12,
+    color: Colors.textLight,
+  },
+  periodTxtActive: {
+    color: "#fff",
+  },
+
   upgradeBtn: {
     backgroundColor: Colors.primary,
     borderRadius: 10,
@@ -940,6 +1141,82 @@ const s = StyleSheet.create({
     fontFamily: Fonts.family.nowBold,
     fontSize: 14,
     color: "#fff",
+  },
+
+  // DUO block
+  duoCard: {
+    backgroundColor: "#fff8f4",
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1.5,
+    borderColor: "#eb7f45",
+    ...cardShadow,
+    shadowColor: "#eb7f45",
+  },
+  duoHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 6,
+  },
+  duoTitle: {
+    fontFamily: Fonts.family.nowBold,
+    fontSize: 16,
+    color: "#eb7f45",
+  },
+  duoDesc: {
+    fontFamily: Fonts.family.nowRegular,
+    fontSize: 13,
+    color: Colors.textLight,
+    lineHeight: 19,
+    marginBottom: 14,
+  },
+  duoBtn: {
+    backgroundColor: "#eb7f45",
+    borderRadius: 10,
+    paddingVertical: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  duoBtnTxt: {
+    fontFamily: Fonts.family.nowBold,
+    fontSize: 14,
+    color: "#fff",
+  },
+
+  // FAQ
+  faqQuestion: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 4,
+    gap: 8,
+  },
+  faqQuestionTxt: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: 13,
+    color: Colors.text,
+    flex: 1,
+  },
+  faqAnswer: {
+    fontFamily: Fonts.family.nowRegular,
+    fontSize: 13,
+    color: Colors.textLight,
+    lineHeight: 19,
+    marginTop: 6,
+    marginBottom: 4,
+  },
+  legalLink: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 6,
+  },
+  legalLinkTxt: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: 13,
+    color: Colors.primary,
+    textDecorationLine: "underline",
   },
 
   // Logout

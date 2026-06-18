@@ -19,8 +19,10 @@ import { AntDesign } from "@expo/vector-icons";
 
 export default function RegisterScreen() {
   const params = useLocalSearchParams<{ email?: string; role?: string }>();
-  const [role, setRole] = useState<"GERANTE" | "CREATRICE" | null>(
-    params.role === "GERANTE" || params.role === "CREATRICE" ? params.role : null
+  const [role, setRole] = useState<"GERANTE" | "CREATRICE" | "GERANTE_CREATRICE" | null>(
+    params.role === "GERANTE" || params.role === "CREATRICE" || params.role === "GERANTE_CREATRICE"
+      ? (params.role as "GERANTE" | "CREATRICE" | "GERANTE_CREATRICE")
+      : null
   );
   const [email, setEmail] = useState(params.email ?? "");
   const [nom, setNom] = useState("");
@@ -28,6 +30,7 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [acceptedCGU, setAcceptedCGU] = useState(false);
 
   const { setTokens, setUser } = useAuthStore();
   const { request, response, promptAsync } = useGoogleAuth();
@@ -81,6 +84,10 @@ export default function RegisterScreen() {
     }
     if (password.length < 8) {
       setError("Le mot de passe doit faire au moins 8 caractères.");
+      return;
+    }
+    if (!acceptedCGU) {
+      setError("Veuillez accepter les CGU et la politique de confidentialité.");
       return;
     }
     try {
@@ -153,6 +160,21 @@ export default function RegisterScreen() {
               );
             })}
           </View>
+          <TouchableOpacity
+            style={[styles.roleCardDuo, role === "GERANTE_CREATRICE" && styles.roleCardSelected]}
+            onPress={() => setRole("GERANTE_CREATRICE")}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.roleIcon}>🏪🎨</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.roleTitle, role === "GERANTE_CREATRICE" && styles.roleTitleSelected]}>
+                Gérante & Créatrice
+              </Text>
+              <Text style={styles.roleDesc}>
+                Je gère ma boutique ET je vends mes propres créations
+              </Text>
+            </View>
+          </TouchableOpacity>
 
           <Text style={styles.label}>Email</Text>
           <TextInput
@@ -195,10 +217,30 @@ export default function RegisterScreen() {
             onChangeText={setPassword}
           />
 
+          {/* Checkbox CGU */}
+          <TouchableOpacity
+            style={styles.cguRow}
+            onPress={() => setAcceptedCGU((v) => !v)}
+            activeOpacity={0.8}
+          >
+            <View style={[styles.checkbox, acceptedCGU && styles.checkboxChecked]}>
+              {acceptedCGU && <AntDesign name="check" size={12} color="#fff" />}
+            </View>
+            <Text style={styles.cguText}>
+              J'accepte les{" "}
+              <Text
+                style={styles.cguLink}
+                onPress={() => router.push("/(auth)/legal")}
+              >
+                CGU et la politique de confidentialité
+              </Text>
+            </Text>
+          </TouchableOpacity>
+
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
           <TouchableOpacity
-            style={styles.btnPrimary}
+            style={[styles.btnPrimary, !acceptedCGU && { opacity: 0.6 }]}
             onPress={handleRegister}
             disabled={loading}
             activeOpacity={0.85}

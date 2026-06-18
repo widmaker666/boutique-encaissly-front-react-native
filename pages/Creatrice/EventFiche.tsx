@@ -17,7 +17,7 @@ import { articleService, statsService, venteService } from "@/services/api";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
 
-type Props = { evenementId: string; evenementNom: string };
+type Props = { evenementId: string; evenementNom: string; onSwitchToGerante?: () => void };
 
 function toUpper(str: string) {
   return str.normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase();
@@ -34,7 +34,7 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-export default function EventFiche({ evenementId, evenementNom }: Props) {
+export default function EventFiche({ evenementId, evenementNom, onSwitchToGerante }: Props) {
   const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
 
@@ -54,7 +54,7 @@ export default function EventFiche({ evenementId, evenementNom }: Props) {
 
   const { data: stats } = useQuery<any>({
     queryKey: ["stats", evenementId],
-    queryFn: () => statsService.getGlobal(evenementId),
+    queryFn: () => statsService.getGlobal({ evenementId }),
   });
 
   const { data: recentVentes } = useQuery<any[]>({
@@ -121,9 +121,16 @@ export default function EventFiche({ evenementId, evenementNom }: Props) {
   return (
     <View style={s.container}>
       {/* Header violet */}
-      <View style={[s.header, { paddingTop: insets.top + 20 }]}>
-        <Text style={s.titre}>{toUpper(evenementNom)}</Text>
-        <Text style={s.sousTitre}>MA FICHE ÉVÉNEMENT</Text>
+      <View style={[s.header, { paddingTop: insets.top + 20 }, onSwitchToGerante && s.headerRow]}>
+        <View>
+          <Text style={s.titre}>{toUpper(evenementNom)}</Text>
+          <Text style={s.sousTitre}>MA FICHE ÉVÉNEMENT</Text>
+        </View>
+        {onSwitchToGerante && (
+          <TouchableOpacity style={s.switchBtn} onPress={onSwitchToGerante} activeOpacity={0.8}>
+            <Text style={s.switchBtnTxt}>🏪 Créatrices</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scroll}>
@@ -299,7 +306,25 @@ const s = StyleSheet.create({
     paddingBottom: 24,
     alignItems: "center",
   },
-  titre: { fontFamily: "Norwester", fontSize: 20, color: "#fff", letterSpacing: 2, textAlign: "center" },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+  },
+  switchBtn: {
+    backgroundColor: "rgba(255,255,255,0.18)",
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.3)",
+  },
+  switchBtnTxt: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: 12,
+    color: "#fff",
+  },
+  titre: { fontFamily: "Norwester", fontSize: 20, color: "#fff", letterSpacing: 2 },
   sousTitre: { fontFamily: Fonts.family.nowRegular, fontSize: 12, color: "rgba(255,255,255,0.7)", marginTop: 4 },
 
   scroll: { padding: 16 },

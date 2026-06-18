@@ -26,6 +26,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AntDesign } from "@expo/vector-icons";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
+import { DuoModeToggle } from "@/components/DuoModeToggle";
 
 //- Carte animée avec délai selon l'index
 function AnimCard({
@@ -76,7 +77,9 @@ export default function DashboardScreen() {
   const insets = useSafeAreaInsets();
   const nav = useRouter();
   const user = useAuthStore((state) => state.user);
-  const isGerante = user?.role === "GERANTE";
+  const isDuo = user?.role === "GERANTE_CREATRICE";
+  const duoMode = useAuthStore((state) => state.duoMode);
+  const isGerante = user?.role === "GERANTE" || (isDuo && duoMode === "GERANTE");
   const isPro = user?.plan === "PRO";
 
   const activeEvenementId = useAuthStore((state) => state.activeEvenementId);
@@ -116,7 +119,7 @@ export default function DashboardScreen() {
   //- Stats globales — CREATRICE uniquement
   const { data, isLoading } = useQuery({
     queryKey: ["stats", activeEvenementId ?? "personal"],
-    queryFn: () => statsService.getGlobal(activeEvenementId ?? undefined),
+    queryFn: () => statsService.getGlobal(activeEvenementId ? { evenementId: activeEvenementId } : {}),
     enabled: !isGerante,
   });
 
@@ -128,7 +131,7 @@ export default function DashboardScreen() {
   //- Historique mensuel — CREATRICE PRO uniquement
   const { data: historique } = useQuery({
     queryKey: ["historique", activeEvenementId ?? "personal"],
-    queryFn: () => statsService.getHistorique(activeEvenementId ?? undefined),
+    queryFn: () => statsService.getHistorique(activeEvenementId ? { evenementId: activeEvenementId } : {}),
     enabled: isPro && !isGerante,
   });
 
@@ -220,6 +223,8 @@ export default function DashboardScreen() {
             {user?.role} · {user?.plan} {isPro ? "✨" : "🔒"}
           </Text>
         </View>
+
+        {isDuo && <DuoModeToggle />}
 
         {/* Chips sélecteur d'événement (CREATRICE avec au moins 1 événement) */}
         {!isGerante && events.length > 0 && (

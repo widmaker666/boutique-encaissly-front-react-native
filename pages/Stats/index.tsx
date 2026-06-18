@@ -9,9 +9,16 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
+
+type Filter =
+  | { type: "all" }
+  | { type: "event"; id: string; nom: string }
+  | { type: "boutique"; id: string; nom: string };
 import { useQuery } from "@tanstack/react-query";
-import { statsService } from "@/services/api";
+import { statsService, evenementService, boutiqueService } from "@/services/api";
+import type { StatsParams } from "@/services/api";
 import { useAuthStore } from "@/stores/auth.store";
+import { DuoModeToggle } from "@/components/DuoModeToggle";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -115,10 +122,17 @@ export default function StatsScreen() {
   const accessToken = useAuthStore((state) => state.accessToken);
   const activeEvenementId = useAuthStore((state) => state.activeEvenementId);
   const activeEvenementNom = useAuthStore((state) => state.activeEvenementNom);
-  const isGerante = user?.role === "GERANTE";
+  const isDuo = user?.role === "GERANTE_CREATRICE";
+  const duoMode = useAuthStore((state) => state.duoMode);
+  const isGerante = user?.role === "GERANTE" || (isDuo && duoMode === "GERANTE");
+  const isCreatrice = user?.role === "CREATRICE" || (isDuo && duoMode === "CREATRICE");
   const isPro = user?.plan === "PRO";
-  const bid = activeEvenementId ?? undefined;
   const [downloading, setDownloading] = useState<string | null>(null);
+  const [selectedFilter, setSelectedFilter] = useState<Filter>(() =>
+    activeEvenementId
+      ? { type: "event", id: activeEvenementId, nom: activeEvenementNom ?? "" }
+      : { type: "all" },
+  );
 
   const handleDownload = async (path: string, filename: string) => {
     setDownloading(filename);
@@ -136,20 +150,45 @@ export default function StatsScreen() {
     }).start();
   }, []);
 
+  // Queries pour peupler les pills
+  const { data: mesEvenements } = useQuery<any[]>({
+    queryKey: ["mes-evenements-stats"],
+    queryFn: () => evenementService.getAll(),
+    enabled: isCreatrice,
+  });
+
+  const { data: mesBoutiques } = useQuery<any[]>({
+    queryKey: ["mes-boutiques-stats"],
+    queryFn: boutiqueService.getMesBoutiques,
+    enabled: isGerante,
+  });
+
+  // Params pour les queries stats selon le filtre choisi
+  const statsParams: StatsParams =
+    selectedFilter.type === "event"
+      ? { evenementId: selectedFilter.id }
+      : selectedFilter.type === "boutique"
+        ? { boutiqueId: selectedFilter.id }
+        : {};
+
+  const filterKey = selectedFilter.type === "all"
+    ? "all"
+    : `${selectedFilter.type}:${selectedFilter.id}`;
+
   const { data: globalData } = useQuery({
-    queryKey: ["stats-global", bid ?? "personal"],
-    queryFn: () => statsService.getGlobal(bid),
+    queryKey: ["stats-global", filterKey],
+    queryFn: () => statsService.getGlobal(statsParams),
   });
 
   const { data: historiqueData } = useQuery({
-    queryKey: ["stats-historique", bid ?? "personal"],
-    queryFn: () => statsService.getHistorique(bid),
+    queryKey: ["stats-historique", filterKey],
+    queryFn: () => statsService.getHistorique(statsParams),
     enabled: isPro,
   });
 
   const { data: topArticlesData } = useQuery({
-    queryKey: ["stats-top-articles", bid ?? "personal"],
-    queryFn: () => statsService.getTopArticles(bid),
+    queryKey: ["stats-top-articles", filterKey],
+    queryFn: () => statsService.getTopArticles(statsParams),
   });
 
   const { data: parCreatriceData } = useQuery({
@@ -226,13 +265,64 @@ export default function StatsScreen() {
         <Text style={st.headerTitle}>STATS</Text>
         <View style={st.badgeWrap}>
           <Text style={st.badge}>
-            {activeEvenementNom ? `🎪 ${activeEvenementNom}` : (isPro ? "PRO ✨" : "FREE")}
+            {selectedFilter.type !== "all"
+              ? `${selectedFilter.type === "event" ? "🎪" : "🏪"} ${selectedFilter.nom}`
+              : isPro ? "PRO ✨" : "FREE"}
           </Text>
         </View>
         <Text style={st.headerSub}>
           {isPro ? "3 derniers mois" : `Mois en cours · ${headerSubtitle}`}
         </Text>
+        {isDuo && <DuoModeToggle />}
       </Animated.View>
+
+      {/* ── Filtre événements / boutiques ── */}
+      {((mesEvenements && mesEvenements.length > 0) || (mesBoutiques && mesBoutiques.length > 0)) && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={st.pillsRow}
+          style={st.pillsScroll}
+        >
+          <TouchableOpacity
+            style={[st.pill, selectedFilter.type === "all" && st.pillActive]}
+            onPress={() => setSelectedFilter({ type: "all" })}
+            activeOpacity={0.75}
+          >
+            <Text style={[st.pillTxt, selectedFilter.type === "all" && st.pillTxtActive]}>
+              Tout
+            </Text>
+          </TouchableOpacity>
+
+          {mesBoutiques?.map((b: any) => {
+            const active = selectedFilter.type === "boutique" && selectedFilter.id === b.id;
+            return (
+              <TouchableOpacity
+                key={b.id}
+                style={[st.pill, active && st.pillActive]}
+                onPress={() => setSelectedFilter({ type: "boutique", id: b.id, nom: b.nom })}
+                activeOpacity={0.75}
+              >
+                <Text style={[st.pillTxt, active && st.pillTxtActive]}>🏪 {b.nom}</Text>
+              </TouchableOpacity>
+            );
+          })}
+
+          {mesEvenements?.map((e: any) => {
+            const active = selectedFilter.type === "event" && selectedFilter.id === e.id;
+            return (
+              <TouchableOpacity
+                key={e.id}
+                style={[st.pill, active && st.pillActive]}
+                onPress={() => setSelectedFilter({ type: "event", id: e.id, nom: e.nom })}
+                activeOpacity={0.75}
+              >
+                <Text style={[st.pillTxt, active && st.pillTxtActive]}>🎪 {e.nom}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      )}
 
       <View style={st.body}>
         {/* ── 2. KPIs grille 2×2 ── */}
@@ -570,6 +660,39 @@ const st = StyleSheet.create({
     fontFamily: Fonts.family.nowLight,
     fontSize: Fonts.sizes.xs,
     textTransform: "capitalize",
+  },
+
+  // ── Filter pills ────────────────────────────────────────────────────────────
+  pillsScroll: {
+    backgroundColor: Colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  pillsRow: {
+    flexDirection: "row",
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    gap: 8,
+  },
+  pill: {
+    backgroundColor: Colors.background,
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+  },
+  pillActive: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  pillTxt: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: 12,
+    color: Colors.textLight,
+  },
+  pillTxtActive: {
+    color: "#fff",
   },
 
   // ── Body ────────────────────────────────────────────────────────────────────

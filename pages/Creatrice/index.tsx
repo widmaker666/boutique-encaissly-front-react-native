@@ -17,6 +17,7 @@ import { Colors } from "@/constants/colors";
 import { styles, getAvatarColor } from "@/styles/pages/creatrice.style";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ModalCreation from "@/components/Creatrice/ModalCreation";
+import { DuoModeToggle } from "@/components/DuoModeToggle";
 import EventFiche from "@/pages/Creatrice/EventFiche";
 import PersonnelRecap from "@/pages/Creatrice/PersonnelRecap";
 
@@ -67,7 +68,9 @@ export default function CreatriceScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
-  const isGerante = user?.role === "GERANTE";
+  const isDuo = user?.role === "GERANTE_CREATRICE";
+  const duoMode = useAuthStore((s) => s.duoMode);
+  const isGerante = user?.role === "GERANTE" || (isDuo && duoMode === "GERANTE");
   const activeEvenementId = useAuthStore((state) => state.activeEvenementId);
   const activeEvenementNom = useAuthStore((state) => state.activeEvenementNom);
   const [search, setSearch] = useState("");
@@ -99,7 +102,7 @@ export default function CreatriceScreen() {
     ]).start();
   }, [isGerante]);
 
-  // ── CREATRICE : EventFiche ou PersonnelRecap selon le contexte actif
+  // ── CREATRICE pure : EventFiche ou PersonnelRecap
   if (!isGerante) {
     if (activeEvenementId) {
       return <EventFiche evenementId={activeEvenementId} evenementNom={activeEvenementNom ?? ""} />;
@@ -146,6 +149,7 @@ export default function CreatriceScreen() {
           <Text style={styles.headerSub}>
             {count} créatrice{count > 1 ? "s" : ""} · {user?.plan ?? "FREE"}
           </Text>
+          {isDuo && <DuoModeToggle />}
         </View>
         <TouchableOpacity
           style={styles.addBtn}

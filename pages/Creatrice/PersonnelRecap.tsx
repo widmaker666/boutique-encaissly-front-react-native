@@ -27,7 +27,7 @@ function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-export default function PersonnelRecap() {
+export default function PersonnelRecap({ onSwitchToGerante }: { onSwitchToGerante?: () => void }) {
   const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
   const setActiveEvenement = useAuthStore((s) => s.setActiveEvenement);
@@ -65,9 +65,16 @@ export default function PersonnelRecap() {
   return (
     <View style={s.container}>
       {/* Header */}
-      <View style={[s.header, { paddingTop: insets.top + 20 }]}>
-        <Text style={s.titre}>MA FICHE</Text>
-        <Text style={s.sousTitre}>AUCUN ÉVÉNEMENT ACTIF</Text>
+      <View style={[s.header, { paddingTop: insets.top + 20 }, onSwitchToGerante && s.headerRow]}>
+        <View>
+          <Text style={s.titre}>MA FICHE</Text>
+          <Text style={s.sousTitre}>AUCUN ÉVÉNEMENT ACTIF</Text>
+        </View>
+        {onSwitchToGerante && (
+          <TouchableOpacity style={s.switchBtn} onPress={onSwitchToGerante} activeOpacity={0.8}>
+            <Text style={s.switchBtnTxt}>🏪 Créatrices</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {loading ? (
@@ -198,6 +205,24 @@ const s = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 24,
     alignItems: "center",
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+  },
+  switchBtn: {
+    backgroundColor: "rgba(255,255,255,0.18)",
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.3)",
+  },
+  switchBtnTxt: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: 12,
+    color: "#fff",
   },
   titre: { fontFamily: "Norwester", fontSize: 20, color: "#fff", letterSpacing: 2 },
   sousTitre: { fontFamily: Fonts.family.nowRegular, fontSize: 12, color: "rgba(255,255,255,0.7)", marginTop: 4 },

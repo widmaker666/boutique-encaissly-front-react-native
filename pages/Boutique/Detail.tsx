@@ -70,7 +70,7 @@ export default function BoutiqueDetailScreen() {
 
   const { data: stats, isLoading } = useQuery<any>({
     queryKey: ["stats-boutique", id],
-    queryFn: () => statsService.getGlobalBoutique(id),
+    queryFn: () => statsService.getGlobal({ boutiqueId: id }),
     enabled: !!id,
   });
 

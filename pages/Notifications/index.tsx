@@ -11,6 +11,8 @@ import {
 } from "react-native";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { notificationService, creatriceService } from "@/services/api";
+import { useFocusEffect } from "expo-router";
+import { useCallback } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "@/constants/colors";
 
@@ -60,6 +62,8 @@ function formatRelative(isoString: string): string {
 
 function getTypeEmoji(type: string): string {
   if (type === "VENTE") return "💰";
+  if (type === "INVITATION_BOUTIQUE") return "🏪";
+  if (type === "ABONNEMENT") return "⭐";
   return "📌";
 }
 
@@ -120,9 +124,16 @@ export default function NotificationsScreen() {
     }).start();
   }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    }, [queryClient])
+  );
+
   const { data: notifications, isLoading } = useQuery<Notification[]>({
     queryKey: ["notifications"],
     queryFn: notificationService.getAll,
+    staleTime: 0,
   });
 
   const unreadCount = notifications?.filter((n) => !n.read).length ?? 0;

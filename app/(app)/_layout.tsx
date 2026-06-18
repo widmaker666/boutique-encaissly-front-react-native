@@ -8,7 +8,9 @@ import { Tabs } from "expo-router";
 
 export default function AppLayout() {
   const user = useAuthStore((s) => s.user);
-  const isGerante = user?.role === "GERANTE";
+  const duoMode = useAuthStore((s) => s.duoMode);
+  const isDuo = user?.role === "GERANTE_CREATRICE";
+  const isGerante = user?.role === "GERANTE" || (isDuo && duoMode === "GERANTE");
 
   const { data: unreadData } = useQuery({
     queryKey: ["notifications-count"],

@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { venteService, creatriceService, articleService } from "@/services/api";
+import { DuoModeToggle } from "@/components/DuoModeToggle";
 import { useAuthStore } from "@/stores/auth.store";
 import type { Vente, Creatrice, Article, ModePaiement } from "@/types";
 import { Colors } from "@/constants/colors";
@@ -141,7 +142,9 @@ function BottomSheetCreation({
   const queryClient = useQueryClient();
   const insets = useSafeAreaInsets();
   const user = useAuthStore((state) => state.user);
-  const isGerante = user?.role === "GERANTE";
+  const isDuo = user?.role === "GERANTE_CREATRICE";
+  const duoMode = useAuthStore((state) => state.duoMode);
+  const isGerante = user?.role === "GERANTE" || (isDuo && duoMode === "GERANTE");
   const activeEvenementId = useAuthStore((state) => state.activeEvenementId);
   const [step, setStep] = useState<Step>(1);
   const [creatrice, setCreatrice] = useState<SelectedCreatrice | null>(null);
@@ -719,7 +722,9 @@ export default function VentesScreen() {
 
   const count = ventes?.length ?? 0;
 
-  const isGerante = user?.role === "GERANTE";
+  const isDuoScreen = user?.role === "GERANTE_CREATRICE";
+  const duoModeScreen = useAuthStore((state) => state.duoMode);
+  const isGerante = user?.role === "GERANTE" || (isDuoScreen && duoModeScreen === "GERANTE");
 
   return (
     <View style={styles.container}>
@@ -746,6 +751,7 @@ export default function VentesScreen() {
           <Text style={styles.headerSub}>
             {activeEvenementNom ? `🎪 ${activeEvenementNom}` : `${count} vente${count > 1 ? "s" : ""} · ${user?.plan ?? "FREE"}`}
           </Text>
+          {isDuoScreen && <DuoModeToggle />}
         </View>
         <TouchableOpacity
           style={[

@@ -56,6 +56,19 @@ export const styles = StyleSheet.create({
     marginTop: 3,
     letterSpacing: 0.4,
   },
+  duoSwitchBtn: {
+    backgroundColor: "rgba(255,255,255,0.18)",
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.32)",
+  },
+  duoSwitchTxt: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: 12,
+    color: "#fff",
+  },
   addBtn: {
     backgroundColor: "rgba(255,255,255,0.18)",
     width: 38,
