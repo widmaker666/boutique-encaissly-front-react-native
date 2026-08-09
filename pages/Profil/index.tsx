@@ -120,7 +120,6 @@ export default function ProfilScreen() {
 
   const [notifEmail, setNotifEmail] = useState(user?.notificationsEmail ?? false);
   const [isEditing, setIsEditing] = useState(false);
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [editPrenom, setEditPrenom] = useState(user?.prenom ?? "");
   const [editNom, setEditNom] = useState(user?.nom ?? "");
   const [showCreateBoutique, setShowCreateBoutique] = useState(false);
@@ -747,34 +746,23 @@ export default function ProfilScreen() {
           )}
         </AnimCard>
 
-        {/* ── Aide & FAQ ── */}
-        <Text style={s.sectionTitle}>Aide & FAQ</Text>
+        {/* ── Aide ── */}
+        <Text style={s.sectionTitle}>Aide</Text>
         <AnimCard index={cardIdx(4)} style={s.card}>
-          {[
-            { q: "Comment enregistrer une vente ?", a: "Allez dans l'onglet Ventes, appuyez sur le bouton +, renseignez l'article, le prix et le mode de paiement, puis validez." },
-            { q: "Comment inviter une créatrice ?", a: "Dans l'onglet Créatrices, appuyez sur + et saisissez l'email de la créatrice. Elle recevra une invitation par email." },
-            { q: "Quelle différence entre Gérante et Créatrice ?", a: "La Gérante gère la boutique, ses créatrices et les stats globales. La Créatrice voit uniquement ses propres ventes et commissions." },
-            { q: "C'est quoi le mode DUO ?", a: "Le mode DUO vous permet d'être à la fois Gérante et Créatrice avec un seul compte. Vous pouvez basculer entre les deux vues via le toggle dans chaque onglet." },
-            { q: "Puis-je avoir plusieurs boutiques ?", a: "Oui avec le plan PRO. En plan FREE, vous êtes limité à 1 boutique et 3 créatrices." },
-            { q: "Comment exporter mes ventes ?", a: "Depuis l'onglet Stats, un bouton d'export vous permet de télécharger un PDF ou CSV. L'export sans filigrane est réservé au plan PRO." },
-            { q: "Comment modifier mon email ?", a: "La modification d'email n'est pas disponible dans l'app pour l'instant. Contactez-nous à support@encaissly.fr." },
-            { q: "Comment résilier mon abonnement ?", a: "Dans cet onglet Profil, section Abonnement, appuyez sur « Résilier l'abonnement ». Vous repasserez immédiatement en plan FREE." },
-          ].map((item, i) => (
-            <View key={i}>
-              {i > 0 && <View style={s.divider} />}
-              <TouchableOpacity
-                style={s.faqQuestion}
-                onPress={() => setOpenFaq(openFaq === i ? null : i)}
-                activeOpacity={0.75}
-              >
-                <Text style={s.faqQuestionTxt}>{item.q}</Text>
-                <AntDesign name={openFaq === i ? "up" : "down"} size={12} color={Colors.textLight} />
-              </TouchableOpacity>
-              {openFaq === i && (
-                <Text style={s.faqAnswer}>{item.a}</Text>
-              )}
+          <TouchableOpacity
+            style={s.createBoutiqueBtn}
+            onPress={() => router.push("/(app)/aide")}
+            activeOpacity={0.75}
+          >
+            <AntDesign name="question-circle" size={14} color={Colors.primary} style={{ marginRight: 8 }} />
+            <View style={{ flex: 1 }}>
+              <Text style={s.createBoutiqueTxt}>Guide complet</Text>
+              <Text style={s.createBoutiqueDesc}>
+                Comment faire chaque action importante dans l'app
+              </Text>
             </View>
-          ))}
+            <AntDesign name="right" size={12} color={Colors.textLight} />
+          </TouchableOpacity>
           <View style={s.divider} />
           <TouchableOpacity
             style={s.legalLink}
@@ -1208,28 +1196,7 @@ const s = StyleSheet.create({
     color: "#fff",
   },
 
-  // FAQ
-  faqQuestion: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 4,
-    gap: 8,
-  },
-  faqQuestionTxt: {
-    fontFamily: Fonts.family.nowMedium,
-    fontSize: 13,
-    color: Colors.text,
-    flex: 1,
-  },
-  faqAnswer: {
-    fontFamily: Fonts.family.nowRegular,
-    fontSize: 13,
-    color: Colors.textLight,
-    lineHeight: 19,
-    marginTop: 6,
-    marginBottom: 4,
-  },
+  // Aide
   legalLink: {
     flexDirection: "row",
     alignItems: "center",
