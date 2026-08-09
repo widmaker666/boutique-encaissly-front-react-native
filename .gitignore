@@ -34,6 +34,9 @@ yarn-error.*
 .env
 .env*.local
 
+# Claude Code local tooling (symlinks, not project content)
+.agents/
+
 # typescript
 *.tsbuildinfo
 
