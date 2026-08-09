@@ -4,6 +4,9 @@
     "slug": "encaissly-mobile",
     "scheme": "encaissly",
     "version": "1.0.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -40,6 +43,9 @@
       "eas": {
         "projectId": "d62bf1ea-49f3-4303-b0fd-254d03e5b46a"
       }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/d62bf1ea-49f3-4303-b0fd-254d03e5b46a"
     }
   }
 }
