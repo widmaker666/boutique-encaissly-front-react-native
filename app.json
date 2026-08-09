@@ -30,6 +30,16 @@
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
     },
-    "plugins": ["expo-router", "expo-font", "expo-web-browser"]
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-web-browser"
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "d62bf1ea-49f3-4303-b0fd-254d03e5b46a"
+      }
+    }
   }
 }

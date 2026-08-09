@@ -36,6 +36,7 @@ yarn-error.*
 
 # Claude Code local tooling (symlinks, not project content)
 .agents/
+.claude/skills/
 
 # typescript
 *.tsbuildinfo
