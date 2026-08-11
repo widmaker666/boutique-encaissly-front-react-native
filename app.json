@@ -2,7 +2,7 @@
   "expo": {
     "name": "encaissly-mobile",
     "slug": "encaissly-mobile",
-    "scheme": "encaissly",
+    "scheme": ["encaissly", "com.encaissly.mobile"],
     "version": "1.0.0",
     "runtimeVersion": {
       "policy": "appVersion"
