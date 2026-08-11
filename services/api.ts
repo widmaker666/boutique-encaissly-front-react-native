@@ -3,7 +3,6 @@ import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import { API_BASE_URL } from "@/constants/api";
 import { useAuthStore } from "@/stores/auth.store";
-import { makeRedirectUri } from "expo-auth-session";
 import { User } from "@/types";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -36,17 +35,13 @@ api.interceptors.response.use(
 );
 
 export const useGoogleAuth = () => {
-  const redirectUri = makeRedirectUri({
-    scheme: "encaissly",
-  });
-
-  console.log(redirectUri);
-
+  //- Pas de redirectUri custom : on laisse expo-auth-session calculer le
+  //- format natif attendu par Google ({package}:/oauthredirect en standalone),
+  //- validé via le SHA-1 enregistré côté client OAuth Android/iOS.
   const [request, response, promptAsync] = Google.useAuthRequest({
     iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
     androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
     webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-    redirectUri,
   });
 
   return { request, response, promptAsync };
