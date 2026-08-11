@@ -194,6 +194,59 @@ export const styles = StyleSheet.create({
     marginTop: 20,
     gap: 4,
   },
+  //- Écran de choix (Google / Email)
+  choiceWrap: {
+    gap: 14,
+    marginTop: 16,
+  },
+  choiceBtnEmail: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
+    backgroundColor: Colors.primary,
+    paddingVertical: 16,
+    borderRadius: 14,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  choiceBtnEmailText: {
+    color: "#FFFFFF",
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: Fonts.sizes.md,
+    letterSpacing: 0.5,
+  },
+  //- Bouton retour vers l'écran de choix
+  backRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+    gap: 6,
+  },
+  backText: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: Fonts.sizes.sm,
+    color: Colors.primary,
+  },
+  //- Email verrouillé (compte Google) — non éditable
+  lockedRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#f3eaff",
+    borderRadius: 14,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    marginBottom: 20,
+  },
+  lockedText: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: Fonts.sizes.md,
+    color: Colors.primary,
+  },
   footerText: {
     fontFamily: Fonts.family.nowLight,
     fontSize: Fonts.sizes.sm,

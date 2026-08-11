@@ -57,7 +57,9 @@ export default function LoginScreen() {
           setUser(user);
           router.replace("/(app)");
         })
-        .catch(() => setError("Connexion Google échouée."))
+        .catch((e: any) =>
+          setError(e?.response?.data?.message ?? "Connexion Google échouée."),
+        )
         .finally(() => setLoading(false));
     }
   }, [response]);

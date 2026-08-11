@@ -47,6 +47,23 @@ export const useGoogleAuth = () => {
   return { request, response, promptAsync };
 };
 
+//- Récupère email/prénom/nom depuis Google avant de créer le compte —
+//- permet de pré-remplir le formulaire d'inscription sans encore rien
+//- envoyer au backend (la création reste différée jusqu'à validation
+//- du rôle + des CGU par l'utilisateur)
+export const fetchGoogleUserInfo = async (googleAccessToken: string) => {
+  const res = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+    headers: { Authorization: `Bearer ${googleAccessToken}` },
+  });
+  if (!res.ok) throw new Error("Impossible de récupérer le profil Google.");
+  const data = await res.json();
+  return {
+    email: data.email as string,
+    prenom: (data.given_name as string | undefined) ?? "",
+    nom: (data.family_name as string | undefined) ?? "",
+  };
+};
+
 //- Service de récupération ID pour google et autre
 export const authService = {
   login: async (email: string, password: string) => {
@@ -60,9 +77,10 @@ export const authService = {
   register: async (
     email: string,
     password: string,
-    nom?: string,
-    prenom?: string,
-    role?: "GERANTE" | "CREATRICE",
+    nom: string | undefined,
+    prenom: string | undefined,
+    role: "GERANTE" | "CREATRICE" | "GERANTE_CREATRICE" | undefined,
+    acceptedCGU: boolean,
   ) => {
     const { data } = await api.post("/auth/register", {
       email,
@@ -70,6 +88,7 @@ export const authService = {
       nom,
       prenom,
       ...(role ? { role } : {}),
+      acceptedCGU,
     });
     return data;
   },
@@ -79,12 +98,22 @@ export const authService = {
     return data;
   },
 
-  //- Envoie le token Google au backend pour récupérer les JWT Encaissly
-  googleMobile: async (googleAccessToken: string) => {
+  //- Envoie le token Google au backend. role/acceptedCGU uniquement pour
+  //- finaliser une INSCRIPTION (après le formulaire pré-rempli) — omis pour
+  //- un simple login, auquel cas un compte inexistant n'est jamais créé.
+  googleMobile: async (
+    googleAccessToken: string,
+    role?: "GERANTE" | "CREATRICE" | "GERANTE_CREATRICE",
+    acceptedCGU?: boolean,
+  ) => {
     const { data } = await api.post<{
       accessToken: string;
       refreshToken: string;
-    }>("/auth/google/mobile", { accessToken: googleAccessToken });
+    }>("/auth/google/mobile", {
+      accessToken: googleAccessToken,
+      ...(role ? { role } : {}),
+      ...(acceptedCGU !== undefined ? { acceptedCGU } : {}),
+    });
     return data;
   },
 };
