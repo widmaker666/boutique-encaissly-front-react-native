@@ -3,6 +3,7 @@ import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import { API_BASE_URL } from "@/constants/api";
 import { useAuthStore } from "@/stores/auth.store";
+import { makeRedirectUri } from "expo-auth-session";
 import { User } from "@/types";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -35,17 +36,17 @@ api.interceptors.response.use(
 );
 
 export const useGoogleAuth = () => {
-  //- Pas de redirectUri custom : expo-auth-session calcule
-  //- `${applicationId}:/oauthredirect` (ex: com.encaissly.mobile:/oauthredirect).
-  //- C'est le seul format que Google accepte pour un client OAuth Android
-  //- même avec "Custom URI scheme" activé — un schéma arbitraire type
-  //- "encaissly://" est rejeté (Google ne valide que ce qui est lié au nom
-  //- de package). Ce schéma doit aussi être déclaré dans app.json → "scheme"
-  //- (tableau) pour qu'Android sache le rediriger vers l'app — build requis.
+  //- makeRedirectUri({ path }) construit une URI garantie de matcher la
+  //- route app/oauthredirect.tsx via expo-router (contrairement au format
+  //- "deviné" manuellement, qui a produit une URI qu'Expo Router n'arrivait
+  //- pas à faire correspondre → "Unmatched Route").
+  const redirectUri = makeRedirectUri({ path: "oauthredirect" });
+
   const [request, response, promptAsync] = Google.useAuthRequest({
     iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
     androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
     webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    redirectUri,
   });
 
   return { request, response, promptAsync };
