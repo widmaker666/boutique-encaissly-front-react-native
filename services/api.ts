@@ -20,6 +20,14 @@ GoogleSignin.configure({
 export const signInWithGoogle = async () => {
   try {
     await GoogleSignin.hasPlayServices();
+    //- Force l'affichage du sélecteur de compte à chaque appel — sans ça,
+    //- la lib re-sélectionne silencieusement le dernier compte utilisé et
+    //- l'utilisateur ne peut plus en choisir un autre.
+    try {
+      await GoogleSignin.signOut();
+    } catch {
+      // pas grave si aucune session n'était active
+    }
     const response = await GoogleSignin.signIn();
 
     if (response.type === "cancelled") return null;
