@@ -20,9 +20,18 @@ GoogleSignin.configure({
 export const signInWithGoogle = async () => {
   try {
     await GoogleSignin.hasPlayServices();
-    //- Force l'affichage du sélecteur de compte à chaque appel — sans ça,
-    //- la lib re-sélectionne silencieusement le dernier compte utilisé et
-    //- l'utilisateur ne peut plus en choisir un autre.
+    //- Force l'affichage du sélecteur de compte à chaque appel. signOut()
+    //- seul ne suffit pas : Android (Credential Manager) continue de
+    //- pré-sélectionner silencieusement le dernier compte utilisé (bandeau
+    //- avec cadenas, pas de choix possible). revokeAccess() invalide
+    //- l'autorisation côté Google, ce qui force un vrai choix de compte —
+    //- l'utilisateur devra reconfirmer l'accès à chaque connexion, c'est le
+    //- compromis nécessaire avec l'API actuellement disponible de la lib.
+    try {
+      await GoogleSignin.revokeAccess();
+    } catch {
+      // pas grave si aucun accès n'était accordé
+    }
     try {
       await GoogleSignin.signOut();
     } catch {
