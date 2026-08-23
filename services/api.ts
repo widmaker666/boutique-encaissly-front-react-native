@@ -1,12 +1,47 @@
 import axios from "axios";
-import * as WebBrowser from "expo-web-browser";
-import * as Google from "expo-auth-session/providers/google";
+import { GoogleSignin, statusCodes, isErrorWithCode } from "@react-native-google-signin/google-signin";
 import { API_BASE_URL } from "@/constants/api";
 import { useAuthStore } from "@/stores/auth.store";
-import { makeRedirectUri } from "expo-auth-session";
 import { User } from "@/types";
 
-WebBrowser.maybeCompleteAuthSession();
+//- Sélecteur de compte natif (Credential Manager) — aucun navigateur, aucune
+//- redirection, donc aucun risque de casse liée aux restrictions Google sur
+//- les redirect_uri custom scheme (cf. historique : expo-auth-session
+//- marchait puis recassait au fil des mises à jour de politique OAuth de
+//- Google, indépendamment de notre code)
+GoogleSignin.configure({
+  webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+  iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+});
+
+//- Déclenche le sélecteur de compte Google et retourne le nécessaire pour
+//- pré-remplir le formulaire d'inscription / finaliser la connexion.
+//- Retourne `null` si l'utilisateur annule (pas une erreur).
+export const signInWithGoogle = async () => {
+  try {
+    await GoogleSignin.hasPlayServices();
+    const response = await GoogleSignin.signIn();
+
+    if (response.type === "cancelled") return null;
+
+    const { user, idToken } = response.data;
+    if (!idToken) {
+      throw new Error("Connexion Google échouée (token manquant).");
+    }
+
+    return {
+      idToken,
+      email: user.email,
+      prenom: user.givenName ?? "",
+      nom: user.familyName ?? "",
+    };
+  } catch (e) {
+    if (isErrorWithCode(e) && e.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+      throw new Error("Google Play Services indisponible ou à mettre à jour.");
+    }
+    throw e instanceof Error ? e : new Error("Connexion Google échouée.");
+  }
+};
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -34,40 +69,6 @@ api.interceptors.response.use(
     return Promise.reject(error);
   },
 );
-
-export const useGoogleAuth = () => {
-  //- makeRedirectUri({ path }) construit une URI garantie de matcher la
-  //- route app/oauthredirect.tsx via expo-router (contrairement au format
-  //- "deviné" manuellement, qui a produit une URI qu'Expo Router n'arrivait
-  //- pas à faire correspondre → "Unmatched Route").
-  const redirectUri = makeRedirectUri({ path: "oauthredirect" });
-
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
-    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-    redirectUri,
-  });
-
-  return { request, response, promptAsync };
-};
-
-//- Récupère email/prénom/nom depuis Google avant de créer le compte —
-//- permet de pré-remplir le formulaire d'inscription sans encore rien
-//- envoyer au backend (la création reste différée jusqu'à validation
-//- du rôle + des CGU par l'utilisateur)
-export const fetchGoogleUserInfo = async (googleAccessToken: string) => {
-  const res = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
-    headers: { Authorization: `Bearer ${googleAccessToken}` },
-  });
-  if (!res.ok) throw new Error("Impossible de récupérer le profil Google.");
-  const data = await res.json();
-  return {
-    email: data.email as string,
-    prenom: (data.given_name as string | undefined) ?? "",
-    nom: (data.family_name as string | undefined) ?? "",
-  };
-};
 
 //- Service de récupération ID pour google et autre
 export const authService = {
@@ -107,7 +108,7 @@ export const authService = {
   //- finaliser une INSCRIPTION (après le formulaire pré-rempli) — omis pour
   //- un simple login, auquel cas un compte inexistant n'est jamais créé.
   googleMobile: async (
-    googleAccessToken: string,
+    googleIdToken: string,
     role?: "GERANTE" | "CREATRICE" | "GERANTE_CREATRICE",
     acceptedCGU?: boolean,
   ) => {
@@ -115,7 +116,7 @@ export const authService = {
       accessToken: string;
       refreshToken: string;
     }>("/auth/google/mobile", {
-      accessToken: googleAccessToken,
+      idToken: googleIdToken,
       ...(role ? { role } : {}),
       ...(acceptedCGU !== undefined ? { acceptedCGU } : {}),
     });

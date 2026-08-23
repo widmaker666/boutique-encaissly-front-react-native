@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
 import { router } from "expo-router";
 import { styles } from "@/styles/pages/login.style";
 import { Colors } from "@/constants/colors";
-import { authService, useGoogleAuth } from "@/services/api";
+import { authService, signInWithGoogle } from "@/services/api";
 import { useAuthStore } from "@/stores/auth.store";
 import { AntDesign } from "@expo/vector-icons";
 
@@ -21,9 +21,9 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const { setTokens, setUser } = useAuthStore();
-  const { request, response, promptAsync } = useGoogleAuth();
 
   const headerAnim = useRef(new Animated.Value(0)).current;
   const formAnim = useRef(new Animated.Value(0)).current;
@@ -43,26 +43,23 @@ export default function LoginScreen() {
     ]).start();
   }, []);
 
-  //- Récupère le token Google et l'envoie au backend
-  useEffect(() => {
-    if (response?.type === "success") {
-      const googleToken = response.authentication?.accessToken;
-      if (!googleToken) return;
-      setLoading(true);
-      authService
-        .googleMobile(googleToken)
-        .then(async ({ accessToken, refreshToken }) => {
-          setTokens(accessToken, refreshToken);
-          const user = await authService.getProfile();
-          setUser(user);
-          router.replace("/(app)");
-        })
-        .catch((e: any) =>
-          setError(e?.response?.data?.message ?? "Connexion Google échouée."),
-        )
-        .finally(() => setLoading(false));
+  const handleGoogleLogin = async () => {
+    setError("");
+    try {
+      setGoogleLoading(true);
+      const result = await signInWithGoogle();
+      if (!result) return; // annulé par l'utilisateur
+      const { accessToken, refreshToken } = await authService.googleMobile(result.idToken);
+      setTokens(accessToken, refreshToken);
+      const user = await authService.getProfile();
+      setUser(user);
+      router.replace("/(app)");
+    } catch (e: any) {
+      setError(e?.response?.data?.message ?? e?.message ?? "Connexion Google échouée.");
+    } finally {
+      setGoogleLoading(false);
     }
-  }, [response]);
+  };
 
   const handleLogin = async () => {
     setError("");
@@ -156,12 +153,18 @@ export default function LoginScreen() {
 
         <TouchableOpacity
           style={styles.btnGoogle}
-          onPress={() => promptAsync()}
-          disabled={!request || loading}
+          onPress={handleGoogleLogin}
+          disabled={googleLoading || loading}
           activeOpacity={0.85}
         >
-          <AntDesign name="google" size={18} color="#EA4335" />
-          <Text style={styles.btnGoogleText}>Continuer avec Google</Text>
+          {googleLoading ? (
+            <ActivityIndicator color={Colors.primary} />
+          ) : (
+            <>
+              <AntDesign name="google" size={18} color="#EA4335" />
+              <Text style={styles.btnGoogleText}>Continuer avec Google</Text>
+            </>
+          )}
         </TouchableOpacity>
 
         <View style={styles.footer}>

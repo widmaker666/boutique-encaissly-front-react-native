@@ -13,7 +13,7 @@ import {
 import { router, useLocalSearchParams } from "expo-router";
 import { styles } from "@/styles/pages/register.style";
 import { Colors } from "@/constants/colors";
-import { authService, useGoogleAuth, fetchGoogleUserInfo } from "@/services/api";
+import { authService, signInWithGoogle } from "@/services/api";
 import { useAuthStore } from "@/stores/auth.store";
 import { AntDesign } from "@expo/vector-icons";
 
@@ -27,9 +27,9 @@ export default function RegisterScreen() {
   const [step, setStep] = useState<"choice" | "form">("choice");
   const [method, setMethod] = useState<Method | null>(null);
 
-  //- Token Google conservé le temps que l'utilisateur complète rôle + CGU —
+  //- idToken Google conservé le temps que l'utilisateur complète rôle + CGU —
   //- le compte n'est créé qu'à la soumission finale, jamais avant
-  const [googleAccessToken, setGoogleAccessToken] = useState<string | null>(null);
+  const [googleIdToken, setGoogleIdToken] = useState<string | null>(null);
   const [loadingGoogleProfile, setLoadingGoogleProfile] = useState(false);
 
   const [role, setRole] = useState<Role | null>(
@@ -46,7 +46,6 @@ export default function RegisterScreen() {
   const [acceptedCGU, setAcceptedCGU] = useState(false);
 
   const { setTokens, setUser } = useAuthStore();
-  const { request, response, promptAsync } = useGoogleAuth();
 
   const headerAnim = useRef(new Animated.Value(0)).current;
   const formAnim = useRef(new Animated.Value(0)).current;
@@ -66,27 +65,27 @@ export default function RegisterScreen() {
     ]).start();
   }, [step]);
 
-  //- Après l'auth Google : récupère juste le profil (email/prénom/nom) pour
-  //- pré-remplir le formulaire. Aucun compte n'est créé à cette étape.
-  useEffect(() => {
-    if (response?.type === "success") {
-      const googleToken = response.authentication?.accessToken;
-      if (!googleToken) return;
-      setError("");
-      setLoadingGoogleProfile(true);
-      fetchGoogleUserInfo(googleToken)
-        .then((profile) => {
-          setGoogleAccessToken(googleToken);
-          setEmail(profile.email);
-          setPrenom(profile.prenom);
-          setNom(profile.nom);
-          setMethod("google");
-          setStep("form");
-        })
-        .catch(() => setError("Impossible de récupérer votre profil Google."))
-        .finally(() => setLoadingGoogleProfile(false));
+  //- Sélecteur de compte natif Google : récupère juste le profil (idToken +
+  //- email/prénom/nom) pour pré-remplir le formulaire. Aucun compte n'est
+  //- créé à cette étape — seulement à la soumission finale (rôle + CGU).
+  const handleChooseGoogle = async () => {
+    setError("");
+    setLoadingGoogleProfile(true);
+    try {
+      const result = await signInWithGoogle();
+      if (!result) return; // annulé par l'utilisateur
+      setGoogleIdToken(result.idToken);
+      setEmail(result.email);
+      setPrenom(result.prenom);
+      setNom(result.nom);
+      setMethod("google");
+      setStep("form");
+    } catch (e: any) {
+      setError(e?.message ?? "Connexion Google échouée.");
+    } finally {
+      setLoadingGoogleProfile(false);
     }
-  }, [response]);
+  };
 
   const handleChooseEmail = () => {
     setMethod("email");
@@ -114,9 +113,9 @@ export default function RegisterScreen() {
       setLoading(true);
 
       if (method === "google") {
-        if (!googleAccessToken) return;
+        if (!googleIdToken) return;
         const { accessToken, refreshToken } = await authService.googleMobile(
-          googleAccessToken,
+          googleIdToken,
           role,
           true,
         );
@@ -247,8 +246,8 @@ export default function RegisterScreen() {
 
               <TouchableOpacity
                 style={styles.btnGoogle}
-                onPress={() => promptAsync()}
-                disabled={!request || loadingGoogleProfile}
+                onPress={handleChooseGoogle}
+                disabled={loadingGoogleProfile}
                 activeOpacity={0.85}
               >
                 {loadingGoogleProfile ? (
