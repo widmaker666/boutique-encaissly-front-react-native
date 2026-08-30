@@ -471,20 +471,7 @@ export default function ProfilScreen() {
                   {memberBoutiques.map((boutique, i) => (
                     <View key={boutique.id}>
                       {i > 0 && <View style={s.divider} />}
-                      <TouchableOpacity
-                        style={s.memberBoutiqueRow}
-                        onPress={() =>
-                          router.push(
-                            `/(app)/mes-ventes-boutique/${boutique.id}?nom=${encodeURIComponent(boutique.nom)}`
-                          )
-                        }
-                        activeOpacity={0.7}
-                      >
-                        <View style={{ flex: 1 }}>
-                          <InfoRow icon="team" label="Membre de" value={boutique.nom} />
-                        </View>
-                        <AntDesign name="right" size={12} color={Colors.textLight} />
-                      </TouchableOpacity>
+                      <InfoRow icon="team" label="Membre de" value={boutique.nom} />
                     </View>
                   ))}
                 </>
@@ -1012,12 +999,6 @@ const s = StyleSheet.create({
   infoRow: {
     flexDirection: "row",
     alignItems: "center",
-  },
-  memberBoutiqueRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 8,
   },
   infoIcon: {
     marginRight: 10,
