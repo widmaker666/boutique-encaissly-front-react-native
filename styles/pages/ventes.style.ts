@@ -172,6 +172,11 @@ export const styles = StyleSheet.create({
     fontFamily: Fonts.family.nowLight,
     fontSize: 11,
     color: Colors.textLight,
+  },
+  cardBottomRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginTop: 8,
   },
 
@@ -594,6 +599,16 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     color: "#FFFFFF",
     letterSpacing: 1.5,
+  },
+  deleteVenteBtn: {
+    paddingVertical: 14,
+    alignItems: "center",
+    marginTop: 8,
+  },
+  deleteVenteTxt: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: 13,
+    color: Colors.error,
   },
   backBtn: {
     flexDirection: "row",

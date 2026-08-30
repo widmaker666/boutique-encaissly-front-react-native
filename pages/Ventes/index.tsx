@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { venteService, creatriceService, articleService } from "@/services/api";
@@ -19,6 +20,7 @@ import type { Vente, Creatrice, Article, ModePaiement } from "@/types";
 import { Colors } from "@/constants/colors";
 import { styles, getAvatarColor } from "@/styles/pages/ventes.style";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { AntDesign } from "@expo/vector-icons";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -35,21 +37,6 @@ function formatDate(isoString: string): string {
   });
 }
 
-function groupVentes(ventes: Vente[]): (Vente & { quantite: number })[] {
-  const map = new Map<string, Vente & { quantite: number }>();
-  for (const v of ventes) {
-    const creatriceId = v.creatriceId ?? "";
-    const key = `${v.nomArticle}-${creatriceId}-${v.modePaiement}`;
-    if (map.has(key)) {
-      const g = map.get(key)!;
-      g.quantite = g.quantite + ((v as any).quantite ?? 1);
-      g.prixVente += v.prixVente;
-    } else {
-      map.set(key, { ...v, quantite: (v as any).quantite ?? 1 });
-    }
-  }
-  return Array.from(map.values());
-}
 
 // ── AnimCard ──────────────────────────────────────────────────────────────────
 
@@ -710,6 +697,213 @@ function BottomSheetCreation({
   );
 }
 
+// ── BottomSheetEdit ───────────────────────────────────────────────────────────
+//- Modifier/supprimer une vente existante. Champs volontairement limités à
+//- ce qui peut vraiment se tromper (nom, prix, mode de paiement, commission)
+//- — pas de réassignation de créatrice/boutique depuis ici.
+
+function BottomSheetEdit({
+  vente,
+  onClose,
+}: {
+  vente: Vente | null;
+  onClose: () => void;
+}) {
+  const queryClient = useQueryClient();
+  const insets = useSafeAreaInsets();
+  const visible = vente != null;
+
+  const [nomArticle, setNomArticle] = useState("");
+  const [prixVente, setPrixVente] = useState("");
+  const [modePaiement, setModePaiement] = useState<ModePaiement>("ESPECES");
+  const [sansCommission, setSansCommission] = useState(false);
+  const [error, setError] = useState(false);
+  const [pending, setPending] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const slideAnim = useRef(new Animated.Value(400)).current;
+
+  useEffect(() => {
+    if (visible && vente) {
+      setNomArticle(vente.nomArticle);
+      setPrixVente(vente.prixVente.toString().replace(".", ","));
+      setModePaiement(vente.modePaiement);
+      setSansCommission(vente.sansCommission ?? false);
+      setError(false);
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        useNativeDriver: true,
+        damping: 20,
+        stiffness: 200,
+      }).start();
+    } else {
+      slideAnim.setValue(400);
+    }
+  }, [visible, vente?.id]);
+
+  const invalidateTout = () => {
+    queryClient.invalidateQueries({ queryKey: ["ventes"] });
+    queryClient.invalidateQueries({ queryKey: ["stats"] });
+    queryClient.invalidateQueries({ queryKey: ["stats-global"] });
+    queryClient.invalidateQueries({ queryKey: ["stats-top-articles"] });
+    queryClient.invalidateQueries({ queryKey: ["stats-historique"] });
+    queryClient.invalidateQueries({ queryKey: ["stats-par-creatrice"] });
+    queryClient.invalidateQueries({ queryKey: ["ventes-recent"] });
+  };
+
+  const handleSave = async () => {
+    if (!vente) return;
+    const prix = parseFloat(prixVente.replace(",", "."));
+    if (!nomArticle.trim() || isNaN(prix) || prix <= 0) {
+      setError(true);
+      return;
+    }
+    setError(false);
+    setPending(true);
+    try {
+      await venteService.update(vente.id, {
+        nomArticle: nomArticle.trim(),
+        prixVente: prix,
+        modePaiement,
+        sansCommission,
+      });
+      invalidateTout();
+      onClose();
+    } catch {
+      setError(true);
+    } finally {
+      setPending(false);
+    }
+  };
+
+  const handleDelete = () => {
+    if (!vente) return;
+    Alert.alert(
+      "Supprimer cette vente",
+      "Cette action est irréversible.",
+      [
+        { text: "Annuler", style: "cancel" },
+        {
+          text: "Supprimer",
+          style: "destructive",
+          onPress: async () => {
+            setDeleting(true);
+            try {
+              await venteService.remove(vente.id);
+              invalidateTout();
+              onClose();
+            } catch {
+              setError(true);
+            } finally {
+              setDeleting(false);
+            }
+          },
+        },
+      ],
+    );
+  };
+
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      <KeyboardAvoidingView style={styles.overlay} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+        <TouchableOpacity style={{ flex: 1 }} activeOpacity={1} onPress={onClose} />
+        <Animated.View style={[styles.sheet, { transform: [{ translateY: slideAnim }] }]}>
+          <View style={styles.sheetHandle} />
+
+          <View style={styles.sheetHeader}>
+            <Text style={styles.sheetTitre}>MODIFIER LA VENTE</Text>
+            <TouchableOpacity style={styles.sheetClose} onPress={onClose}>
+              <Text style={styles.sheetCloseTxt}>×</Text>
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView contentContainerStyle={styles.sheetScroll} keyboardShouldPersistTaps="handled">
+            <TextInput
+              style={styles.manuelFormInput}
+              placeholder="Nom de l'article"
+              placeholderTextColor="#aaa"
+              value={nomArticle}
+              onChangeText={setNomArticle}
+            />
+            <TextInput
+              style={[styles.manuelFormInput, { marginTop: 12 }]}
+              placeholder="Prix (€)"
+              placeholderTextColor="#aaa"
+              value={prixVente}
+              onChangeText={setPrixVente}
+              keyboardType="decimal-pad"
+            />
+
+            <View style={[styles.formGroup, { marginTop: 20 }]}>
+              <Text style={styles.formLabel}>Mode de paiement</Text>
+              <View style={styles.modePaiementRow}>
+                {(["ESPECES", "CARTE"] as ModePaiement[]).map((m) => (
+                  <TouchableOpacity
+                    key={m}
+                    style={[styles.modeChip, modePaiement === m && styles.modeChipActive]}
+                    activeOpacity={0.8}
+                    onPress={() => {
+                      setModePaiement(m);
+                      if (m !== "ESPECES") setSansCommission(false);
+                    }}
+                  >
+                    <Text style={[styles.modeChipTxt, modePaiement === m && styles.modeChipTxtActive]}>
+                      {m}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {modePaiement === "ESPECES" && (
+                <TouchableOpacity
+                  style={styles.sansCommissionRow}
+                  onPress={() => setSansCommission((v) => !v)}
+                  activeOpacity={0.75}
+                >
+                  <View style={[styles.checkbox, sansCommission && styles.checkboxChecked]}>
+                    {sansCommission && <Text style={styles.checkboxTick}>✓</Text>}
+                  </View>
+                  <Text style={styles.sansCommissionTxt}>Pas de commission sur cette vente</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {error && (
+              <Text style={styles.errorTxt}>Erreur — vérifie les champs et réessaye.</Text>
+            )}
+
+            <TouchableOpacity
+              style={[styles.submitBtn, pending && styles.submitBtnDisabled, { marginTop: 20 }]}
+              activeOpacity={0.85}
+              onPress={handleSave}
+              disabled={pending || deleting}
+            >
+              {pending ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text style={styles.submitTxt}>ENREGISTRER</Text>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.deleteVenteBtn}
+              activeOpacity={0.75}
+              onPress={handleDelete}
+              disabled={pending || deleting}
+            >
+              <Text style={styles.deleteVenteTxt}>
+                {deleting ? "Suppression..." : "Supprimer cette vente"}
+              </Text>
+            </TouchableOpacity>
+          </ScrollView>
+
+          <View style={{ height: insets.bottom }} />
+        </Animated.View>
+      </KeyboardAvoidingView>
+    </Modal>
+  );
+}
+
 // ── VentesScreen ──────────────────────────────────────────────────────────────
 
 type FilterMode = "TOUT" | "ESPECES" | "CARTE";
@@ -721,6 +915,7 @@ export default function VentesScreen() {
   const activeEvenementNom = useAuthStore((state) => state.activeEvenementNom);
   const [filter, setFilter] = useState<FilterMode>("TOUT");
   const [sheetVisible, setSheetVisible] = useState(false);
+  const [editingVente, setEditingVente] = useState<Vente | null>(null);
 
   const headerAnim = useRef(new Animated.Value(0)).current;
 
@@ -826,26 +1021,31 @@ export default function VentesScreen() {
             </View>
           )}
           {ventes && ventes.length > 0 ? (
-            groupVentes(ventes).map((v, index) => (
+            ventes.map((v, index) => (
               <AnimCard key={v.id} index={index} style={styles.card}>
-                <View style={styles.cardRow}>
-                  <View style={styles.cardLeft}>
-                    <Text style={styles.cardNomArticle} numberOfLines={2}>
-                      {v.nomArticle}
-                      {v.quantite > 1 ? `  × ${v.quantite}` : ""}
-                    </Text>
-                    {(v.evenement?.nom || v.creatrice?.nom) && (
-                      <Text style={styles.cardCreatrice} numberOfLines={1}>
-                        {v.evenement?.nom ?? v.creatrice?.nom} · {v.modePaiement}
+                <TouchableOpacity activeOpacity={0.7} onPress={() => setEditingVente(v)}>
+                  <View style={styles.cardRow}>
+                    <View style={styles.cardLeft}>
+                      <Text style={styles.cardNomArticle} numberOfLines={2}>
+                        {v.nomArticle}
+                        {(v.quantite ?? 1) > 1 ? `  × ${v.quantite}` : ""}
                       </Text>
-                    )}
+                      {(v.evenement?.nom || v.creatrice?.nom) && (
+                        <Text style={styles.cardCreatrice} numberOfLines={1}>
+                          {v.evenement?.nom ?? v.creatrice?.nom} · {v.modePaiement}
+                        </Text>
+                      )}
+                    </View>
+                    <View style={styles.cardRight}>
+                      <Text style={styles.cardPrix}>{v.prixVente.toFixed(2)} €</Text>
+                      <BadgePaiement mode={v.modePaiement} />
+                    </View>
                   </View>
-                  <View style={styles.cardRight}>
-                    <Text style={styles.cardPrix}>{v.prixVente.toFixed(2)} €</Text>
-                    <BadgePaiement mode={v.modePaiement} />
+                  <View style={styles.cardBottomRow}>
+                    <Text style={styles.cardDate}>{formatDate(v.createdAt)}</Text>
+                    <AntDesign name="edit" size={13} color={Colors.textLight} />
                   </View>
-                </View>
-                <Text style={styles.cardDate}>{formatDate(v.createdAt)}</Text>
+                </TouchableOpacity>
               </AnimCard>
             ))
           ) : (
@@ -868,6 +1068,12 @@ export default function VentesScreen() {
       <BottomSheetCreation
         visible={sheetVisible}
         onClose={() => setSheetVisible(false)}
+      />
+
+      {/* Bottom sheet édition/suppression */}
+      <BottomSheetEdit
+        vente={editingVente}
+        onClose={() => setEditingVente(null)}
       />
     </View>
   );

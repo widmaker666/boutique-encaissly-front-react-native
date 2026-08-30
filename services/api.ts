@@ -186,6 +186,22 @@ export const venteService = {
     const { data } = await api.post("/vente", dto);
     return data;
   },
+  update: async (
+    id: string,
+    dto: Partial<{
+      nomArticle: string;
+      prixVente: number;
+      modePaiement: "ESPECES" | "CARTE";
+      sansCommission: boolean;
+    }>,
+  ) => {
+    const { data } = await api.patch(`/vente/${id}`, dto);
+    return data;
+  },
+  remove: async (id: string) => {
+    const { data } = await api.delete(`/vente/${id}`);
+    return data;
+  },
 };
 
 //- Les boutiques
