@@ -118,16 +118,25 @@ export default function DashboardScreen() {
   const events: any[] = mesEvenements ?? [];
   const memberBoutiques: any[] = memberBoutiquesData ?? [];
 
+  //- mode reflète la vue actuellement affichée (gérante/créatrice) — sans
+  //- effet pour un compte non-DUO, mais indispensable pour un DUO puisque
+  //- duoMode ne se déduit jamais du rôle seul côté serveur
+  const currentMode = isGerante ? "GERANTE" : "CREATRICE";
+
   //- Stats globales — CREATRICE uniquement
   const { data, isLoading } = useQuery({
-    queryKey: ["stats", activeEvenementId ?? "personal"],
-    queryFn: () => statsService.getGlobal(activeEvenementId ? { evenementId: activeEvenementId } : {}),
+    queryKey: ["stats", activeEvenementId ?? "personal", currentMode],
+    queryFn: () =>
+      statsService.getGlobal({
+        ...(activeEvenementId ? { evenementId: activeEvenementId } : {}),
+        mode: currentMode,
+      }),
     enabled: !isGerante,
   });
 
   const { data: recentVentes } = useQuery({
-    queryKey: ["ventes-recent", activeEvenementId ?? "personal"],
-    queryFn: () => venteService.getRecent(activeEvenementId ?? undefined),
+    queryKey: ["ventes-recent", activeEvenementId ?? "personal", currentMode],
+    queryFn: () => venteService.getRecent(activeEvenementId ?? undefined, currentMode),
   });
 
   //- Historique mensuel — CREATRICE PRO uniquement

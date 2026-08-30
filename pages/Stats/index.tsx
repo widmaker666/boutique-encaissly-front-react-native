@@ -166,17 +166,22 @@ export default function StatsScreen() {
     enabled: isGerante,
   });
 
+  //- mode reflète la vue actuellement affichée (gérante/créatrice) — sans
+  //- effet pour un compte non-DUO, mais indispensable pour un DUO puisque
+  //- duoMode ne se déduit jamais du rôle seul côté serveur
+  const currentMode = isGerante ? "GERANTE" : "CREATRICE";
+
   // Params pour les queries stats selon le filtre choisi
   const statsParams: StatsParams =
     selectedFilter.type === "event"
-      ? { evenementId: selectedFilter.id }
+      ? { evenementId: selectedFilter.id, mode: currentMode }
       : selectedFilter.type === "boutique"
-        ? { boutiqueId: selectedFilter.id }
-        : {};
+        ? { boutiqueId: selectedFilter.id, mode: currentMode }
+        : { mode: currentMode };
 
-  const filterKey = selectedFilter.type === "all"
+  const filterKey = (selectedFilter.type === "all"
     ? "all"
-    : `${selectedFilter.type}:${selectedFilter.id}`;
+    : `${selectedFilter.type}:${selectedFilter.id}`) + `:${currentMode}`;
 
   const { data: globalData } = useQuery({
     queryKey: ["stats-global", filterKey],
@@ -195,8 +200,8 @@ export default function StatsScreen() {
   });
 
   const { data: parCreatriceData } = useQuery({
-    queryKey: ["stats-par-creatrice"],
-    queryFn: statsService.getParCreatrice,
+    queryKey: ["stats-par-creatrice", currentMode],
+    queryFn: () => statsService.getParCreatrice(currentMode),
     enabled: isGerante,
   });
 

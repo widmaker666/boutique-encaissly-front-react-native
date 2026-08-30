@@ -142,7 +142,14 @@ export const authService = {
 };
 
 //- Récupération des stats
-export type StatsParams = { evenementId?: string; boutiqueId?: string };
+//- mode : uniquement pour un compte GERANTE_CREATRICE (DUO) — indique au
+//- backend dans quelle vue (duoMode) l'app se trouve actuellement, puisque
+//- ce toggle est un état 100% client jamais déductible du rôle stocké seul.
+export type StatsParams = {
+  evenementId?: string;
+  boutiqueId?: string;
+  mode?: "GERANTE" | "CREATRICE";
+};
 
 export const statsService = {
   getGlobal: async (params?: StatsParams) => {
@@ -157,16 +164,18 @@ export const statsService = {
     const { data } = await api.get("/stats/top-articles", { params: params ?? {} });
     return data;
   },
-  getParCreatrice: async () => {
-    const { data } = await api.get("/stats/par-creatrice");
+  getParCreatrice: async (mode?: "GERANTE" | "CREATRICE") => {
+    const { data } = await api.get("/stats/par-creatrice", { params: mode ? { mode } : {} });
     return data;
   },
 };
 
 //- Récupération des dernière ventes
 export const venteService = {
-  getRecent: async (evenementId?: string) => {
-    const { data } = await api.get("/vente/recent", { params: evenementId ? { evenementId } : {} });
+  getRecent: async (evenementId?: string, mode?: "GERANTE" | "CREATRICE") => {
+    const { data } = await api.get("/vente/recent", {
+      params: { ...(evenementId ? { evenementId } : {}), ...(mode ? { mode } : {}) },
+    });
     return data;
   },
   getAll: async (filters?: { creatriceId?: string; modePaiement?: string; evenementId?: string; boutiqueId?: string }) => {
