@@ -93,6 +93,11 @@ export default function MesVentesBoutiqueScreen() {
                       {v.nomArticle}
                       {(v.quantite ?? 1) > 1 ? `  × ${v.quantite}` : ""}
                     </Text>
+                    {v.creatrice?.nom && (
+                      <Text style={venteStyles.cardCreatrice} numberOfLines={1}>
+                        {v.creatrice.nom}
+                      </Text>
+                    )}
                   </View>
                   <View style={venteStyles.cardRight}>
                     <Text style={venteStyles.cardPrix}>{v.prixVente.toFixed(2)} €</Text>
