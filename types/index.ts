@@ -47,6 +47,7 @@ export interface Vente {
   montantCommission: number;
   netCreatrice: number;
   quantite?: number;
+  sansCommission?: boolean;
 }
 
 export interface Boutique {

@@ -181,6 +181,7 @@ export const venteService = {
     evenementId?: string;
     articleId?: string;
     quantite?: number;
+    sansCommission?: boolean;
   }) => {
     const { data } = await api.post("/vente", dto);
     return data;

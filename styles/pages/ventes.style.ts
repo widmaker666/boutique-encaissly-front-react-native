@@ -534,6 +534,16 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 10,
   },
+  sansCommissionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 14,
+  },
+  sansCommissionTxt: {
+    fontFamily: Fonts.family.nowRegular,
+    fontSize: 13,
+    color: Colors.text,
+  },
   modeChip: {
     flex: 1,
     paddingVertical: 13,

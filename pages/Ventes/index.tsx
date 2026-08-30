@@ -150,6 +150,7 @@ function BottomSheetCreation({
   const [creatrice, setCreatrice] = useState<SelectedCreatrice | null>(null);
   const [selections, setSelections] = useState<ArticleSelection[]>([]);
   const [modePaiement, setModePaiement] = useState<ModePaiement>("ESPECES");
+  const [sansCommission, setSansCommission] = useState(false);
   const [showManuelForm, setShowManuelForm] = useState(false);
   const [manuelNom, setManuelNom] = useState("");
   const [manuelPrix, setManuelPrix] = useState("");
@@ -170,6 +171,7 @@ function BottomSheetCreation({
       setCreatrice(null);
       setSelections([]);
       setModePaiement("ESPECES");
+      setSansCommission(false);
       setShowManuelForm(false);
       setManuelNom("");
       setManuelPrix("");
@@ -284,6 +286,7 @@ function BottomSheetCreation({
               articleId: s.article.id,
               quantite: s.quantite,
               evenementId,
+              sansCommission,
             });
           }
           return venteService.create({
@@ -293,6 +296,7 @@ function BottomSheetCreation({
             creatriceId: creatrice.id,
             quantite: s.quantite,
             evenementId,
+            sansCommission,
           });
         })
       );
@@ -636,7 +640,10 @@ function BottomSheetCreation({
                           modePaiement === m && styles.modeChipActive,
                         ]}
                         activeOpacity={0.8}
-                        onPress={() => setModePaiement(m)}
+                        onPress={() => {
+                          setModePaiement(m);
+                          if (m !== "ESPECES") setSansCommission(false);
+                        }}
                       >
                         <Text
                           style={[
@@ -649,6 +656,21 @@ function BottomSheetCreation({
                       </TouchableOpacity>
                     ))}
                   </View>
+
+                  {modePaiement === "ESPECES" && (
+                    <TouchableOpacity
+                      style={styles.sansCommissionRow}
+                      onPress={() => setSansCommission((v) => !v)}
+                      activeOpacity={0.75}
+                    >
+                      <View style={[styles.checkbox, sansCommission && styles.checkboxChecked]}>
+                        {sansCommission && <Text style={styles.checkboxTick}>✓</Text>}
+                      </View>
+                      <Text style={styles.sansCommissionTxt}>
+                        Pas de commission sur cette vente
+                      </Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
 
                 {/* Erreur */}
