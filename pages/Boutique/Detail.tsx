@@ -62,7 +62,9 @@ export default function BoutiqueDetailScreen() {
   const insets = useSafeAreaInsets();
   const accessToken = useAuthStore((s) => s.accessToken);
   const user = useAuthStore((s) => s.user);
-  const isPro = user?.plan === "PRO";
+  //- DUO débloque les mêmes fonctionnalités que PRO (plan payant à part
+  //- entière, pas une variante de FREE)
+  const isPro = user?.plan === "PRO" || user?.plan === "DUO";
 
   const [downloading, setDownloading] = useState<string | null>(null);
 

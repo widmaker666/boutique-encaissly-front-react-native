@@ -169,7 +169,10 @@ export default function ProfilScreen() {
 
   const evenements: any[] = mesEvenements ?? [];
   const memberBoutiques: Boutique[] = mesBoutiques ?? [];
-  const canCreateEvent = isPro || evenements.length < 1;
+  //- DUO débloque les mêmes fonctionnalités que PRO (plan payant à part
+  //- entière) — isPro reste volontairement "PRO uniquement" plus bas pour
+  //- l'affichage du badge/CTA, donc on ajoute isPlanDuo ici explicitement
+  const canCreateEvent = isPro || isPlanDuo || evenements.length < 1;
 
   const { mutate: saveProfile, isPending: isSaving } = useMutation({
     mutationFn: () => userService.updateProfile({ nom: editNom || undefined, prenom: editPrenom || undefined }),

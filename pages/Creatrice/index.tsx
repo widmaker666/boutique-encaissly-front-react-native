@@ -234,7 +234,7 @@ export default function CreatriceScreen() {
           <Text style={styles.emptyTxt}>Aucune créatrice trouvée</Text>
         )}
 
-        {!user?.plan?.includes("PRO") && (
+        {user?.plan === "FREE" && (
           <AnimCard index={(filtered?.length ?? 0) + 1} style={styles.lockedBox}>
             <Text style={styles.lockedEmoji}>🔒</Text>
             <Text style={styles.lockedTxt}>3 créatrices max en FREE</Text>

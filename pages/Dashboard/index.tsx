@@ -80,7 +80,9 @@ export default function DashboardScreen() {
   const isDuo = user?.role === "GERANTE_CREATRICE";
   const duoMode = useAuthStore((state) => state.duoMode);
   const isGerante = user?.role === "GERANTE" || (isDuo && duoMode === "GERANTE");
-  const isPro = user?.plan === "PRO";
+  //- DUO débloque les mêmes fonctionnalités que PRO (c'est un plan payant à
+  //- part entière, pas une variante de FREE) — jamais "plan === PRO" seul ici
+  const isPro = user?.plan === "PRO" || user?.plan === "DUO";
 
   const activeEvenementId = useAuthStore((state) => state.activeEvenementId);
   const activeEvenementNom = useAuthStore((state) => state.activeEvenementNom);

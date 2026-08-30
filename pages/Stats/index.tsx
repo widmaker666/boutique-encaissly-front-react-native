@@ -126,7 +126,10 @@ export default function StatsScreen() {
   const duoMode = useAuthStore((state) => state.duoMode);
   const isGerante = user?.role === "GERANTE" || (isDuo && duoMode === "GERANTE");
   const isCreatrice = user?.role === "CREATRICE" || (isDuo && duoMode === "CREATRICE");
-  const isPro = user?.plan === "PRO";
+  //- DUO débloque les mêmes fonctionnalités que PRO (plan payant à part
+  //- entière, pas une variante de FREE) — le nom réel du plan reste affiché
+  //- correctement plus bas via user?.plan, pas via ce flag
+  const isPro = user?.plan === "PRO" || user?.plan === "DUO";
   const [downloading, setDownloading] = useState<string | null>(null);
   const [selectedFilter, setSelectedFilter] = useState<Filter>(() =>
     activeEvenementId
@@ -267,7 +270,7 @@ export default function StatsScreen() {
           <Text style={st.badge}>
             {selectedFilter.type !== "all"
               ? `${selectedFilter.type === "event" ? "🎪" : "🏪"} ${selectedFilter.nom}`
-              : isPro ? "PRO ✨" : "FREE"}
+              : isPro ? `${user?.plan} ✨` : "FREE"}
           </Text>
         </View>
         <Text style={st.headerSub}>
