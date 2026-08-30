@@ -293,6 +293,47 @@ export default function ProfilScreen() {
     );
   };
 
+  const { mutate: deleteAccount, isPending: isDeletingAccount } = useMutation({
+    mutationFn: () => userService.deleteAccount(),
+    onSuccess: () => {
+      logout();
+      router.replace("/(auth)/login");
+    },
+    onError: () => {
+      Alert.alert("Erreur", "Impossible de supprimer le compte. Réessayez plus tard.");
+    },
+  });
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      "Supprimer mon compte",
+      isGerante
+        ? "Cette action est irréversible. Vos boutiques, créatrices, ventes et statistiques seront définitivement supprimées."
+        : "Cette action est irréversible. Votre compte et vos informations personnelles seront définitivement supprimés.",
+      [
+        { text: "Annuler", style: "cancel" },
+        {
+          text: "Continuer",
+          style: "destructive",
+          onPress: () => {
+            Alert.alert(
+              "Dernière confirmation",
+              "Voulez-vous vraiment supprimer définitivement votre compte Encaissly ?",
+              [
+                { text: "Annuler", style: "cancel" },
+                {
+                  text: "Oui, supprimer",
+                  style: "destructive",
+                  onPress: () => deleteAccount(),
+                },
+              ],
+            );
+          },
+        },
+      ],
+    );
+  };
+
   const handleLogout = () => {
     Alert.alert("Déconnexion", "Voulez-vous vous déconnecter ?", [
       { text: "Annuler", style: "cancel" },
@@ -782,6 +823,20 @@ export default function ProfilScreen() {
           </TouchableOpacity>
         </AnimCard>
 
+        {/* ── Zone de danger ── */}
+        <AnimCard index={cardIdx(6)} style={{ marginTop: 10 }}>
+          <TouchableOpacity
+            style={s.deleteAccountBtn}
+            onPress={handleDeleteAccount}
+            disabled={isDeletingAccount}
+            activeOpacity={0.75}
+          >
+            <Text style={s.deleteAccountTxt}>
+              {isDeletingAccount ? "Suppression en cours..." : "Supprimer mon compte"}
+            </Text>
+          </TouchableOpacity>
+        </AnimCard>
+
         <Text style={s.footer}>
           Encaissly · La caisse intelligente des boutiques de créateurs
         </Text>
@@ -1225,6 +1280,18 @@ const s = StyleSheet.create({
     fontFamily: Fonts.family.nowBold,
     fontSize: 15,
     color: Colors.error,
+  },
+
+  // Suppression de compte — délibérément discret, pas un bouton principal
+  deleteAccountBtn: {
+    paddingVertical: 10,
+    alignItems: "center",
+  },
+  deleteAccountTxt: {
+    fontFamily: Fonts.family.nowRegular,
+    fontSize: 12,
+    color: Colors.textLight,
+    textDecorationLine: "underline",
   },
 
   // Footer

@@ -379,6 +379,9 @@ export const userService = {
     }
     return response.json();
   },
+  //- Droit à l'effacement RGPD — supprime le compte et tout ce qu'il
+  //- possède/gère côté backend (voir UserService.deleteAccount)
+  deleteAccount: () => api.delete('/user/account').then((r) => r.data),
 };
 
 //- Stripe
