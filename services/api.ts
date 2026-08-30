@@ -169,7 +169,7 @@ export const venteService = {
     const { data } = await api.get("/vente/recent", { params: evenementId ? { evenementId } : {} });
     return data;
   },
-  getAll: async (filters?: { creatriceId?: string; modePaiement?: string; evenementId?: string }) => {
+  getAll: async (filters?: { creatriceId?: string; modePaiement?: string; evenementId?: string; boutiqueId?: string }) => {
     const { data } = await api.get("/vente", { params: filters });
     return data;
   },

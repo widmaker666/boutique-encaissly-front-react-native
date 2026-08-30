@@ -86,6 +86,7 @@ export default function AppLayout() {
       <Tabs.Screen name="notifications" options={{ href: null }} />
       <Tabs.Screen name="aide" options={{ href: null }} />
       <Tabs.Screen name="boutique/[id]" options={{ href: null }} />
+      <Tabs.Screen name="mes-ventes-boutique/[id]" options={{ href: null }} />
     </Tabs>
   );
 }
