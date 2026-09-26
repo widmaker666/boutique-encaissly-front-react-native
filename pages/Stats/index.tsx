@@ -19,6 +19,7 @@ import { statsService, evenementService, boutiqueService } from "@/services/api"
 import type { StatsParams } from "@/services/api";
 import { useAuthStore } from "@/stores/auth.store";
 import { DuoModeToggle } from "@/components/DuoModeToggle";
+import VentesExportButtons from "@/components/VentesExportButtons";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -568,6 +569,14 @@ export default function StatsScreen() {
             <LockedExportBtn label="📗 Export Excel" />
           )}
         </AnimCard>
+
+        {/* Détail des ventes de toutes les créatrices, mois par mois — vue gérante uniquement */}
+        {isGerante && (
+          <>
+            <Text style={st.sectionTitle}>Ventes des créatrices</Text>
+            <VentesExportButtons filenameBase="ventes-boutique" />
+          </>
+        )}
       </View>
     </ScrollView>
   );

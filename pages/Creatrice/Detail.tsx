@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import ModalModifier from "@/components/Creatrice/ModalModifier";
 import ModalInviter from "@/components/Creatrice/ModalInviter";
+import VentesExportButtons from "@/components/VentesExportButtons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -97,6 +98,11 @@ export default function CreatriceDetailScreen() {
   const insets = useSafeAreaInsets();
   const user = useAuthStore((state) => state.user);
   const isGerante = user?.role === "GERANTE" || user?.role === "GERANTE_CREATRICE";
+  // Vue gérante réellement active (un compte DUO peut être en vue créatrice) :
+  // l'export des ventes d'une créatrice n'a de sens que côté gérante
+  const duoMode = useAuthStore((state) => state.duoMode);
+  const isGeranteView =
+    user?.role === "GERANTE" || (user?.role === "GERANTE_CREATRICE" && duoMode === "GERANTE");
   const queryClient = useQueryClient();
 
   const [modalModifier, setModalModifier] = useState(false);
@@ -252,6 +258,17 @@ export default function CreatriceDetailScreen() {
             <Text style={styles.catalogueBtnArrow}>›</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Export des ventes de cette créatrice, mois par mois — vue gérante uniquement */}
+        {isGeranteView && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>RÉCUPÉRER SES VENTES</Text>
+            <VentesExportButtons
+              creatriceId={creatrice.id}
+              filenameBase={`ventes-${creatrice.nom.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+            />
+          </View>
+        )}
 
         {/* Ventes globales */}
         <View style={styles.section}>

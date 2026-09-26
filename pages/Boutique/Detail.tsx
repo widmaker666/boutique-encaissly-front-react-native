@@ -15,6 +15,7 @@ import * as Sharing from "expo-sharing";
 import { statsService } from "@/services/api";
 import { useAuthStore } from "@/stores/auth.store";
 import { API_BASE_URL } from "@/constants/api";
+import VentesExportButtons from "@/components/VentesExportButtons";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
 
@@ -188,6 +189,13 @@ export default function BoutiqueDetailScreen() {
             </>
           )}
         </TouchableOpacity>
+
+        {/* Détail des ventes de toutes les créatrices de cette boutique, mois par mois */}
+        <Text style={[s.sectionTitle, { marginTop: 12 }]}>VENTES DES CRÉATRICES</Text>
+        <VentesExportButtons
+          boutiqueId={id}
+          filenameBase={`ventes-${boutiqueName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+        />
 
         <View style={{ height: insets.bottom + 24 }} />
       </ScrollView>
