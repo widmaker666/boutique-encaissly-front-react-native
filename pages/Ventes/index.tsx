@@ -927,21 +927,25 @@ export default function VentesScreen() {
     }).start();
   }, []);
 
+  const isDuoScreen = user?.role === "GERANTE_CREATRICE";
+  const duoModeScreen = useAuthStore((state) => state.duoMode);
+  const isGerante = user?.role === "GERANTE" || (isDuoScreen && duoModeScreen === "GERANTE");
+  const currentMode: "GERANTE" | "CREATRICE" = isGerante ? "GERANTE" : "CREATRICE";
+
   const queryFilters = {
     ...(filter !== "TOUT" ? { modePaiement: filter } : {}),
     ...(activeEvenementId ? { evenementId: activeEvenementId } : {}),
+    mode: currentMode,
   };
 
+  //- `currentMode` dans la clé : sans ça, basculer gérante/créatrice (DUO)
+  //- ne redéclencherait pas la requête et afficherait la liste de l'autre vue.
   const { data: ventes, isLoading } = useQuery<Vente[]>({
-    queryKey: ["ventes", filter, activeEvenementId ?? "personal"],
+    queryKey: ["ventes", filter, activeEvenementId ?? "personal", currentMode],
     queryFn: () => venteService.getAll(queryFilters),
   });
 
   const count = ventes?.length ?? 0;
-
-  const isDuoScreen = user?.role === "GERANTE_CREATRICE";
-  const duoModeScreen = useAuthStore((state) => state.duoMode);
-  const isGerante = user?.role === "GERANTE" || (isDuoScreen && duoModeScreen === "GERANTE");
 
   return (
     <View style={styles.container}>
