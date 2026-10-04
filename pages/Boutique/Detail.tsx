@@ -216,7 +216,7 @@ const s = StyleSheet.create({
   backBtn: { width: 36, alignItems: "center" },
   backTxt: { fontFamily: Fonts.family.nowBold, fontSize: 28, color: "#fff", lineHeight: 36 },
   headerCenter: { flex: 1, alignItems: "center" },
-  titre: { fontFamily: "Norwester", fontSize: 18, color: "#fff", letterSpacing: 2 },
+  titre: { fontFamily: Fonts.family.norwester, fontSize: 18, color: "#fff", letterSpacing: 2 },
   sousTitre: { fontFamily: Fonts.family.nowRegular, fontSize: 11, color: "rgba(255,255,255,0.7)", marginTop: 2 },
 
   scroll: { padding: 16 },
@@ -232,7 +232,7 @@ const s = StyleSheet.create({
     padding: 14, shadowColor: "#7a41bb", shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.07, shadowRadius: 6, elevation: 2,
   },
-  statValue: { fontFamily: "Norwester", fontSize: 18, color: Colors.primary, marginBottom: 4 },
+  statValue: { fontFamily: Fonts.family.norwester, fontSize: 18, color: Colors.primary, marginBottom: 4 },
   statLabel: { fontFamily: Fonts.family.nowRegular, fontSize: 11, color: Colors.textLight },
 
   exportBtn: {

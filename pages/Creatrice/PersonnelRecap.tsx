@@ -224,7 +224,7 @@ const s = StyleSheet.create({
     fontSize: 12,
     color: "#fff",
   },
-  titre: { fontFamily: "Norwester", fontSize: 20, color: "#fff", letterSpacing: 2 },
+  titre: { fontFamily: Fonts.family.norwester, fontSize: 20, color: "#fff", letterSpacing: 2 },
   sousTitre: { fontFamily: Fonts.family.nowRegular, fontSize: 12, color: "rgba(255,255,255,0.7)", marginTop: 4 },
 
   scroll: { padding: 16 },
@@ -309,7 +309,7 @@ const s = StyleSheet.create({
   eventNom: { fontFamily: Fonts.family.nowBold, fontSize: 14, color: Colors.text, marginBottom: 2 },
   eventMeta: { fontFamily: Fonts.family.nowRegular, fontSize: 11, color: Colors.textLight },
   eventRight: { alignItems: "flex-end", gap: 6 },
-  eventCa: { fontFamily: "Norwester", fontSize: 15, color: Colors.primary },
+  eventCa: { fontFamily: Fonts.family.norwester, fontSize: 15, color: Colors.primary },
   activerBtn: {
     backgroundColor: Colors.primary, borderRadius: 12,
     paddingHorizontal: 10, paddingVertical: 4,

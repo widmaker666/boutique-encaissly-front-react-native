@@ -324,7 +324,7 @@ const s = StyleSheet.create({
     fontSize: 12,
     color: "#fff",
   },
-  titre: { fontFamily: "Norwester", fontSize: 20, color: "#fff", letterSpacing: 2 },
+  titre: { fontFamily: Fonts.family.norwester, fontSize: 20, color: "#fff", letterSpacing: 2 },
   sousTitre: { fontFamily: Fonts.family.nowRegular, fontSize: 12, color: "rgba(255,255,255,0.7)", marginTop: 4 },
 
   scroll: { padding: 16 },
@@ -348,7 +348,7 @@ const s = StyleSheet.create({
     padding: 14, shadowColor: "#7a41bb", shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.07, shadowRadius: 6, elevation: 2,
   },
-  statValue: { fontFamily: "Norwester", fontSize: 18, color: Colors.primary, marginBottom: 4 },
+  statValue: { fontFamily: Fonts.family.norwester, fontSize: 18, color: Colors.primary, marginBottom: 4 },
   statLabel: { fontFamily: Fonts.family.nowRegular, fontSize: 11, color: Colors.textLight },
 
   importBanner: {
@@ -380,13 +380,13 @@ const s = StyleSheet.create({
   venteLeft: { flex: 1 },
   venteNom: { fontFamily: Fonts.family.nowMedium, fontSize: 13, color: Colors.text },
   venteMeta: { fontFamily: Fonts.family.nowRegular, fontSize: 11, color: Colors.textLight, marginTop: 2 },
-  ventePrix: { fontFamily: "Norwester", fontSize: 16, color: Colors.primary },
+  ventePrix: { fontFamily: Fonts.family.norwester, fontSize: 16, color: Colors.primary },
 
   // Modal
   overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.4)", justifyContent: "flex-end" },
   sheet: { backgroundColor: Colors.surface, borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20 },
   sheetHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: "#ddd", alignSelf: "center", marginBottom: 16 },
-  sheetTitre: { fontFamily: "Norwester", fontSize: 18, color: Colors.text, letterSpacing: 1, marginBottom: 16 },
+  sheetTitre: { fontFamily: Fonts.family.norwester, fontSize: 18, color: Colors.text, letterSpacing: 1, marginBottom: 16 },
   fieldLabel: { fontFamily: Fonts.family.nowMedium, fontSize: 12, color: Colors.textLight, marginBottom: 4, marginTop: 8, textTransform: "uppercase" },
   fieldRow: { flexDirection: "row" },
   input: {

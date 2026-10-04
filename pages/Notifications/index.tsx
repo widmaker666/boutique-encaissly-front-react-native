@@ -15,6 +15,7 @@ import { useFocusEffect } from "expo-router";
 import { useCallback } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "@/constants/colors";
+import { Fonts } from "@/constants/fonts";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -288,7 +289,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   titre: {
-    fontFamily: "Norwester",
+    fontFamily: Fonts.family.norwester,
     fontSize: 22,
     color: "#fff",
     letterSpacing: 1.5,

@@ -896,7 +896,7 @@ const s = StyleSheet.create({
     borderColor: "rgba(255,255,255,0.4)",
   },
   avatarTxt: {
-    fontFamily: "Norwester",
+    fontFamily: Fonts.family.norwester,
     fontSize: 28,
     color: "#fff",
   },

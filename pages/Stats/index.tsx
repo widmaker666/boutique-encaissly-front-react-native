@@ -652,7 +652,7 @@ const st = StyleSheet.create({
   },
   headerTitle: {
     color: "#FFFFFF",
-    fontFamily: "Norwester",
+    fontFamily: Fonts.family.norwester,
     fontSize: Fonts.sizes.xl,
     letterSpacing: 2,
     marginBottom: 10,
@@ -748,7 +748,7 @@ const st = StyleSheet.create({
     marginBottom: 6,
   },
   cardValue: {
-    fontFamily: "Norwester",
+    fontFamily: Fonts.family.norwester,
     color: Colors.primary,
     fontSize: Fonts.sizes.lg,
     letterSpacing: 0.5,
@@ -777,7 +777,7 @@ const st = StyleSheet.create({
     color: Colors.text,
   },
   paiementMontant: {
-    fontFamily: "Norwester",
+    fontFamily: Fonts.family.norwester,
     fontSize: Fonts.sizes.md,
     color: Colors.primary,
     letterSpacing: 0.5,
@@ -857,7 +857,7 @@ const st = StyleSheet.create({
     marginRight: 8,
   },
   articleCA: {
-    fontFamily: "Norwester",
+    fontFamily: Fonts.family.norwester,
     fontSize: Fonts.sizes.md,
     color: Colors.primary,
     letterSpacing: 0.5,
@@ -1018,7 +1018,7 @@ const st = StyleSheet.create({
     marginTop: 2,
   },
   cardValueGreen: {
-    fontFamily: 'Norwester',
+    fontFamily: Fonts.family.norwester,
     color: '#16a34a',
     fontSize: Fonts.sizes.lg,
     letterSpacing: 0.5,

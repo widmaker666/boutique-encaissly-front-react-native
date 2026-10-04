@@ -16,7 +16,6 @@ export default function RootLayout() {
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState<boolean | null>(null);
 
   const [fontsLoaded] = useFonts({
-    Norwester: require("@/assets/fonts/norwester.otf"),
     Urbanist: require("@/assets/fonts/Urbanist-VariableFont_wght.ttf"),
     "Now-Thin": require("@/assets/fonts/Now-Thin.otf"),
     "Now-Light": require("@/assets/fonts/Now-Light.otf"),
