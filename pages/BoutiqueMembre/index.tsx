@@ -8,6 +8,8 @@ import { boutiqueService } from "@/services/api";
 import type { Boutique } from "@/types";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
+import { Radius } from "@/constants/spacing";
+import { shadows } from "@/styles/utils/shadows.styles";
 
 function AnimRow({ children, index }: { children: React.ReactNode; index: number }) {
   const anim = useRef(new Animated.Value(0)).current;
@@ -43,7 +45,7 @@ export default function BoutiqueMembreScreen() {
   return (
     <View style={s.container}>
       <View style={[s.header, { paddingTop: insets.top + 16 }]}>
-        <Text style={s.titre}>BOUTIQUES</Text>
+        <Text style={s.titre}>Boutiques</Text>
         <Text style={s.sousTitre}>
           {count} boutique{count > 1 ? "s" : ""}
         </Text>
@@ -84,21 +86,22 @@ export default function BoutiqueMembreScreen() {
 
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
+  // Header crème — même DA que le web
   header: {
-    backgroundColor: Colors.primary,
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: 12,
   },
   titre: {
     fontFamily: Fonts.family.norwester,
-    fontSize: 22,
-    color: "#fff",
-    letterSpacing: 1,
+    fontWeight: "800",
+    fontSize: 30,
+    color: Colors.text,
+    letterSpacing: -0.5,
   },
   sousTitre: {
     fontFamily: Fonts.family.nowRegular,
     fontSize: 13,
-    color: "rgba(255,255,255,0.75)",
+    color: Colors.textLight,
     marginTop: 4,
   },
   content: { padding: 16, paddingBottom: 40 },
@@ -106,21 +109,17 @@ const s = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: Colors.surface,
-    borderRadius: 14,
+    borderRadius: Radius.lg,
     padding: 16,
     marginBottom: 12,
     gap: 12,
-    shadowColor: "#7a41bb",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
+    ...shadows.sm,
   },
   cardIconWrap: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
-    backgroundColor: "#f3eaff",
+    width: 40,
+    height: 40,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.primaryTint,
     alignItems: "center",
     justifyContent: "center",
   },

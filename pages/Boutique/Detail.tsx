@@ -18,6 +18,8 @@ import { API_BASE_URL } from "@/constants/api";
 import VentesExportButtons from "@/components/VentesExportButtons";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
+import { Radius } from "@/constants/spacing";
+import { shadows } from "@/styles/utils/shadows.styles";
 
 const MIME: Record<string, string> = {
   pdf: "application/pdf",
@@ -99,8 +101,8 @@ export default function BoutiqueDetailScreen() {
           <Text style={s.backTxt}>‹</Text>
         </TouchableOpacity>
         <View style={s.headerCenter}>
-          <Text style={s.titre} numberOfLines={1}>{toUpper(boutiqueName)}</Text>
           <Text style={s.sousTitre}>FICHE BOUTIQUE</Text>
+          <Text style={s.titre} numberOfLines={1}>{boutiqueName}</Text>
         </View>
         <View style={{ width: 36 }} />
       </View>
@@ -108,7 +110,7 @@ export default function BoutiqueDetailScreen() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scroll}>
 
         {/* Stats */}
-        <Text style={s.sectionTitle}>STATISTIQUES</Text>
+        <Text style={s.sectionTitle}>Statistiques</Text>
         {isLoading ? (
           <ActivityIndicator color={Colors.primary} style={{ marginVertical: 24 }} />
         ) : (
@@ -128,7 +130,7 @@ export default function BoutiqueDetailScreen() {
         )}
 
         {/* Export */}
-        <Text style={[s.sectionTitle, { marginTop: 8 }]}>EXPORTER LES STATS</Text>
+        <Text style={[s.sectionTitle, { marginTop: 8 }]}>Exporter les stats</Text>
 
         <TouchableOpacity
           style={[s.exportBtn, downloading === "pdf" && s.exportBtnLoading]}
@@ -191,7 +193,7 @@ export default function BoutiqueDetailScreen() {
         </TouchableOpacity>
 
         {/* Détail des ventes de toutes les créatrices de cette boutique, mois par mois */}
-        <Text style={[s.sectionTitle, { marginTop: 12 }]}>VENTES DES CRÉATRICES</Text>
+        <Text style={[s.sectionTitle, { marginTop: 12 }]}>Ventes des créatrices</Text>
         <VentesExportButtons
           boutiqueId={id}
           filenameBase={`ventes-${boutiqueName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
@@ -206,47 +208,49 @@ export default function BoutiqueDetailScreen() {
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
 
+  // Header crème — même DA que le web
   header: {
-    backgroundColor: Colors.primary,
     paddingHorizontal: 16,
-    paddingBottom: 20,
+    paddingBottom: 12,
     flexDirection: "row",
     alignItems: "center",
+    gap: 12,
   },
-  backBtn: { width: 36, alignItems: "center" },
-  backTxt: { fontFamily: Fonts.family.nowBold, fontSize: 28, color: "#fff", lineHeight: 36 },
-  headerCenter: { flex: 1, alignItems: "center" },
-  titre: { fontFamily: Fonts.family.norwester, fontSize: 18, color: "#fff", letterSpacing: 2 },
-  sousTitre: { fontFamily: Fonts.family.nowRegular, fontSize: 11, color: "rgba(255,255,255,0.7)", marginTop: 2 },
+  backBtn: {
+    width: 44, height: 44, borderRadius: Radius.md, backgroundColor: Colors.surface,
+    alignItems: "center", justifyContent: "center",
+  },
+  backTxt: { fontFamily: Fonts.family.nowBold, fontSize: 24, color: Colors.text, lineHeight: 28 },
+  headerCenter: { flex: 1 },
+  titre: { fontFamily: Fonts.family.norwester, fontWeight: "800", fontSize: 26, color: Colors.text, letterSpacing: -0.3 },
+  sousTitre: { fontFamily: Fonts.family.nowBold, fontSize: 11, color: Colors.primary, letterSpacing: 0.6, marginBottom: 2 },
 
   scroll: { padding: 16 },
 
   sectionTitle: {
-    fontFamily: Fonts.family.nowBold, fontSize: 12, color: Colors.textLight,
-    letterSpacing: 1, textTransform: "uppercase", marginBottom: 10, marginTop: 4,
+    fontFamily: Fonts.family.norwester, fontWeight: "800", fontSize: Fonts.sizes.lg, color: Colors.text,
+    letterSpacing: -0.3, marginBottom: 10, marginTop: 4,
   },
 
   statsGrid: { flexDirection: "row", flexWrap: "wrap", gap: 10, marginBottom: 20 },
   statCard: {
-    flex: 1, minWidth: "45%", backgroundColor: Colors.surface, borderRadius: 12,
-    padding: 14, shadowColor: "#7a41bb", shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.07, shadowRadius: 6, elevation: 2,
+    flex: 1, minWidth: "45%", backgroundColor: Colors.surface, borderRadius: Radius.lg,
+    padding: 16, ...shadows.sm,
   },
-  statValue: { fontFamily: Fonts.family.norwester, fontSize: 18, color: Colors.primary, marginBottom: 4 },
-  statLabel: { fontFamily: Fonts.family.nowRegular, fontSize: 11, color: Colors.textLight },
+  statValue: { fontFamily: Fonts.family.norwester, fontWeight: "800", fontSize: 20, color: Colors.text, marginBottom: 4 },
+  statLabel: { fontFamily: Fonts.family.nowBold, fontSize: 11, color: Colors.textLight, letterSpacing: 0.3 },
 
   exportBtn: {
     flexDirection: "row", alignItems: "center", backgroundColor: Colors.surface,
-    borderRadius: 12, padding: 14, marginBottom: 10,
-    shadowColor: "#7a41bb", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4, elevation: 1,
+    borderRadius: Radius.lg, padding: 16, marginBottom: 10, minHeight: 56, ...shadows.sm,
   },
   exportBtnLocked: { opacity: 0.5 },
-  exportBtnLoading: { backgroundColor: Colors.primary },
+  exportBtnLoading: { backgroundColor: Colors.text },
   exportIcon: { fontSize: 24, marginRight: 12 },
   exportInfo: { flex: 1 },
   exportLabel: { fontFamily: Fonts.family.nowBold, fontSize: 14, color: Colors.text },
   exportLabelLocked: { color: Colors.textLight },
   exportSub: { fontFamily: Fonts.family.nowRegular, fontSize: 12, color: Colors.textLight, marginTop: 2 },
-  exportArrow: { fontFamily: Fonts.family.nowBold, fontSize: 18, color: Colors.primary },
+  exportArrow: { fontFamily: Fonts.family.nowBold, fontSize: 18, color: Colors.text },
   lockIcon: { fontSize: 16 },
 });

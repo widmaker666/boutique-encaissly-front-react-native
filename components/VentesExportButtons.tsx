@@ -4,6 +4,7 @@ import { useAuthStore } from "@/stores/auth.store";
 import { downloadAndShare } from "@/services/download";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
+import { shadows } from "@/styles/utils/shadows.styles";
 
 const MOIS_FR = [
   "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
@@ -169,14 +170,10 @@ export default function VentesExportButtons({ boutiqueId, creatriceId, filenameB
 const s = StyleSheet.create({
   card: {
     backgroundColor: Colors.surface,
-    borderRadius: 14,
-    padding: 14,
+    borderRadius: 16,
+    padding: 16,
     marginBottom: 10,
-    shadowColor: "#7a41bb",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 2,
+    ...shadows.sm,
   },
   intro: {
     fontFamily: Fonts.family.nowRegular,
@@ -188,7 +185,7 @@ const s = StyleSheet.create({
   monthRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f6f0fb",
+    backgroundColor: Colors.background,
     borderRadius: 12,
     paddingVertical: 6,
     paddingHorizontal: 6,
@@ -206,7 +203,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.family.nowBold,
     fontSize: 28,
     lineHeight: 32,
-    color: Colors.primary,
+    color: Colors.text,
   },
   monthCenter: { flex: 1, alignItems: "center" },
   monthLabel: {
@@ -227,7 +224,7 @@ const s = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 4,
     borderTopWidth: 1,
-    borderTopColor: "#f0e8f8",
+    borderTopColor: Colors.border,
   },
   formatBtnLocked: { opacity: 0.5 },
   formatIcon: { fontSize: 22 },
@@ -246,7 +243,7 @@ const s = StyleSheet.create({
   arrow: {
     fontFamily: Fonts.family.nowBold,
     fontSize: 18,
-    color: Colors.primary,
+    color: Colors.text,
   },
   lock: { fontSize: 16 },
 });
