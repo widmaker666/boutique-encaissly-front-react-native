@@ -5,28 +5,17 @@ import { useQuery } from "@tanstack/react-query";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AntDesign } from "@expo/vector-icons";
 import { venteService } from "@/services/api";
-import type { Vente, ModePaiement } from "@/types";
+import type { Vente } from "@/types";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
+import { Radius, Spacing } from "@/constants/spacing";
 import { styles as venteStyles } from "@/styles/pages/ventes.style";
+import ListRow from "@/components/List/ListRow";
+import Badge from "@/components/Badge/Badge";
+import { Notice } from "@/components/Notice/Notice";
 
 function formatDate(isoString: string): string {
-  return new Date(isoString).toLocaleDateString("fr-FR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
-
-function BadgePaiement({ mode }: { mode: ModePaiement }) {
-  const isEspeces = mode === "ESPECES";
-  return (
-    <View style={[venteStyles.badgePaiement, isEspeces ? venteStyles.badgeEspeces : venteStyles.badgeCarte]}>
-      <Text style={[venteStyles.badgeTxt, isEspeces ? venteStyles.badgeTxtEspeces : venteStyles.badgeTxtCarte]}>
-        {isEspeces ? "ESPECES" : "CARTE"}
-      </Text>
-    </View>
-  );
+  return new Date(isoString).toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
 }
 
 function AnimCard({ children, index }: { children: React.ReactNode; index: number }) {
@@ -35,12 +24,7 @@ function AnimCard({ children, index }: { children: React.ReactNode; index: numbe
     Animated.timing(anim, { toValue: 1, duration: 320, delay: index * 50, useNativeDriver: true }).start();
   }, []);
   return (
-    <Animated.View
-      style={[
-        venteStyles.card,
-        { opacity: anim, transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }] },
-      ]}
-    >
+    <Animated.View style={{ opacity: anim, transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }] }}>
       {children}
     </Animated.View>
   );
@@ -65,14 +49,20 @@ export default function MesVentesBoutiqueScreen() {
   });
   const ventes: Vente[] = res?.data ?? [];
 
-  const count = ventes?.length ?? 0;
-  const ca = (ventes ?? []).reduce((acc, v) => acc + v.prixVente, 0);
+  const count = ventes.length;
+  const ca = ventes.reduce((acc, v) => acc + v.prixVente, 0);
 
   return (
-    <View style={[s.container, { paddingTop: insets.top }]}>
+    <View style={[s.container, { paddingTop: insets.top + 12 }]}>
       <View style={s.header}>
-        <TouchableOpacity onPress={() => router.back()} style={s.backBtn} activeOpacity={0.7}>
-          <AntDesign name="arrow-left" size={22} color="#fff" />
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={s.backBtn}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="Retour"
+        >
+          <AntDesign name="arrow-left" size={20} color={Colors.text} />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
           <Text style={s.headerTitle} numberOfLines={1}>{boutiqueName}</Text>
@@ -89,36 +79,29 @@ export default function MesVentesBoutiqueScreen() {
       ) : (
         <ScrollView contentContainerStyle={venteStyles.list} showsVerticalScrollIndicator={false}>
           {count > 0 ? (
-            ventes!.map((v, index) => (
+            ventes.map((v, index) => (
               <AnimCard key={v.id} index={index}>
-                <View style={venteStyles.cardRow}>
-                  <View style={venteStyles.cardLeft}>
-                    <Text style={venteStyles.cardNomArticle} numberOfLines={2}>
-                      {v.nomArticle}
-                      {(v.quantite ?? 1) > 1 ? `  × ${v.quantite}` : ""}
-                    </Text>
-                    {v.creatrice?.nom && (
-                      <Text style={venteStyles.cardCreatrice} numberOfLines={1}>
-                        {v.creatrice.nom}
+                <ListRow
+                  left={
+                    <>
+                      <Text style={venteStyles.cardNomArticle} numberOfLines={2}>
+                        {v.nomArticle}
+                        {(v.quantite ?? 1) > 1 ? `  × ${v.quantite}` : ""}
                       </Text>
-                    )}
-                  </View>
-                  <View style={venteStyles.cardRight}>
-                    <Text style={venteStyles.cardPrix}>{v.prixVente.toFixed(2)} €</Text>
-                    <BadgePaiement mode={v.modePaiement} />
-                  </View>
-                </View>
-                <Text style={venteStyles.cardDate}>{formatDate(v.createdAt)}</Text>
+                      <Text style={venteStyles.cardMeta}>{formatDate(v.createdAt)}</Text>
+                    </>
+                  }
+                  right={
+                    <>
+                      <Text style={venteStyles.cardPrix}>{v.prixVente.toFixed(2)} €</Text>
+                      <Badge color={v.modePaiement === "CARTE" ? "info" : "warning"}>{v.modePaiement}</Badge>
+                    </>
+                  }
+                />
               </AnimCard>
             ))
           ) : (
-            <View style={venteStyles.emptyContainer}>
-              <Text style={venteStyles.emptyIcon}>🧾</Text>
-              <Text style={venteStyles.emptyTxt}>Aucune vente ici pour l'instant</Text>
-              <Text style={venteStyles.emptySub}>
-                Tes ventes enregistrées dans cette boutique apparaîtront ici.
-              </Text>
-            </View>
+            <Notice>Aucune vente ici pour l'instant — tes ventes enregistrées dans cette boutique apparaîtront ici.</Notice>
           )}
         </ScrollView>
       )}
@@ -129,24 +112,31 @@ export default function MesVentesBoutiqueScreen() {
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   header: {
-    backgroundColor: Colors.primary,
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    gap: 14,
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.lg,
+    gap: Spacing.md,
   },
-  backBtn: { padding: 4 },
+  backBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   headerTitle: {
     fontFamily: Fonts.family.norwester,
-    fontSize: 18,
-    color: "#fff",
-    letterSpacing: 0.5,
+    fontWeight: "800",
+    fontSize: 24,
+    color: Colors.text,
+    letterSpacing: -0.3,
   },
   headerSub: {
     fontFamily: Fonts.family.nowRegular,
     fontSize: 12,
-    color: "rgba(255,255,255,0.75)",
+    color: Colors.textLight,
     marginTop: 2,
   },
   loadingContainer: { flex: 1, alignItems: "center", justifyContent: "center" },

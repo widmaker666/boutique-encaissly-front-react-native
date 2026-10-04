@@ -23,6 +23,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AntDesign } from "@expo/vector-icons";
 import Chip from "@/components/Chip/Chip";
 import Button from "@/components/Buttons/Button";
+import Badge from "@/components/Badge/Badge";
+import ListRow from "@/components/List/ListRow";
+import { Notice } from "@/components/Notice/Notice";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -79,29 +82,6 @@ function AnimCard({
     >
       {children}
     </Animated.View>
-  );
-}
-
-// ── BadgePaiement ─────────────────────────────────────────────────────────────
-
-function BadgePaiement({ mode }: { mode: ModePaiement }) {
-  const isEspeces = mode === "ESPECES";
-  return (
-    <View
-      style={[
-        styles.badgePaiement,
-        isEspeces ? styles.badgeEspeces : styles.badgeCarte,
-      ]}
-    >
-      <Text
-        style={[
-          styles.badgeTxt,
-          isEspeces ? styles.badgeTxtEspeces : styles.badgeTxtCarte,
-        ]}
-      >
-        {isEspeces ? "ESPECES" : "CARTE"}
-      </Text>
-    </View>
   );
 }
 
@@ -1018,63 +998,25 @@ export default function VentesScreen() {
           },
         ]}
       >
-        <View>
-          <Text style={styles.titre}>VENTES</Text>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.eyebrow}>{isGerante ? "GÉRANTE" : "CRÉATRICE"}</Text>
+          <Text style={styles.titre}>Ventes</Text>
           <Text style={styles.headerSub}>
             {activeEvenementNom ? `🎪 ${activeEvenementNom}` : `${total} vente${total > 1 ? "s" : ""} · ${user?.plan ?? "FREE"}`}
           </Text>
-          {isDuoScreen && <DuoModeToggle />}
+          {isDuoScreen && <DuoModeToggle variant="onLight" />}
         </View>
-        <TouchableOpacity
-          style={[
-            styles.addBtn,
-            { width: "auto", paddingHorizontal: 14, borderRadius: 20, height: 38 },
-            !isGerante && !activeEvenementId && { opacity: 0.35 },
-          ]}
-          activeOpacity={0.8}
-          onPress={() => { if (isGerante || activeEvenementId) setSheetVisible(true); }}
+        <Button
+          size="sm"
+          disabled={!isGerante && !activeEvenementId}
+          onPress={() => setSheetVisible(true)}
+          accessibilityLabel="Ajouter une vente"
         >
-          <Text style={[styles.addBtnTxt, { fontSize: 13, lineHeight: 38 }]}>＋ Ajouter une vente</Text>
-        </TouchableOpacity>
+          ＋ Ajouter
+        </Button>
       </Animated.View>
 
-      {/* Filtres chips */}
-      <View style={styles.filtersWrapper}>
-        {(["TOUT", "ESPECES", "CARTE"] as FilterMode[]).map((f) => (
-          <TouchableOpacity
-            key={f}
-            style={[styles.chip, filter === f && styles.chipActive]}
-            activeOpacity={0.8}
-            onPress={() => setFilter(f)}
-          >
-            <Text
-              style={[styles.chipTxt, filter === f && styles.chipTxtActive]}
-            >
-              {f}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Filtre mois — chips horizontales scrollables, mois précis uniquement */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 16, paddingBottom: 8 }}>
-        <Chip active={mois === ""} onPress={() => setMois("")}>Tout l'historique</Chip>
-        {moisOptions().map((o) => (
-          <Chip key={o.value} active={mois === o.value} onPress={() => setMois(o.value)}>{o.label}</Chip>
-        ))}
-      </ScrollView>
-
-      {/* Filtre créatrice — gérante uniquement */}
-      {isGerante && (creatrices?.length ?? 0) > 0 && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 16, paddingBottom: 12 }}>
-          <Chip active={creatriceId === ""} onPress={() => setCreatriceId("")}>Toutes les créatrices</Chip>
-          {(creatrices ?? []).map((c) => (
-            <Chip key={c.id} active={creatriceId === c.id} onPress={() => setCreatriceId(c.id)}>{c.nom}</Chip>
-          ))}
-        </ScrollView>
-      )}
-
-      {/* Liste */}
+      {/* Liste — les filtres sont dans le scroll pour ne pas manger l'écran */}
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator color={Colors.primary} />
@@ -1084,54 +1026,64 @@ export default function VentesScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.list}
         >
+          <View style={styles.filtersBlock}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsRow}>
+              {(["TOUT", "ESPECES", "CARTE"] as FilterMode[]).map((f) => (
+                <Chip key={f} active={filter === f} onPress={() => setFilter(f)}>{f}</Chip>
+              ))}
+            </ScrollView>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsRow}>
+              <Chip active={mois === ""} onPress={() => setMois("")}>Tout l'historique</Chip>
+              {moisOptions().map((o) => (
+                <Chip key={o.value} active={mois === o.value} onPress={() => setMois(o.value)}>{o.label}</Chip>
+              ))}
+            </ScrollView>
+            {isGerante && (creatrices?.length ?? 0) > 0 && (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsRow}>
+                <Chip active={creatriceId === ""} onPress={() => setCreatriceId("")}>Toutes les créatrices</Chip>
+                {(creatrices ?? []).map((c) => (
+                  <Chip key={c.id} active={creatriceId === c.id} onPress={() => setCreatriceId(c.id)}>{c.nom}</Chip>
+                ))}
+              </ScrollView>
+            )}
+          </View>
+
           {!isGerante && !activeEvenementId && (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyIcon}>🎪</Text>
-              <Text style={styles.emptyTxt}>Aucun événement actif</Text>
-              <Text style={styles.emptySub}>
-                Va dans l'onglet <Text style={{ fontFamily: "Now-Bold" }}>Ma fiche</Text> pour activer ou créer un événement, puis reviens ici pour vendre.
-              </Text>
-            </View>
+            <Notice>🎪 Aucun événement actif — va dans l'onglet Ma fiche pour activer ou créer un événement, puis reviens ici pour vendre.</Notice>
           )}
-          {ventes && ventes.length > 0 ? (
+          {ventes.length > 0 ? (
             ventes.map((v, index) => (
-              <AnimCard key={v.id} index={index} style={styles.card}>
-                <TouchableOpacity activeOpacity={0.7} onPress={() => setEditingVente(v)}>
-                  <View style={styles.cardRow}>
-                    <View style={styles.cardLeft}>
+              <AnimCard key={v.id} index={index % PAGE_SIZE}>
+                <ListRow
+                  onPress={() => setEditingVente(v)}
+                  accessibilityLabel={`Vente ${v.nomArticle}, ${v.prixVente.toFixed(2)} euros, modifier`}
+                  left={
+                    <>
                       <Text style={styles.cardNomArticle} numberOfLines={2}>
                         {v.nomArticle}
                         {(v.quantite ?? 1) > 1 ? `  × ${v.quantite}` : ""}
                       </Text>
-                      {(v.evenement?.nom || v.creatrice?.nom) && (
-                        <Text style={styles.cardCreatrice} numberOfLines={1}>
-                          {v.evenement?.nom ?? v.creatrice?.nom} · {v.modePaiement}
-                        </Text>
-                      )}
-                    </View>
-                    <View style={styles.cardRight}>
+                      <Text style={styles.cardMeta} numberOfLines={1}>
+                        {[v.evenement?.nom ?? v.creatrice?.nom, formatDate(v.createdAt)].filter(Boolean).join(" · ")}
+                      </Text>
+                    </>
+                  }
+                  right={
+                    <>
                       <Text style={styles.cardPrix}>{v.prixVente.toFixed(2)} €</Text>
-                      <BadgePaiement mode={v.modePaiement} />
-                    </View>
-                  </View>
-                  <View style={styles.cardBottomRow}>
-                    <Text style={styles.cardDate}>{formatDate(v.createdAt)}</Text>
-                    <AntDesign name="edit" size={13} color={Colors.textLight} />
-                  </View>
-                </TouchableOpacity>
+                      <Badge color={v.modePaiement === "CARTE" ? "info" : "warning"}>{v.modePaiement}</Badge>
+                    </>
+                  }
+                />
               </AnimCard>
             ))
           ) : (
             !isGerante && !activeEvenementId ? null : (
-              <View style={styles.emptyContainer}>
-                <Text style={styles.emptyIcon}>🧾</Text>
-                <Text style={styles.emptyTxt}>Aucune vente</Text>
-                <Text style={styles.emptySub}>
-                  {filter !== "TOUT"
-                    ? `Aucune vente en ${filter}`
-                    : "Appuie sur + pour enregistrer la première vente"}
-                </Text>
-              </View>
+              <Notice>
+                {filter !== "TOUT" || mois || creatriceId
+                  ? "Aucune vente pour ces filtres."
+                  : "Aucune vente — appuie sur « Ajouter » pour enregistrer la première."}
+              </Notice>
             )
           )}
           {hasNextPage && (

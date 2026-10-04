@@ -34,11 +34,11 @@ export default function AppLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: Colors.primary,
+        tabBarActiveTintColor: Colors.text,
         tabBarInactiveTintColor: Colors.textLight,
         tabBarStyle: {
           backgroundColor: Colors.surface,
-          borderTopColor: Colors.primaryLight,
+          borderTopColor: Colors.border,
           borderTopWidth: 1,
         },
         tabBarLabelStyle: {

@@ -1,14 +1,7 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
-
-const cardShadow = {
-  shadowColor: "#7a41bb",
-  shadowOffset: { width: 0, height: 3 },
-  shadowOpacity: 0.09,
-  shadowRadius: 8,
-  elevation: 3,
-};
+import { Radius, Spacing } from "@/constants/spacing";
 
 export const styles = StyleSheet.create({
   container: {
@@ -16,261 +9,197 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   content: {
-    paddingBottom: 48,
+    paddingBottom: Spacing.xxxxxl,
   },
 
-  // ── HEADER ──────────────────────────────────────
+  // ── HEADER (fond crème, titre affirmé — même DA que le web) ──
   header: {
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 20,
-    paddingBottom: 28,
-    alignItems: "center",
+    paddingHorizontal: Spacing.xl,
+    paddingBottom: Spacing.lg,
   },
-  greeting: {
-    color: "rgba(255,255,255,0.75)",
-    fontFamily: Fonts.family.nowLight,
-    fontSize: Fonts.sizes.sm,
+  headerTop: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  eyebrow: {
+    fontFamily: Fonts.family.nowBold,
+    fontSize: Fonts.sizes.xs,
+    color: Colors.primary,
+    letterSpacing: 0.6,
     marginBottom: 4,
   },
   name: {
-    color: "#FFFFFF",
     fontFamily: Fonts.family.norwester,
-    fontWeight: "800" as const,
-    fontSize: Fonts.sizes.xl,
-    letterSpacing: 0.5,
-    marginBottom: 10,
+    fontWeight: "800",
+    fontSize: 30,
+    color: Colors.text,
+    letterSpacing: -0.5,
   },
-  badgeWrap: {
-    backgroundColor: "rgba(255,255,255,0.18)",
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 4,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.3)",
+  bellBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  badge: {
-    color: "#FFFFFF",
-    fontFamily: Fonts.family.nowMedium,
-    fontSize: Fonts.sizes.xs,
-    letterSpacing: 0.5,
+  bellBadge: {
+    position: "absolute",
+    top: 6,
+    right: 6,
+    backgroundColor: Colors.error,
+    borderRadius: Radius.pill,
+    minWidth: 16,
+    height: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 3,
+  },
+  bellBadgeTxt: {
+    fontFamily: Fonts.family.nowBold,
+    fontSize: 9,
+    color: "#fff",
+    lineHeight: Platform.OS === "android" ? 14 : undefined,
+  },
+  badgeRow: {
+    flexDirection: "row",
+    gap: Spacing.sm,
+    marginTop: Spacing.md,
+  },
+  chipsRow: {
+    gap: Spacing.sm,
+    paddingTop: Spacing.lg,
   },
 
-  // ── BODY ────────────────────────────────────────
+  // ── BODY ──
   body: {
-    padding: 16,
+    paddingHorizontal: Spacing.xl,
+    gap: Spacing.md,
+  },
+  sectionTitle: {
+    fontFamily: Fonts.family.norwester,
+    fontWeight: "800",
+    fontSize: Fonts.sizes.lg,
+    color: Colors.text,
+    letterSpacing: -0.3,
+    marginTop: Spacing.lg,
   },
 
-  sectionTitle: {
-    fontFamily: Fonts.family.nowMedium,
+  // ── KPI : une carte "hero" sombre + 3 secondaires ──
+  heroCard: {
+    backgroundColor: Colors.text,
+    borderRadius: Radius.xl,
+    padding: Spacing.xxl,
+    gap: Spacing.md,
+  },
+  heroLabel: {
+    fontFamily: Fonts.family.nowBold,
+    fontSize: Fonts.sizes.xs,
+    color: "rgba(255,255,255,0.6)",
+    letterSpacing: 0.4,
+  },
+  heroValue: {
+    fontFamily: Fonts.family.norwester,
+    fontWeight: "800",
+    fontSize: 38,
+    color: "#fff",
+    letterSpacing: -1,
+  },
+  heroSub: {
+    fontFamily: Fonts.family.nowRegular,
+    fontSize: Fonts.sizes.sm,
+    color: "rgba(255,255,255,0.7)",
+  },
+  kpiRow: {
+    flexDirection: "row",
+    gap: Spacing.md,
+  },
+  kpiCard: {
+    flex: 1,
+  },
+  kpiLabel: {
+    fontFamily: Fonts.family.nowBold,
     fontSize: 11,
     color: Colors.textLight,
-    textTransform: "uppercase",
-    letterSpacing: 1,
-    marginBottom: 10,
-    marginTop: 20,
+    letterSpacing: 0.3,
+    marginBottom: Spacing.sm,
+  },
+  kpiValue: {
+    fontFamily: Fonts.family.norwester,
+    fontWeight: "800",
+    fontSize: Fonts.sizes.lg,
+    color: Colors.text,
   },
 
-  // ── INFO BOXES ──────────────────────────────────
-  infoBox: {
-    backgroundColor: Colors.surface,
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 10,
-    ...cardShadow,
+  // ── LIGNES (boutiques, ventes, historique) ──
+  rowTitle: {
+    fontFamily: Fonts.family.nowBold,
+    fontSize: Fonts.sizes.sm,
+    color: Colors.text,
   },
+  rowMeta: {
+    fontFamily: Fonts.family.nowRegular,
+    fontSize: Fonts.sizes.xs,
+    color: Colors.textLight,
+  },
+  rowValue: {
+    fontFamily: Fonts.family.nowBold,
+    fontSize: Fonts.sizes.sm,
+    color: Colors.text,
+  },
+  rowLeftInline: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.md,
+  },
+
+  // ── INFO / LOCKED ──
   infoTxt: {
     fontFamily: Fonts.family.nowMedium,
-    fontSize: Fonts.sizes.xs,
+    fontSize: Fonts.sizes.sm,
     color: Colors.primaryDark,
-    textAlign: "center",
   },
-  moisBadge: {
-    backgroundColor: "#fff8f0",
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 12,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#ffd0a0",
-  },
-  moisTxt: {
-    fontFamily: Fonts.family.nowMedium,
-    fontSize: Fonts.sizes.xs,
-    color: "#c06000",
-  },
-
-  // ── BOUTIQUES ───────────────────────────────────
-  boutiqueRow: {
-    backgroundColor: Colors.surface,
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 8,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    ...cardShadow,
-  },
-  boutiqueName: {
-    fontFamily: Fonts.family.nowMedium,
-    color: Colors.text,
-    fontSize: Fonts.sizes.sm,
-    marginBottom: 2,
-  },
-  boutiqueMeta: {
-    fontFamily: Fonts.family.nowLight,
-    color: Colors.textLight,
-    fontSize: Fonts.sizes.xs,
-  },
-  boutiqueArrow: {
-    color: Colors.primaryLight,
-    fontSize: 22,
-  },
-
-  // ── CARDS GRID ──────────────────────────────────
-  cardsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-    marginBottom: 8,
-  },
-  card: {
-    backgroundColor: Colors.surface,
-    borderRadius: 14,
-    padding: 16,
-    width: "48.5%",
-    ...cardShadow,
-  },
-  cardLabel: {
-    fontFamily: Fonts.family.nowLight,
-    color: Colors.textLight,
-    fontSize: Fonts.sizes.xs,
-    marginBottom: 6,
-  },
-  cardValue: {
-    fontFamily: Fonts.family.norwester,
-    color: Colors.primary,
-    fontSize: Fonts.sizes.lg,
-    letterSpacing: 0.5,
-  },
-
-  // ── PAIEMENTS ───────────────────────────────────
-  paiementRow: {
-    flexDirection: "row",
-    gap: 10,
-    marginBottom: 8,
-  },
-  paiementCard: {
-    flex: 1,
-    backgroundColor: Colors.surface,
-    borderRadius: 14,
-    padding: 16,
-    ...cardShadow,
-  },
-
-  // ── VENTES ──────────────────────────────────────
-  venteRow: {
-    backgroundColor: Colors.surface,
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 8,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    ...cardShadow,
-  },
-  venteName: {
-    fontFamily: Fonts.family.nowMedium,
-    color: Colors.text,
-    fontSize: Fonts.sizes.sm,
-    marginBottom: 2,
-  },
-  venteMeta: {
-    fontFamily: Fonts.family.nowLight,
-    color: Colors.textLight,
-    fontSize: Fonts.sizes.xs,
-  },
-  ventePrice: {
-    fontFamily: Fonts.family.norwester,
-    color: Colors.success,
-    fontSize: Fonts.sizes.md,
-    letterSpacing: 0.5,
-  },
-
-  // ── HISTORIQUE ──────────────────────────────────
-  historiqueRow: {
-    backgroundColor: Colors.surface,
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 8,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    ...cardShadow,
-  },
-  historiqueMois: {
-    fontFamily: Fonts.family.nowMedium,
-    color: Colors.text,
-    fontSize: Fonts.sizes.sm,
-    textTransform: "capitalize",
-  },
-  historiqueRight: {
-    alignItems: "flex-end",
-  },
-  historiqueCA: {
-    fontFamily: Fonts.family.norwester,
-    color: Colors.primary,
-    fontSize: Fonts.sizes.md,
-    letterSpacing: 0.5,
-  },
-  historiqueNb: {
-    fontFamily: Fonts.family.nowLight,
-    color: Colors.textLight,
-    fontSize: Fonts.sizes.xs,
-    marginTop: 2,
-  },
-
-  // ── LOCKED ──────────────────────────────────────
-  lockedBox: {
-    backgroundColor: Colors.primaryLight + "15",
-    borderRadius: 16,
-    padding: 20,
-    alignItems: "center",
-    marginTop: 8,
-    marginBottom: 4,
+  lockedCard: {
+    backgroundColor: Colors.primaryTint,
     borderWidth: 1.5,
-    borderColor: Colors.primaryLight + "40",
+    borderColor: Colors.primaryLight,
     borderStyle: "dashed",
+    alignItems: "center",
+    gap: Spacing.sm,
   },
   lockedTxt: {
-    fontFamily: Fonts.family.nowMedium,
-    color: Colors.primaryDark,
+    fontFamily: Fonts.family.nowBold,
     fontSize: Fonts.sizes.sm,
+    color: Colors.primaryDark,
     textAlign: "center",
-    marginBottom: 6,
   },
   lockedDesc: {
-    fontFamily: Fonts.family.nowLight,
-    color: Colors.textLight,
+    fontFamily: Fonts.family.nowRegular,
     fontSize: Fonts.sizes.xs,
+    color: Colors.textLight,
     textAlign: "center",
-    marginBottom: 14,
     lineHeight: 18,
+    marginBottom: Spacing.sm,
   },
-  upgradeBtn: {
-    backgroundColor: Colors.primary,
-    borderRadius: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 24,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 4,
+
+  // ── CRÉATION BOUTIQUE ──
+  emptyCard: {
+    gap: Spacing.md,
   },
-  upgradeTxt: {
-    color: "#FFFFFF",
-    fontFamily: Fonts.family.nowMedium,
+  emptyTxt: {
+    fontFamily: Fonts.family.nowRegular,
     fontSize: Fonts.sizes.sm,
-    letterSpacing: 0.3,
+    color: Colors.textLight,
+    textAlign: "center",
+  },
+  formRow: {
+    flexDirection: "row",
+    gap: Spacing.md,
+  },
+  emptyHint: {
+    fontFamily: Fonts.family.nowRegular,
+    fontSize: Fonts.sizes.sm,
+    color: Colors.textLight,
   },
 });

@@ -30,76 +30,43 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
 
-  // ── HEADER ──────────────────────────────────────
+  // ── HEADER (fond crème, même DA que le web) ──────
   header: {
-    backgroundColor: Colors.primary,
     paddingHorizontal: 20,
-    paddingBottom: 24,
+    paddingBottom: 12,
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-end",
+    alignItems: "flex-start",
+    gap: 12,
+  },
+  eyebrow: {
+    fontFamily: Fonts.family.nowBold,
+    fontSize: Fonts.sizes.xs,
+    color: Colors.primary,
+    letterSpacing: 0.6,
+    marginBottom: 4,
   },
   titre: {
     fontFamily: Fonts.family.norwester,
     fontWeight: "800" as const,
     fontSize: 30,
-    color: "#FFFFFF",
-    letterSpacing: 2,
+    color: Colors.text,
+    letterSpacing: -0.5,
   },
   headerSub: {
-    fontFamily: Fonts.family.nowLight,
+    fontFamily: Fonts.family.nowRegular,
     fontSize: Fonts.sizes.xs,
-    color: "rgba(255,255,255,0.65)",
+    color: Colors.textLight,
     marginTop: 3,
-    letterSpacing: 0.4,
-  },
-  addBtn: {
-    backgroundColor: "rgba(255,255,255,0.18)",
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.32)",
-  },
-  addBtnTxt: {
-    color: "#FFFFFF",
-    fontSize: 24,
-    lineHeight: 28,
-    fontFamily: Fonts.family.nowLight,
   },
 
   // ── FILTRES ─────────────────────────────────────
-  filtersWrapper: {
-    flexDirection: "row",
-    paddingHorizontal: 16,
-    marginTop: 14,
-    marginBottom: 8,
+  filtersBlock: {
     gap: 8,
+    marginBottom: 4,
   },
-  chip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: Colors.surface,
-    borderWidth: 1.5,
-    borderColor: Colors.border,
-    ...cardShadow,
-    shadowOpacity: 0.05,
-  },
-  chipActive: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
-  },
-  chipTxt: {
-    fontFamily: Fonts.family.nowMedium,
-    fontSize: Fonts.sizes.xs,
-    color: Colors.textLight,
-    letterSpacing: 0.5,
-  },
-  chipTxtActive: {
-    color: "#FFFFFF",
+  chipsRow: {
+    gap: 8,
   },
 
   // ── LIST ────────────────────────────────────────
@@ -107,99 +74,24 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 4,
     paddingBottom: 32,
+    gap: 10,
   },
 
-  // ── CARD VENTE ──────────────────────────────────
-  card: {
-    backgroundColor: Colors.surface,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 10,
-    ...cardShadow,
-  },
-  cardRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  },
-  cardLeft: {
-    flex: 1,
-    paddingRight: 12,
-  },
+  // ── LIGNE VENTE ─────────────────────────────────
   cardNomArticle: {
-    fontFamily: Fonts.family.nowMedium,
+    fontFamily: Fonts.family.nowBold,
     fontSize: Fonts.sizes.sm,
     color: Colors.text,
-    marginBottom: 4,
   },
-  cardCreatrice: {
-    fontFamily: Fonts.family.nowLight,
+  cardMeta: {
+    fontFamily: Fonts.family.nowRegular,
     fontSize: Fonts.sizes.xs,
     color: Colors.textLight,
-  },
-  cardRight: {
-    alignItems: "flex-end",
   },
   cardPrix: {
     fontFamily: Fonts.family.nowBold,
     fontSize: Fonts.sizes.md,
-    color: Colors.success,
-    marginBottom: 6,
-  },
-  badgePaiement: {
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-  },
-  badgeEspeces: {
-    backgroundColor: "#FFF3E0",
-  },
-  badgeCarte: {
-    backgroundColor: "#E0EDFF",
-  },
-  badgeTxt: {
-    fontFamily: Fonts.family.nowBold,
-    fontSize: 10,
-    letterSpacing: 0.4,
-  },
-  badgeTxtEspeces: {
-    color: "#C47D00",
-  },
-  badgeTxtCarte: {
-    color: "#2962B8",
-  },
-  cardDate: {
-    fontFamily: Fonts.family.nowLight,
-    fontSize: 11,
-    color: Colors.textLight,
-  },
-  cardBottomRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 8,
-  },
-
-  // ── EMPTY STATE ─────────────────────────────────
-  emptyContainer: {
-    alignItems: "center",
-    marginTop: 60,
-  },
-  emptyIcon: {
-    fontSize: 40,
-    marginBottom: 12,
-  },
-  emptyTxt: {
-    fontFamily: Fonts.family.nowMedium,
-    fontSize: Fonts.sizes.sm,
-    color: Colors.textLight,
-    marginBottom: 6,
-  },
-  emptySub: {
-    fontFamily: Fonts.family.nowLight,
-    fontSize: Fonts.sizes.xs,
-    color: Colors.textLight,
-    textAlign: "center",
+    color: Colors.text,
   },
 
   // ── BOTTOM SHEET ─────────────────────────────────
