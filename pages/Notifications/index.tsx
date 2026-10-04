@@ -16,6 +16,8 @@ import { useCallback } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
+import { shadows } from "@/styles/utils/shadows.styles";
+import { Radius } from "@/constants/spacing";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -138,6 +140,7 @@ export default function NotificationsScreen() {
   });
 
   const unreadCount = notifications?.filter((n) => !n.read).length ?? 0;
+  const readCount = notifications?.filter((n) => n.read).length ?? 0;
 
   const { mutate: acceptInvitation, isPending: isAccepting } = useMutation({
     mutationFn: ({ creatriceId, boutiqueId }: { creatriceId: string; boutiqueId: string }) =>
@@ -161,9 +164,28 @@ export default function NotificationsScreen() {
     },
   });
 
+  //- Supprime définitivement les notifications déjà lues (les non lues restent)
+  const clearReadMutation = useMutation({
+    mutationFn: notificationService.clearRead,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
+
+  function confirmClearRead() {
+    Alert.alert(
+      "Nettoyer les notifications lues",
+      `Supprimer définitivement ${readCount} notification${readCount > 1 ? "s" : ""} déjà lue${readCount > 1 ? "s" : ""} ? Les non lues restent intactes.`,
+      [
+        { text: "Annuler", style: "cancel" },
+        { text: "Nettoyer", style: "destructive", onPress: () => clearReadMutation.mutate() },
+      ],
+    );
+  }
+
   return (
     <View style={styles.container}>
-      {/* Header violet */}
+      {/* Header crème */}
       <Animated.View
         style={[
           styles.header,
@@ -181,19 +203,35 @@ export default function NotificationsScreen() {
           },
         ]}
       >
-        <Text style={styles.titre}>NOTIFICATIONS</Text>
-        {unreadCount > 0 && (
-          <TouchableOpacity
-            style={styles.markAllBtn}
-            activeOpacity={0.8}
-            onPress={() => markAllMutation.mutate()}
-            disabled={markAllMutation.isPending}
-          >
-            <Text style={styles.markAllTxt}>
-              {markAllMutation.isPending ? "..." : "Tout lire"}
-            </Text>
-          </TouchableOpacity>
-        )}
+        <Text style={styles.titre}>Notifications</Text>
+        <View style={styles.headerActions}>
+          {readCount > 0 && (
+            <TouchableOpacity
+              style={styles.clearBtn}
+              activeOpacity={0.8}
+              onPress={confirmClearRead}
+              disabled={clearReadMutation.isPending}
+              accessibilityRole="button"
+            >
+              <Text style={styles.clearTxt}>
+                {clearReadMutation.isPending ? "..." : "Nettoyer les lues"}
+              </Text>
+            </TouchableOpacity>
+          )}
+          {unreadCount > 0 && (
+            <TouchableOpacity
+              style={styles.markAllBtn}
+              activeOpacity={0.8}
+              onPress={() => markAllMutation.mutate()}
+              disabled={markAllMutation.isPending}
+              accessibilityRole="button"
+            >
+              <Text style={styles.markAllTxt}>
+                {markAllMutation.isPending ? "..." : "Tout lire"}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </Animated.View>
 
       {/* Contenu */}
@@ -278,32 +316,52 @@ export default function NotificationsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f4ff",
+    backgroundColor: Colors.background,
   },
+  // Header crème — même DA que le web
   header: {
-    backgroundColor: Colors.primary,
     paddingHorizontal: 20,
-    paddingBottom: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    paddingBottom: 12,
+    gap: 10,
   },
   titre: {
     fontFamily: Fonts.family.norwester,
-    fontSize: 22,
-    color: "#fff",
-    letterSpacing: 1.5,
+    fontWeight: "800",
+    fontSize: 30,
+    color: Colors.text,
+    letterSpacing: -0.5,
   },
+  headerActions: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  // = Button primary size="sm"
   markAllBtn: {
-    backgroundColor: "rgba(255,255,255,0.2)",
-    borderRadius: 16,
+    backgroundColor: Colors.text,
+    borderRadius: Radius.md,
     paddingHorizontal: 14,
-    paddingVertical: 6,
+    minHeight: 36,
+    justifyContent: "center",
   },
   markAllTxt: {
-    fontFamily: "Now-Medium",
+    fontFamily: Fonts.family.nowBold,
     fontSize: 13,
     color: "#fff",
+  },
+  // = Button dangerOutline size="sm"
+  clearBtn: {
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    paddingHorizontal: 14,
+    minHeight: 36,
+    justifyContent: "center",
+  },
+  clearTxt: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: 13,
+    color: Colors.error,
   },
   loadingContainer: {
     flex: 1,
@@ -320,7 +378,7 @@ const styles = StyleSheet.create({
     fontSize: 48,
   },
   emptyTxt: {
-    fontFamily: "Now-Regular",
+    fontFamily: Fonts.family.nowRegular,
     fontSize: 15,
     color: Colors.textLight,
     textAlign: "center",
@@ -330,14 +388,10 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   card: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 14,
-    shadowColor: "#7a41bb",
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.lg,
+    padding: 16,
+    ...shadows.sm,
   },
   cardUnread: {
     backgroundColor: "#f3eaff",
@@ -350,7 +404,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   dotWrapper: {
-    paddingTop: 4,
+    paddingTop: 6,
   },
   dot: {
     width: 8,
@@ -361,7 +415,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
   },
   dotRead: {
-    backgroundColor: "#ccc",
+    backgroundColor: Colors.border,
   },
   cardContent: {
     flex: 1,
@@ -374,24 +428,23 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   typeBadge: {
-    backgroundColor: "rgba(122, 65, 187, 0.1)",
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    backgroundColor: Colors.primaryTint,
+    borderRadius: Radius.pill,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
   },
   typeBadgeTxt: {
-    fontFamily: "Now-Medium",
+    fontFamily: Fonts.family.nowBold,
     fontSize: 11,
-    color: Colors.primary,
-    letterSpacing: 0.5,
+    color: Colors.primaryDark,
   },
   cardDate: {
-    fontFamily: "Now-Light",
+    fontFamily: Fonts.family.nowRegular,
     fontSize: 11,
     color: Colors.textLight,
   },
   cardMessage: {
-    fontFamily: "Now-Regular",
+    fontFamily: Fonts.family.nowRegular,
     fontSize: 14,
     color: Colors.text,
     lineHeight: 20,
@@ -406,24 +459,25 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: "#f0eaf8",
+    borderTopColor: Colors.border,
   },
   inviteTxt: {
-    fontFamily: "Now-Light",
+    fontFamily: Fonts.family.nowRegular,
     fontSize: 12,
-    color: "#7a7a7a",
+    color: Colors.textLight,
     flex: 1,
   },
   joinBtn: {
-    backgroundColor: "#7a41bb",
-    borderRadius: 8,
+    backgroundColor: Colors.text,
+    borderRadius: Radius.md,
     paddingHorizontal: 14,
-    paddingVertical: 7,
+    minHeight: 36,
+    justifyContent: "center",
     marginLeft: 10,
   },
   joinBtnTxt: {
-    fontFamily: "Now-Bold",
-    fontSize: 12,
+    fontFamily: Fonts.family.nowBold,
+    fontSize: 13,
     color: "#fff",
   },
 });

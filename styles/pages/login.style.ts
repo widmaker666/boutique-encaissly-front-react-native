@@ -2,14 +2,6 @@ import { StyleSheet } from "react-native";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
 
-const inputShadow = {
-  shadowColor: "#000",
-  shadowOffset: { width: 0, height: 1 },
-  shadowOpacity: 0.06,
-  shadowRadius: 4,
-  elevation: 2,
-};
-
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -33,15 +25,13 @@ export const styles = StyleSheet.create({
   },
   label: {
     fontFamily: Fonts.family.nowMedium,
-    fontSize: 12,
-    color: Colors.textLight,
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
+    fontSize: 14,
+    color: Colors.text,
     marginBottom: 8,
   },
   input: {
     backgroundColor: Colors.surface,
-    borderRadius: 14,
+    borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 18,
     fontSize: Fonts.sizes.md,
@@ -50,7 +40,6 @@ export const styles = StyleSheet.create({
     marginBottom: 20,
     borderWidth: 1,
     borderColor: Colors.border,
-    ...inputShadow,
   },
   inputError: {
     borderColor: Colors.error,
@@ -64,20 +53,17 @@ export const styles = StyleSheet.create({
     marginBottom: 16,
   },
   btnPrimary: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.text,
     paddingVertical: 16,
-    borderRadius: 14,
+    borderRadius: 12,
     alignItems: "center",
     marginTop: 8,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 5,
+    minHeight: 52,
+    justifyContent: "center",
   },
   btnPrimaryText: {
     color: "#FFFFFF",
-    fontFamily: Fonts.family.nowMedium,
+    fontFamily: Fonts.family.nowBold,
     fontSize: Fonts.sizes.md,
     letterSpacing: 0.5,
   },
@@ -90,10 +76,9 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border,
     paddingVertical: 14,
-    borderRadius: 14,
+    borderRadius: 12,
     marginTop: 14,
     marginBottom: 8,
-    ...inputShadow,
   },
   btnGoogleText: {
     color: Colors.text,

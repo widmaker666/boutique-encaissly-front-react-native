@@ -6,6 +6,8 @@ import { AntDesign } from "@expo/vector-icons";
 import { useAuthStore } from "@/stores/auth.store";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
+import { shadows } from "@/styles/utils/shadows.styles";
+import { Radius } from "@/constants/spacing";
 
 interface HelpItem {
   title: string;
@@ -109,7 +111,7 @@ export default function AideScreen() {
       items: [
         {
           title: "Comment modifier mon email ?",
-          body: "La modification d'email n'est pas disponible dans l'app pour l'instant. Contactez-nous à support@encaissly.fr.",
+          body: "La modification d'email n'est pas disponible dans l'app pour l'instant. Contactez-nous à contact.encaissly@gmail.com.",
         },
       ],
     },
@@ -143,7 +145,7 @@ export default function AideScreen() {
     <View style={[s.container, { paddingTop: insets.top }]}>
       <View style={s.header}>
         <TouchableOpacity onPress={() => router.back()} style={s.backBtn} activeOpacity={0.7}>
-          <AntDesign name="arrow-left" size={22} color="#fff" />
+          <AntDesign name="arrow-left" size={20} color={Colors.text} />
         </TouchableOpacity>
         <Text style={s.headerTitle}>Aide</Text>
       </View>
@@ -197,30 +199,31 @@ export default function AideScreen() {
   );
 }
 
-const cardShadow = {
-  shadowColor: "#7a41bb",
-  shadowOffset: { width: 0, height: 3 },
-  shadowOpacity: 0.08,
-  shadowRadius: 8,
-  elevation: 3,
-};
-
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
+  // Header crème — même DA que le web
   header: {
-    backgroundColor: Colors.primary,
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
-    paddingVertical: 16,
-    gap: 14,
+    paddingVertical: 12,
+    gap: 12,
   },
-  backBtn: { padding: 4 },
+  backBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   headerTitle: {
     fontFamily: Fonts.family.norwester,
-    fontSize: 18,
-    color: "#fff",
-    letterSpacing: 1,
+    fontWeight: "800",
+    fontSize: 24,
+    color: Colors.text,
+    letterSpacing: -0.3,
+    flexShrink: 1,
   },
   content: { padding: 20 },
   intro: {
@@ -231,21 +234,20 @@ const s = StyleSheet.create({
     marginBottom: 20,
   },
   sectionTitle: {
-    fontFamily: Fonts.family.nowBold,
-    fontSize: 13,
-    color: Colors.textLight,
-    letterSpacing: 0.8,
-    textTransform: "uppercase",
-    marginBottom: 8,
+    fontFamily: Fonts.family.norwester,
+    fontWeight: "800",
+    fontSize: Fonts.sizes.lg,
+    color: Colors.text,
+    letterSpacing: -0.3,
+    marginBottom: 10,
     marginTop: 4,
-    marginLeft: 4,
   },
   card: {
     backgroundColor: Colors.surface,
-    borderRadius: 14,
+    borderRadius: 16,
     padding: 16,
     marginBottom: 16,
-    ...cardShadow,
+    ...shadows.sm,
   },
   divider: {
     height: 1,
@@ -267,12 +269,12 @@ const s = StyleSheet.create({
   },
   itemTitleTxt: {
     fontFamily: Fonts.family.nowMedium,
-    fontSize: 13,
+    fontSize: 14,
     color: Colors.text,
     flexShrink: 1,
   },
   badge: {
-    borderRadius: 8,
+    borderRadius: 999,
     paddingHorizontal: 7,
     paddingVertical: 2,
   },

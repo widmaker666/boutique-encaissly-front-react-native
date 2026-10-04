@@ -129,10 +129,11 @@ const s = StyleSheet.create({
   },
   title: {
     fontFamily: Fonts.family.norwester,
-    fontSize: 26,
-    color: Colors.primary,
+    fontWeight: "800",
+    fontSize: 28,
+    color: Colors.text,
     textAlign: "center",
-    letterSpacing: 0.5,
+    letterSpacing: -0.5,
   },
   body: {
     fontFamily: Fonts.family.nowRegular,
@@ -154,7 +155,7 @@ const s = StyleSheet.create({
   },
   dotActive: {
     width: 24,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.text,
   },
   btnRow: {
     flexDirection: "row",
@@ -164,22 +165,24 @@ const s = StyleSheet.create({
   },
   skipBtn: {
     flex: 1,
-    paddingVertical: 14,
-    borderRadius: 14,
-    borderWidth: 1,
+    minHeight: 52,
+    justifyContent: "center",
+    borderRadius: 12,
+    borderWidth: 1.5,
     borderColor: Colors.border,
     alignItems: "center",
   },
   skipTxt: {
     fontFamily: Fonts.family.nowMedium,
     fontSize: 15,
-    color: Colors.textLight,
+    color: Colors.text,
   },
   nextBtn: {
     flex: 2,
-    paddingVertical: 14,
-    borderRadius: 14,
-    backgroundColor: Colors.primary,
+    minHeight: 52,
+    justifyContent: "center",
+    borderRadius: 12,
+    backgroundColor: Colors.text,
     alignItems: "center",
   },
   nextBtnFull: {

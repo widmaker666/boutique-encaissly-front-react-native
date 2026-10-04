@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AntDesign } from "@expo/vector-icons";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
+import { Radius } from "@/constants/spacing";
 
 function Section({ title, children }: { title: string; children: string }) {
   return (
@@ -22,7 +23,7 @@ export default function LegalScreen() {
     <View style={[s.container, { paddingTop: insets.top }]}>
       <View style={s.header}>
         <TouchableOpacity onPress={() => router.back()} style={s.backBtn} activeOpacity={0.7}>
-          <AntDesign name="arrow-left" size={22} color="#fff" />
+          <AntDesign name="arrow-left" size={20} color={Colors.text} />
         </TouchableOpacity>
         <Text style={s.headerTitle}>CGU & Confidentialité</Text>
       </View>
@@ -51,7 +52,7 @@ export default function LegalScreen() {
         </Section>
 
         <Section title="6. Vos droits (RGPD)">
-          {`Conformément au RGPD, vous disposez des droits suivants :\n• Accès à vos données\n• Rectification de vos données\n• Suppression de votre compte\n• Portabilité de vos données\n• Opposition au traitement\n\nPour exercer ces droits, contactez-nous à : support@encaissly.fr`}
+          {`Conformément au RGPD, vous disposez des droits suivants :\n• Accès à vos données\n• Rectification de vos données\n• Suppression de votre compte\n• Portabilité de vos données\n• Opposition au traitement\n\nPour exercer ces droits, contactez-nous à : contact.encaissly@gmail.com`}
         </Section>
 
         <Section title="7. Cookies et tracking">
@@ -67,7 +68,7 @@ export default function LegalScreen() {
         </Section>
 
         <Section title="10. Contact">
-          {`Pour toute question relative à vos données ou à ces conditions :\nEmail : support@encaissly.fr`}
+          {`Pour toute question relative à vos données ou à ces conditions :\nEmail : contact.encaissly@gmail.com`}
         </Section>
 
         <View style={{ height: 40 }} />
@@ -78,20 +79,29 @@ export default function LegalScreen() {
 
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
+  // Header crème — même DA que le web
   header: {
-    backgroundColor: Colors.primary,
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
-    paddingVertical: 16,
-    gap: 14,
+    paddingVertical: 12,
+    gap: 12,
   },
-  backBtn: { padding: 4 },
+  backBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   headerTitle: {
     fontFamily: Fonts.family.norwester,
-    fontSize: 18,
-    color: "#fff",
-    letterSpacing: 1,
+    fontWeight: "800",
+    fontSize: 24,
+    color: Colors.text,
+    letterSpacing: -0.3,
+    flexShrink: 1,
   },
   content: { padding: 20 },
   lastUpdate: {
