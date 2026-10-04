@@ -22,7 +22,7 @@ export default function LegalScreen() {
     <View style={[s.container, { paddingTop: insets.top }]}>
       <View style={s.header}>
         <TouchableOpacity onPress={() => router.back()} style={s.backBtn} activeOpacity={0.7}>
-          <AntDesign name="arrowleft" size={22} color="#fff" />
+          <AntDesign name="arrow-left" size={22} color="#fff" />
         </TouchableOpacity>
         <Text style={s.headerTitle}>CGU & Confidentialité</Text>
       </View>

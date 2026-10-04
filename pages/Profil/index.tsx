@@ -21,6 +21,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
+import { shadows } from "@/styles/utils/shadows.styles";
+import { Radius } from "@/constants/spacing";
 import { AntDesign } from "@expo/vector-icons";
 import type { Boutique } from "@/types";
 
@@ -433,7 +435,7 @@ export default function ProfilScreen() {
         <Text style={s.name}>{displayName}</Text>
         <Text style={s.emailTxt}>{user?.email}</Text>
         <View style={s.badgeRow}>
-          <View style={[s.badge, { backgroundColor: isGerante ? Colors.primary : "#eb7f45" }]}>
+          <View style={[s.badge, { backgroundColor: Colors.primary }]}>
             <Text style={s.badgeTxt}>{isGerante ? "Gérante" : "Créatrice"}</Text>
           </View>
           {isPlanDuo ? (
@@ -446,7 +448,7 @@ export default function ProfilScreen() {
             </View>
           )}
         </View>
-        {isDuo && <DuoModeToggle />}
+        {isDuo && <DuoModeToggle variant="onLight" />}
       </Animated.View>
 
       <View style={s.body}>
@@ -523,7 +525,7 @@ export default function ProfilScreen() {
                     onPress={() => setShowCreateBoutique(true)}
                     activeOpacity={0.75}
                   >
-                    <AntDesign name="plus" size={14} color={Colors.primary} style={{ marginRight: 8 }} />
+                    <AntDesign name="plus" size={14} color={Colors.text} style={{ marginRight: 8 }} />
                     <View style={{ flex: 1 }}>
                       <Text style={s.createBoutiqueTxt}>Créer un événement</Text>
                       <Text style={s.createBoutiqueDesc}>
@@ -603,7 +605,7 @@ export default function ProfilScreen() {
               />
               <View style={s.divider} />
               <TouchableOpacity style={s.editBtn} onPress={() => setIsEditing(true)} activeOpacity={0.75}>
-                <AntDesign name="edit" size={14} color={Colors.primary} style={{ marginRight: 6 }} />
+                <AntDesign name="edit" size={14} color={Colors.text} style={{ marginRight: 6 }} />
                 <Text style={s.editBtnTxt}>Modifier le nom / prénom</Text>
               </TouchableOpacity>
             </>
@@ -813,7 +815,7 @@ export default function ProfilScreen() {
             onPress={() => router.push("/(auth)/legal")}
             activeOpacity={0.75}
           >
-            <AntDesign name="file1" size={13} color={Colors.primary} style={{ marginRight: 6 }} />
+            <AntDesign name="file" size={13} color={Colors.primary} style={{ marginRight: 6 }} />
             <Text style={s.legalLinkTxt}>CGU & Politique de confidentialité</Text>
           </TouchableOpacity>
         </AnimCard>
@@ -848,14 +850,6 @@ export default function ProfilScreen() {
   );
 }
 
-const cardShadow = {
-  shadowColor: "#7a41bb",
-  shadowOffset: { width: 0, height: 3 },
-  shadowOpacity: 0.08,
-  shadowRadius: 8,
-  elevation: 3,
-};
-
 const s = StyleSheet.create({
   container: {
     flex: 1,
@@ -865,72 +859,70 @@ const s = StyleSheet.create({
     paddingBottom: 56,
   },
 
-  // Header
+  // Header crème centré — même DA que le web
   header: {
-    backgroundColor: Colors.primary,
     paddingHorizontal: 20,
-    paddingBottom: 32,
+    paddingBottom: 12,
     alignItems: "center",
   },
   avatarWrap: {
-    width: 72,
-    height: 72,
+    width: 80,
+    height: 80,
     marginBottom: 12,
     position: "relative",
   },
   avatarImg: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.4)",
+    width: 80,
+    height: 80,
+    borderRadius: Radius.lg,
   },
   avatarPlaceholder: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: "rgba(255,255,255,0.2)",
+    width: 80,
+    height: 80,
+    borderRadius: Radius.lg,
+    backgroundColor: Colors.primary,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.4)",
   },
   avatarTxt: {
     fontFamily: Fonts.family.norwester,
-    fontSize: 28,
+    fontWeight: "800",
+    fontSize: 30,
     color: "#fff",
   },
   cameraBtn: {
     position: "absolute",
-    bottom: 0,
-    right: 0,
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: Colors.primary,
+    bottom: -4,
+    right: -4,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: Colors.text,
     borderWidth: 2,
-    borderColor: "#fff",
+    borderColor: Colors.background,
     alignItems: "center",
     justifyContent: "center",
   },
   name: {
-    fontFamily: Fonts.family.nowBold,
-    fontSize: 20,
-    color: "#fff",
-    marginBottom: 4,
+    fontFamily: Fonts.family.norwester,
+    fontWeight: "800",
+    fontSize: 26,
+    color: Colors.text,
+    letterSpacing: -0.3,
+    marginBottom: 2,
   },
   emailTxt: {
     fontFamily: Fonts.family.nowRegular,
     fontSize: 13,
-    color: "rgba(255,255,255,0.7)",
-    marginBottom: 14,
+    color: Colors.textLight,
+    marginBottom: 12,
   },
   badgeRow: {
     flexDirection: "row",
     gap: 8,
   },
   badge: {
-    borderRadius: 12,
+    borderRadius: Radius.pill,
     paddingHorizontal: 12,
     paddingVertical: 4,
   },
@@ -943,29 +935,28 @@ const s = StyleSheet.create({
   // Body
   body: {
     paddingHorizontal: 16,
-    paddingTop: 20,
+    paddingTop: 16,
   },
   sectionTitle: {
-    fontFamily: Fonts.family.nowBold,
-    fontSize: 13,
-    color: Colors.textLight,
-    letterSpacing: 0.8,
-    textTransform: "uppercase",
-    marginBottom: 8,
-    marginTop: 4,
-    marginLeft: 4,
+    fontFamily: Fonts.family.norwester,
+    fontWeight: "800",
+    fontSize: Fonts.sizes.lg,
+    color: Colors.text,
+    letterSpacing: -0.3,
+    marginBottom: 10,
+    marginTop: 8,
   },
   card: {
     backgroundColor: Colors.surface,
-    borderRadius: 14,
+    borderRadius: Radius.lg,
     padding: 16,
     marginBottom: 16,
-    ...cardShadow,
+    ...shadows.sm,
   },
   divider: {
     height: 1,
     backgroundColor: Colors.border,
-    marginVertical: 10,
+    marginVertical: 12,
   },
   emptyTxt: {
     fontFamily: Fonts.family.nowRegular,
@@ -977,12 +968,13 @@ const s = StyleSheet.create({
   createBoutiqueBtn: {
     flexDirection: "row",
     alignItems: "center",
+    minHeight: 44,
     paddingVertical: 4,
   },
   createBoutiqueTxt: {
-    fontFamily: Fonts.family.nowMedium,
+    fontFamily: Fonts.family.nowBold,
     fontSize: 14,
-    color: Colors.primary,
+    color: Colors.text,
     marginBottom: 2,
   },
   createBoutiqueDesc: {
@@ -993,8 +985,8 @@ const s = StyleSheet.create({
   },
   createBoutiqueLabel: {
     fontFamily: Fonts.family.nowMedium,
-    fontSize: 13,
-    color: Colors.textLight,
+    fontSize: 14,
+    color: Colors.text,
     marginBottom: 6,
   },
 
@@ -1002,6 +994,7 @@ const s = StyleSheet.create({
   infoRow: {
     flexDirection: "row",
     alignItems: "center",
+    minHeight: 28,
   },
   infoIcon: {
     marginRight: 10,
@@ -1015,7 +1008,7 @@ const s = StyleSheet.create({
   },
   infoValue: {
     fontFamily: Fonts.family.nowRegular,
-    fontSize: 13,
+    fontSize: 14,
     color: Colors.text,
     flex: 1,
     textAlign: "right",
@@ -1029,12 +1022,13 @@ const s = StyleSheet.create({
   editInput: {
     flex: 1,
     fontFamily: Fonts.family.nowRegular,
-    fontSize: 13,
+    fontSize: 14,
     color: Colors.text,
-    borderBottomWidth: 1.5,
-    borderBottomColor: Colors.primary,
-    paddingVertical: 4,
-    paddingHorizontal: 6,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: Radius.sm,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
     textAlign: "right",
   },
   editActions: {
@@ -1042,41 +1036,47 @@ const s = StyleSheet.create({
     gap: 10,
     marginTop: 4,
   },
+  // = Button secondary / primary
   cancelBtn: {
     flex: 1,
-    paddingVertical: 10,
-    borderRadius: 10,
-    borderWidth: 1,
+    minHeight: 44,
+    justifyContent: "center",
+    borderRadius: Radius.md,
+    borderWidth: 1.5,
     borderColor: Colors.border,
     alignItems: "center",
   },
   cancelBtnTxt: {
     fontFamily: Fonts.family.nowMedium,
-    fontSize: 13,
-    color: Colors.textLight,
+    fontSize: 14,
+    color: Colors.text,
   },
   saveBtn: {
     flex: 1,
-    paddingVertical: 10,
-    borderRadius: 10,
-    backgroundColor: Colors.primary,
+    minHeight: 44,
+    justifyContent: "center",
+    borderRadius: Radius.md,
+    backgroundColor: Colors.text,
     alignItems: "center",
   },
   saveBtnTxt: {
     fontFamily: Fonts.family.nowBold,
-    fontSize: 13,
+    fontSize: 14,
     color: "#fff",
   },
   editBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 6,
+    minHeight: 44,
+    borderRadius: Radius.md,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
   },
   editBtnTxt: {
     fontFamily: Fonts.family.nowMedium,
-    fontSize: 13,
-    color: Colors.primary,
+    fontSize: 14,
+    color: Colors.text,
   },
 
   // Switch
@@ -1111,15 +1111,15 @@ const s = StyleSheet.create({
     color: Colors.primary,
   },
   proActiveBadge: {
-    backgroundColor: "#e6f7ef",
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    backgroundColor: Colors.successTint,
+    borderRadius: Radius.pill,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
   },
   proActiveTxt: {
     fontFamily: Fonts.family.nowBold,
     fontSize: 11,
-    color: "#1a7a4a",
+    color: Colors.successDark,
   },
   proDesc: {
     fontFamily: Fonts.family.nowRegular,
@@ -1128,14 +1128,14 @@ const s = StyleSheet.create({
     lineHeight: 19,
   },
   resilierBtn: {
-    paddingVertical: 8,
-    alignItems: "center",
+    minHeight: 40,
+    justifyContent: "center",
+    alignItems: "flex-start",
   },
   resilierTxt: {
-    fontFamily: Fonts.family.nowRegular,
-    fontSize: 13,
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: 14,
     color: Colors.error,
-    textDecorationLine: "underline",
   },
 
   // FREE block
@@ -1173,17 +1173,19 @@ const s = StyleSheet.create({
     fontSize: 13,
     color: Colors.text,
   },
+  // Bascule mensuel/annuel — accent violet volontaire (moment d'upsell, comme le web)
   periodToggle: {
     flexDirection: "row",
-    backgroundColor: "#f0eaf8",
-    borderRadius: 10,
+    backgroundColor: Colors.primaryTint,
+    borderRadius: Radius.md,
     padding: 3,
     marginBottom: 12,
   },
   periodBtn: {
     flex: 1,
-    paddingVertical: 7,
-    borderRadius: 8,
+    minHeight: 36,
+    justifyContent: "center",
+    borderRadius: Radius.sm,
     alignItems: "center",
   },
   periodBtnActive: {
@@ -1199,29 +1201,27 @@ const s = StyleSheet.create({
   },
 
   upgradeBtn: {
-    backgroundColor: Colors.primary,
-    borderRadius: 10,
-    paddingVertical: 12,
+    backgroundColor: Colors.text,
+    borderRadius: Radius.md,
+    minHeight: 48,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
   },
   upgradeBtnTxt: {
     fontFamily: Fonts.family.nowBold,
-    fontSize: 14,
+    fontSize: 15,
     color: "#fff",
   },
 
-  // DUO block
+  // DUO block — garde son orange d'identité (comme le web)
   duoCard: {
-    backgroundColor: "#fff8f4",
-    borderRadius: 14,
+    backgroundColor: Colors.warningTint,
+    borderRadius: Radius.lg,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1.5,
     borderColor: "#eb7f45",
-    ...cardShadow,
-    shadowColor: "#eb7f45",
   },
   duoHeader: {
     flexDirection: "row",
@@ -1232,7 +1232,7 @@ const s = StyleSheet.create({
   duoTitle: {
     fontFamily: Fonts.family.nowBold,
     fontSize: 16,
-    color: "#eb7f45",
+    color: "#c2410c",
   },
   duoDesc: {
     fontFamily: Fonts.family.nowRegular,
@@ -1243,14 +1243,14 @@ const s = StyleSheet.create({
   },
   duoBtn: {
     backgroundColor: "#eb7f45",
-    borderRadius: 10,
-    paddingVertical: 12,
+    borderRadius: Radius.md,
+    minHeight: 48,
     alignItems: "center",
     justifyContent: "center",
   },
   duoBtnTxt: {
     fontFamily: Fonts.family.nowBold,
-    fontSize: 14,
+    fontSize: 15,
     color: "#fff",
   },
 
@@ -1258,26 +1258,25 @@ const s = StyleSheet.create({
   legalLink: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 6,
+    minHeight: 40,
   },
   legalLinkTxt: {
     fontFamily: Fonts.family.nowMedium,
-    fontSize: 13,
+    fontSize: 14,
     color: Colors.primary,
     textDecorationLine: "underline",
   },
 
-  // Logout
+  // Logout (= Button dangerOutline pleine largeur)
   logoutBtn: {
     backgroundColor: Colors.surface,
-    borderRadius: 14,
-    paddingVertical: 15,
+    borderRadius: Radius.md,
+    minHeight: 48,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    ...cardShadow,
     borderWidth: 1,
-    borderColor: "#fde8e8",
+    borderColor: Colors.border,
   },
   logoutTxt: {
     fontFamily: Fonts.family.nowBold,
@@ -1287,7 +1286,8 @@ const s = StyleSheet.create({
 
   // Suppression de compte — délibérément discret, pas un bouton principal
   deleteAccountBtn: {
-    paddingVertical: 10,
+    minHeight: 40,
+    justifyContent: "center",
     alignItems: "center",
   },
   deleteAccountTxt: {
@@ -1299,11 +1299,11 @@ const s = StyleSheet.create({
 
   // Footer
   footer: {
-    fontFamily: Fonts.family.nowLight,
+    fontFamily: Fonts.family.nowRegular,
     fontSize: 11,
     color: Colors.textLight,
     textAlign: "center",
     marginTop: 24,
-    opacity: 0.7,
+    opacity: 0.8,
   },
 });

@@ -22,6 +22,8 @@ import { DuoModeToggle } from "@/components/DuoModeToggle";
 import VentesExportButtons from "@/components/VentesExportButtons";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
+import { shadows } from "@/styles/utils/shadows.styles";
+import { Radius } from "@/constants/spacing";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
@@ -271,7 +273,7 @@ export default function StatsScreen() {
           },
         ]}
       >
-        <Text style={st.headerTitle}>STATS</Text>
+        <Text style={st.headerTitle}>Stats</Text>
         <View style={st.badgeWrap}>
           <Text style={st.badge}>
             {selectedFilter.type !== "all"
@@ -282,7 +284,7 @@ export default function StatsScreen() {
         <Text style={st.headerSub}>
           {isPro ? "3 derniers mois" : `Mois en cours · ${headerSubtitle}`}
         </Text>
-        {isDuo && <DuoModeToggle />}
+        {isDuo && <DuoModeToggle variant="onLight" />}
       </Animated.View>
 
       {/* ── Filtre événements / boutiques ── */}
@@ -626,14 +628,6 @@ function LockedExportBtn({ label }: { label: string }) {
 
 // ── Styles ─────────────────────────────────────────────────────────────────────
 
-const cardShadow = {
-  shadowColor: "#7a41bb",
-  shadowOffset: { width: 0, height: 3 },
-  shadowOpacity: 0.09,
-  shadowRadius: 8,
-  elevation: 3,
-};
-
 const st = StyleSheet.create({
   container: {
     flex: 1,
@@ -643,70 +637,64 @@ const st = StyleSheet.create({
     paddingBottom: 56,
   },
 
-  // ── Header ──────────────────────────────────────────────────────────────────
+  // ── Header crème — même DA que le web ──────────────────────────────────────
   header: {
-    backgroundColor: Colors.primary,
     paddingHorizontal: 20,
-    paddingBottom: 28,
-    alignItems: "center",
+    paddingBottom: 12,
+    alignItems: "flex-start",
   },
   headerTitle: {
-    color: "#FFFFFF",
+    color: Colors.text,
     fontFamily: Fonts.family.norwester,
-    fontSize: Fonts.sizes.xl,
-    letterSpacing: 2,
-    marginBottom: 10,
-  },
-  badgeWrap: {
-    backgroundColor: "rgba(255,255,255,0.18)",
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 4,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.3)",
+    fontWeight: "800",
+    fontSize: 30,
+    letterSpacing: -0.5,
     marginBottom: 8,
   },
+  badgeWrap: {
+    backgroundColor: Colors.primaryTint,
+    borderRadius: Radius.pill,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    marginBottom: 6,
+  },
   badge: {
-    color: "#FFFFFF",
-    fontFamily: Fonts.family.nowMedium,
-    fontSize: Fonts.sizes.xs,
-    letterSpacing: 0.5,
+    color: Colors.primaryDark,
+    fontFamily: Fonts.family.nowBold,
+    fontSize: 11,
   },
   headerSub: {
-    color: "rgba(255,255,255,0.75)",
-    fontFamily: Fonts.family.nowLight,
+    color: Colors.textLight,
+    fontFamily: Fonts.family.nowRegular,
     fontSize: Fonts.sizes.xs,
-    textTransform: "capitalize",
   },
 
-  // ── Filter pills ────────────────────────────────────────────────────────────
+  // ── Filter pills (= components/Chip) ────────────────────────────────────────
   pillsScroll: {
-    backgroundColor: Colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    flexGrow: 0,
   },
   pillsRow: {
     flexDirection: "row",
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     gap: 8,
   },
   pill: {
-    backgroundColor: Colors.background,
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 7,
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.pill,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     borderWidth: 1.5,
     borderColor: Colors.border,
   },
   pillActive: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
+    backgroundColor: Colors.text,
+    borderColor: Colors.text,
   },
   pillTxt: {
     fontFamily: Fonts.family.nowMedium,
-    fontSize: 12,
-    color: Colors.textLight,
+    fontSize: Fonts.sizes.sm,
+    color: Colors.text,
   },
   pillTxtActive: {
     color: "#fff",
@@ -718,11 +706,11 @@ const st = StyleSheet.create({
   },
 
   sectionTitle: {
-    fontFamily: Fonts.family.nowMedium,
-    fontSize: 11,
-    color: Colors.textLight,
-    textTransform: "uppercase",
-    letterSpacing: 1,
+    fontFamily: Fonts.family.norwester,
+    fontWeight: "800",
+    fontSize: Fonts.sizes.lg,
+    color: Colors.text,
+    letterSpacing: -0.3,
     marginBottom: 10,
     marginTop: 20,
   },
@@ -736,32 +724,33 @@ const st = StyleSheet.create({
   },
   card: {
     backgroundColor: Colors.surface,
-    borderRadius: 14,
+    borderRadius: Radius.lg,
     padding: 16,
     width: "48.5%",
-    ...cardShadow,
+    ...shadows.sm,
   },
   cardLabel: {
-    fontFamily: Fonts.family.nowLight,
+    fontFamily: Fonts.family.nowBold,
     color: Colors.textLight,
-    fontSize: Fonts.sizes.xs,
+    fontSize: 11,
+    letterSpacing: 0.3,
     marginBottom: 6,
   },
   cardValue: {
     fontFamily: Fonts.family.norwester,
+    fontWeight: "800",
     color: Colors.primary,
     fontSize: Fonts.sizes.lg,
-    letterSpacing: 0.5,
   },
 
   // ── Paiements ────────────────────────────────────────────────────────────────
   paiementsCard: {
     backgroundColor: Colors.surface,
-    borderRadius: 14,
+    borderRadius: Radius.lg,
     padding: 16,
     marginBottom: 8,
     gap: 14,
-    ...cardShadow,
+    ...shadows.sm,
   },
   paiementRow: {
     gap: 6,
@@ -777,16 +766,15 @@ const st = StyleSheet.create({
     color: Colors.text,
   },
   paiementMontant: {
-    fontFamily: Fonts.family.norwester,
+    fontFamily: Fonts.family.nowBold,
     fontSize: Fonts.sizes.md,
     color: Colors.primary,
-    letterSpacing: 0.5,
   },
 
   // ── Barres de progression ────────────────────────────────────────────────────
   barTrack: {
     height: 6,
-    backgroundColor: "#e8d5f5",
+    backgroundColor: Colors.primaryTint,
     borderRadius: 3,
     marginTop: 4,
   },
@@ -799,10 +787,10 @@ const st = StyleSheet.create({
   // ── Historique chart ─────────────────────────────────────────────────────────
   chartCard: {
     backgroundColor: Colors.surface,
-    borderRadius: 14,
+    borderRadius: Radius.lg,
     padding: 16,
     marginBottom: 8,
-    ...cardShadow,
+    ...shadows.sm,
   },
   barsContainer: {
     flexDirection: "row",
@@ -828,9 +816,9 @@ const st = StyleSheet.create({
     borderRadius: 4,
   },
   barMonthLabel: {
-    fontSize: 10,
+    fontSize: 11,
     color: Colors.textLight,
-    fontFamily: Fonts.family.nowLight,
+    fontFamily: Fonts.family.nowRegular,
     marginTop: 6,
     textTransform: "capitalize",
   },
@@ -838,10 +826,10 @@ const st = StyleSheet.create({
   // ── Articles ─────────────────────────────────────────────────────────────────
   articleRow: {
     backgroundColor: Colors.surface,
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 8,
-    ...cardShadow,
+    borderRadius: Radius.lg,
+    padding: 16,
+    marginBottom: 10,
+    ...shadows.sm,
   },
   articleHeader: {
     flexDirection: "row",
@@ -850,20 +838,19 @@ const st = StyleSheet.create({
     marginBottom: 2,
   },
   articleNom: {
-    fontFamily: Fonts.family.nowMedium,
+    fontFamily: Fonts.family.nowBold,
     fontSize: Fonts.sizes.sm,
     color: Colors.text,
     flex: 1,
     marginRight: 8,
   },
   articleCA: {
-    fontFamily: Fonts.family.norwester,
+    fontFamily: Fonts.family.nowBold,
     fontSize: Fonts.sizes.md,
     color: Colors.primary,
-    letterSpacing: 0.5,
   },
   articleMeta: {
-    fontFamily: Fonts.family.nowLight,
+    fontFamily: Fonts.family.nowRegular,
     fontSize: Fonts.sizes.xs,
     color: Colors.textLight,
     marginBottom: 6,
@@ -878,22 +865,22 @@ const st = StyleSheet.create({
   },
   tableHeaderCell: {
     flex: 1,
-    fontFamily: Fonts.family.nowMedium,
-    fontSize: 10,
+    fontFamily: Fonts.family.nowBold,
+    fontSize: 11,
     color: Colors.textLight,
     textTransform: "uppercase",
-    letterSpacing: 0.8,
+    letterSpacing: 0.5,
     textAlign: "right",
   },
   tableRow: {
     backgroundColor: Colors.surface,
-    borderRadius: 12,
+    borderRadius: Radius.md,
     paddingHorizontal: 14,
-    paddingVertical: 12,
-    marginBottom: 6,
+    paddingVertical: 14,
+    marginBottom: 8,
     flexDirection: "row",
     alignItems: "center",
-    ...cardShadow,
+    ...shadows.sm,
   },
   tableCell: {
     flex: 1,
@@ -904,39 +891,40 @@ const st = StyleSheet.create({
   },
   tableCellNom: {
     flex: 2,
-    fontFamily: Fonts.family.nowMedium,
+    fontFamily: Fonts.family.nowBold,
     textAlign: "left",
     color: Colors.text,
   },
   tableCellNet: {
-    color: Colors.success,
-    fontFamily: Fonts.family.nowMedium,
+    color: Colors.successDark,
+    fontFamily: Fonts.family.nowBold,
   },
 
   // ── Export ───────────────────────────────────────────────────────────────────
   exportCard: {
     backgroundColor: Colors.surface,
-    borderRadius: 14,
+    borderRadius: Radius.lg,
     overflow: "hidden",
     marginBottom: 8,
-    ...cardShadow,
+    ...shadows.sm,
   },
   exportBtn: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 14,
+    minHeight: 56,
     borderBottomWidth: 1,
-    borderBottomColor: "#f0e8f8",
+    borderBottomColor: Colors.border,
     gap: 12,
   },
   exportBtnLabel: {
-    fontFamily: Fonts.family.nowMedium,
+    fontFamily: Fonts.family.nowBold,
     fontSize: Fonts.sizes.sm,
     color: Colors.text,
   },
   exportBtnSub: {
-    fontFamily: Fonts.family.nowLight,
+    fontFamily: Fonts.family.nowRegular,
     fontSize: Fonts.sizes.xs,
     color: Colors.textLight,
     marginTop: 1,
@@ -944,10 +932,10 @@ const st = StyleSheet.create({
   exportBtnArrow: {
     fontFamily: Fonts.family.nowBold,
     fontSize: 18,
-    color: Colors.primary,
+    color: Colors.text,
   },
   exportBtnLocked: {
-    backgroundColor: "#fafafa",
+    backgroundColor: "#faf8f4",
     justifyContent: "space-between",
   },
   exportBtnLabelLocked: {
@@ -956,35 +944,36 @@ const st = StyleSheet.create({
     color: Colors.textLight,
   },
   exportBtnLockedBadge: {
-    fontFamily: Fonts.family.nowMedium,
-    fontSize: 10,
-    color: Colors.primary,
-    backgroundColor: Colors.primaryLight + "25",
-    paddingHorizontal: 8,
+    fontFamily: Fonts.family.nowBold,
+    fontSize: 11,
+    color: Colors.primaryDark,
+    backgroundColor: Colors.primaryTint,
+    paddingHorizontal: 10,
     paddingVertical: 3,
-    borderRadius: 8,
+    borderRadius: Radius.pill,
+    overflow: "hidden",
   },
 
   // ── Locked / Empty ────────────────────────────────────────────────────────────
   lockedBox: {
-    backgroundColor: Colors.primaryLight + "15",
-    borderRadius: 16,
+    backgroundColor: Colors.primaryTint,
+    borderRadius: Radius.lg,
     padding: 20,
     alignItems: "center",
     marginBottom: 4,
     borderWidth: 1.5,
-    borderColor: Colors.primaryLight + "40",
+    borderColor: Colors.primaryLight,
     borderStyle: "dashed",
   },
   lockedTxt: {
-    fontFamily: Fonts.family.nowMedium,
+    fontFamily: Fonts.family.nowBold,
     color: Colors.primaryDark,
     fontSize: Fonts.sizes.sm,
     textAlign: "center",
     marginBottom: 6,
   },
   lockedDesc: {
-    fontFamily: Fonts.family.nowLight,
+    fontFamily: Fonts.family.nowRegular,
     color: Colors.textLight,
     fontSize: Fonts.sizes.xs,
     textAlign: "center",
@@ -992,35 +981,33 @@ const st = StyleSheet.create({
   },
   emptyCard: {
     backgroundColor: Colors.surface,
-    borderRadius: 14,
-    padding: 16,
-    alignItems: "center",
+    borderRadius: Radius.lg,
+    padding: 20,
     marginBottom: 8,
-    ...cardShadow,
   },
   emptyTxt: {
-    fontFamily: Fonts.family.nowLight,
-    fontSize: Fonts.sizes.xs,
+    fontFamily: Fonts.family.nowRegular,
+    fontSize: Fonts.sizes.sm,
     color: Colors.textLight,
   },
 
   // ── Évolution & valeur verte ──────────────────────────────────────────────────
   evolutionUp: {
-    color: '#16a34a',
-    fontFamily: 'Now-Medium',
-    fontSize: 10,
+    color: Colors.successDark,
+    fontFamily: Fonts.family.nowBold,
+    fontSize: 11,
     marginTop: 2,
   },
   evolutionDown: {
-    color: '#dc2626',
-    fontFamily: 'Now-Medium',
-    fontSize: 10,
+    color: Colors.error,
+    fontFamily: Fonts.family.nowBold,
+    fontSize: 11,
     marginTop: 2,
   },
   cardValueGreen: {
     fontFamily: Fonts.family.norwester,
-    color: '#16a34a',
+    fontWeight: "800",
+    color: Colors.successDark,
     fontSize: Fonts.sizes.lg,
-    letterSpacing: 0.5,
   },
 });
