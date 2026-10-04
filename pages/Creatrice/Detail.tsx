@@ -227,7 +227,7 @@ export default function CreatriceDetailScreen() {
       >
         {/* Stats globales */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>STATISTIQUES</Text>
+          <Text style={styles.sectionTitle}>Statistiques</Text>
           <View style={styles.statsGrid}>
             {[
               { label: "Chiffre d'affaires", value: formatMontant(creatrice.stats.ca) },
@@ -262,7 +262,7 @@ export default function CreatriceDetailScreen() {
         {/* Export des ventes de cette créatrice, mois par mois — vue gérante uniquement */}
         {isGeranteView && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>RÉCUPÉRER SES VENTES</Text>
+            <Text style={styles.sectionTitle}>Récupérer ses ventes</Text>
             <VentesExportButtons
               creatriceId={creatrice.id}
               filenameBase={`ventes-${creatrice.nom.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
@@ -273,7 +273,7 @@ export default function CreatriceDetailScreen() {
         {/* Ventes globales */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
-            VENTES ({creatrice.ventes.length})
+            Ventes ({creatrice.ventes.length})
           </Text>
           {creatrice.ventes.length === 0 && (
             <Text style={styles.emptyVentes}>Aucune vente enregistrée.</Text>

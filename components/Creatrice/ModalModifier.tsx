@@ -1,3 +1,4 @@
+import { Colors } from "@/constants/colors";
 import { useRef, useEffect, useState } from "react";
 import {
   Modal,
@@ -163,7 +164,7 @@ export default function ModalModifier({ visible, onClose, creatrice }: Props) {
                       errorMsg && !form.nom.trim() && s.inputError,
                     ]}
                     placeholder="Marie Dupont"
-                    placeholderTextColor="#b0b0b0"
+                    placeholderTextColor={Colors.textLight}
                     value={form.nom}
                     onChangeText={(v) => setForm((f) => ({ ...f, nom: v }))}
                     onFocus={() => setFocused("nom")}
@@ -176,7 +177,7 @@ export default function ModalModifier({ visible, onClose, creatrice }: Props) {
                   <TextInput
                     style={[s.input, focused === "email" && s.inputFocused]}
                     placeholder="marie@example.com"
-                    placeholderTextColor="#b0b0b0"
+                    placeholderTextColor={Colors.textLight}
                     value={form.email}
                     onChangeText={(v) => setForm((f) => ({ ...f, email: v }))}
                     onFocus={() => setFocused("email")}
@@ -190,7 +191,7 @@ export default function ModalModifier({ visible, onClose, creatrice }: Props) {
                   <TextInput
                     style={[s.input, focused === "telephone" && s.inputFocused]}
                     placeholder="06 12 34 56 78"
-                    placeholderTextColor="#b0b0b0"
+                    placeholderTextColor={Colors.textLight}
                     value={form.telephone}
                     onChangeText={(v) =>
                       setForm((f) => ({ ...f, telephone: v }))
@@ -213,7 +214,7 @@ export default function ModalModifier({ visible, onClose, creatrice }: Props) {
                         s.inputError,
                     ]}
                     placeholder="15"
-                    placeholderTextColor="#b0b0b0"
+                    placeholderTextColor={Colors.textLight}
                     value={form.tauxDeCommission}
                     onChangeText={(v) =>
                       setForm((f) => ({ ...f, tauxDeCommission: v }))

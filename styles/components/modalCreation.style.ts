@@ -1,15 +1,10 @@
 import { StyleSheet } from "react-native";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
+import { Radius } from "@/constants/spacing";
+import { shadows } from "@/styles/utils/shadows.styles";
 
-const inputShadow = {
-  shadowColor: "#7a41bb",
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.07,
-  shadowRadius: 6,
-  elevation: 2,
-};
-
+// Partagé par les modales créatrice (création / modification / invitation).
 export const modalStyles = StyleSheet.create({
   // ── OVERLAY ─────────────────────────────────────
   overlay: {
@@ -21,10 +16,11 @@ export const modalStyles = StyleSheet.create({
   // ── SHEET ───────────────────────────────────────
   sheet: {
     backgroundColor: Colors.surface,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: Radius.xl,
+    borderTopRightRadius: Radius.xl,
     paddingHorizontal: 20,
     paddingBottom: 32,
+    ...shadows.sheet,
   },
 
   // ── HANDLE ──────────────────────────────────────
@@ -50,13 +46,13 @@ export const modalStyles = StyleSheet.create({
     fontFamily: Fonts.family.norwester,
     fontWeight: "800" as const,
     fontSize: 20,
-    color: Colors.primaryDark,
-    letterSpacing: 1.5,
+    color: Colors.text,
+    letterSpacing: -0.3,
   },
   closeBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 36,
+    height: 36,
+    borderRadius: Radius.md,
     backgroundColor: Colors.background,
     alignItems: "center",
     justifyContent: "center",
@@ -64,17 +60,16 @@ export const modalStyles = StyleSheet.create({
   closeBtnTxt: {
     fontFamily: Fonts.family.nowBold,
     fontSize: 18,
-    color: Colors.textLight,
+    color: Colors.text,
     lineHeight: 22,
     marginTop: -1,
   },
 
-  // ── FORM ────────────────────────────────────────
+  // ── FORM (même rendu que components/Inputs/Field) ──
   label: {
     fontFamily: Fonts.family.nowMedium,
-    fontSize: Fonts.sizes.xs,
-    color: Colors.textLight,
-    letterSpacing: 0.8,
+    fontSize: Fonts.sizes.sm,
+    color: Colors.text,
     marginBottom: 6,
     marginTop: 14,
   },
@@ -83,59 +78,51 @@ export const modalStyles = StyleSheet.create({
   },
   input: {
     backgroundColor: Colors.surface,
-    borderRadius: 14,
-    borderWidth: 1.5,
+    borderRadius: Radius.md,
+    borderWidth: 1,
     borderColor: Colors.border,
-    paddingHorizontal: 14,
-    paddingVertical: 13,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     fontFamily: Fonts.family.nowRegular,
-    fontSize: Fonts.sizes.sm,
+    fontSize: Fonts.sizes.md,
     color: Colors.text,
-    ...inputShadow,
   },
   inputFocused: {
-    borderColor: Colors.primaryLight,
+    borderColor: Colors.primary,
   },
   inputError: {
     borderColor: Colors.error,
   },
 
-  // ── ERROR MSG ───────────────────────────────────
+  // ── ERROR MSG (= Banner error) ──────────────────
   errorBox: {
-    backgroundColor: Colors.error + "15",
-    borderRadius: 10,
+    backgroundColor: Colors.errorTint,
+    borderRadius: Radius.md,
     paddingHorizontal: 14,
     paddingVertical: 10,
     marginTop: 16,
-    borderWidth: 1,
-    borderColor: Colors.error + "40",
   },
   errorTxt: {
     fontFamily: Fonts.family.nowRegular,
-    fontSize: Fonts.sizes.xs,
+    fontSize: Fonts.sizes.sm,
     color: Colors.error,
   },
 
-  // ── CTA ─────────────────────────────────────────
+  // ── CTA (= Button primary) ──────────────────────
   ctaBtn: {
-    backgroundColor: Colors.primary,
-    borderRadius: 14,
-    paddingVertical: 15,
+    backgroundColor: Colors.text,
+    borderRadius: Radius.md,
+    minHeight: 48,
+    justifyContent: "center",
     alignItems: "center",
     marginTop: 24,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 5,
   },
   ctaBtnDisabled: {
-    opacity: 0.55,
+    opacity: 0.5,
   },
   ctaTxt: {
-    fontFamily: Fonts.family.norwester,
-    fontSize: Fonts.sizes.sm,
+    fontFamily: Fonts.family.nowBold,
+    fontSize: 15,
     color: "#FFFFFF",
-    letterSpacing: 1.2,
   },
 });

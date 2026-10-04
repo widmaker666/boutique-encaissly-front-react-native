@@ -16,6 +16,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { articleService, statsService, venteService } from "@/services/api";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
+import { Radius } from "@/constants/spacing";
+import { shadows } from "@/styles/utils/shadows.styles";
 
 type Props = { evenementId: string; evenementNom: string; onSwitchToGerante?: () => void };
 
@@ -129,8 +131,8 @@ export default function EventFiche({ evenementId, evenementNom, onSwitchToGerant
       {/* Header violet */}
       <View style={[s.header, { paddingTop: insets.top + 20 }, onSwitchToGerante && s.headerRow]}>
         <View>
-          <Text style={s.titre}>{toUpper(evenementNom)}</Text>
           <Text style={s.sousTitre}>MA FICHE ÉVÉNEMENT</Text>
+          <Text style={s.titre}>{evenementNom}</Text>
         </View>
         {onSwitchToGerante && (
           <TouchableOpacity style={s.switchBtn} onPress={onSwitchToGerante} activeOpacity={0.8}>
@@ -142,7 +144,7 @@ export default function EventFiche({ evenementId, evenementNom, onSwitchToGerant
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scroll}>
 
         {/* Stats */}
-        <Text style={s.sectionTitle}>STATISTIQUES</Text>
+        <Text style={s.sectionTitle}>Statistiques</Text>
         <View style={s.statsGrid}>
           {[
             { label: "Chiffre d'affaires", value: fmt(ca) },
@@ -159,7 +161,7 @@ export default function EventFiche({ evenementId, evenementNom, onSwitchToGerant
 
         {/* Articles */}
         <View style={s.sectionRow}>
-          <Text style={s.sectionTitle}>ARTICLES ({articlesList.length})</Text>
+          <Text style={s.sectionTitle}>Articles ({articlesList.length})</Text>
           <View style={s.sectionActions}>
             <TouchableOpacity
               style={s.actionBtn}
@@ -178,7 +180,7 @@ export default function EventFiche({ evenementId, evenementNom, onSwitchToGerant
               onPress={() => setModalAddVisible(true)}
               activeOpacity={0.8}
             >
-              <Text style={[s.actionBtnTxt, { color: "#fff" }]}>+ Ajouter</Text>
+              <Text style={[s.actionBtnTxt, { color: "#fff", fontFamily: Fonts.family.nowBold }]}>+ Ajouter</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -217,7 +219,7 @@ export default function EventFiche({ evenementId, evenementNom, onSwitchToGerant
         {/* Dernières ventes */}
         {ventes.length > 0 && (
           <>
-            <Text style={[s.sectionTitle, { marginTop: 12 }]}>DERNIÈRES VENTES</Text>
+            <Text style={[s.sectionTitle, { marginTop: 12 }]}>Dernières ventes</Text>
             {ventes.slice(0, 10).map((v) => (
               <View key={v.id} style={s.venteRow}>
                 <View style={s.venteLeft}>
@@ -306,61 +308,61 @@ export default function EventFiche({ evenementId, evenementNom, onSwitchToGerant
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
 
+  // Header crème — même DA que le web
   header: {
-    backgroundColor: Colors.primary,
     paddingHorizontal: 20,
-    paddingBottom: 24,
-    alignItems: "center",
+    paddingBottom: 12,
   },
   headerRow: {
     flexDirection: "row",
-    alignItems: "flex-end",
+    alignItems: "flex-start",
     justifyContent: "space-between",
+    gap: 12,
   },
   switchBtn: {
-    backgroundColor: "rgba(255,255,255,0.18)",
-    borderRadius: 20,
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.pill,
     paddingHorizontal: 14,
-    paddingVertical: 7,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.3)",
+    paddingVertical: 8,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
   },
   switchBtnTxt: {
     fontFamily: Fonts.family.nowMedium,
     fontSize: 12,
-    color: "#fff",
+    color: Colors.text,
   },
-  titre: { fontFamily: Fonts.family.norwester, fontSize: 20, color: "#fff", letterSpacing: 2 },
-  sousTitre: { fontFamily: Fonts.family.nowRegular, fontSize: 12, color: "rgba(255,255,255,0.7)", marginTop: 4 },
+  titre: { fontFamily: Fonts.family.norwester, fontWeight: "800", fontSize: 28, color: Colors.text, letterSpacing: -0.5 },
+  sousTitre: { fontFamily: Fonts.family.nowBold, fontSize: 12, color: Colors.primary, letterSpacing: 0.6, marginBottom: 4 },
 
   scroll: { padding: 16 },
 
   sectionTitle: {
-    fontFamily: Fonts.family.nowBold, fontSize: 12, color: Colors.textLight,
-    letterSpacing: 1, textTransform: "uppercase", marginBottom: 10, marginTop: 4,
+    fontFamily: Fonts.family.norwester, fontWeight: "800", fontSize: Fonts.sizes.lg, color: Colors.text,
+    letterSpacing: -0.3, marginBottom: 10, marginTop: 8,
   },
-  sectionRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 10, marginTop: 4 },
+  sectionRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 10, marginTop: 8 },
   sectionActions: { flexDirection: "row", gap: 8 },
+  // = Button variant="secondary" size="sm" / primary
   actionBtn: {
-    paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8,
-    borderWidth: 1, borderColor: Colors.primary, flexDirection: "row", alignItems: "center", gap: 4,
+    paddingHorizontal: 14, minHeight: 36, borderRadius: Radius.md,
+    borderWidth: 1.5, borderColor: Colors.border, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4,
   },
-  actionBtnPrimary: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  actionBtnTxt: { fontFamily: Fonts.family.nowMedium, fontSize: 12, color: Colors.primary },
+  actionBtnPrimary: { backgroundColor: Colors.text, borderColor: Colors.text },
+  actionBtnTxt: { fontFamily: Fonts.family.nowMedium, fontSize: 13, color: Colors.text },
 
   statsGrid: { flexDirection: "row", flexWrap: "wrap", gap: 10, marginBottom: 20 },
   statCard: {
-    flex: 1, minWidth: "45%", backgroundColor: Colors.surface, borderRadius: 12,
-    padding: 14, shadowColor: "#7a41bb", shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.07, shadowRadius: 6, elevation: 2,
+    flex: 1, minWidth: "45%", backgroundColor: Colors.surface, borderRadius: Radius.lg,
+    padding: 16, ...shadows.sm,
   },
-  statValue: { fontFamily: Fonts.family.norwester, fontSize: 18, color: Colors.primary, marginBottom: 4 },
-  statLabel: { fontFamily: Fonts.family.nowRegular, fontSize: 11, color: Colors.textLight },
+  statValue: { fontFamily: Fonts.family.norwester, fontWeight: "800", fontSize: 20, color: Colors.text, marginBottom: 4 },
+  statLabel: { fontFamily: Fonts.family.nowBold, fontSize: 11, color: Colors.textLight, letterSpacing: 0.3 },
 
   importBanner: {
-    backgroundColor: "#e6f7ef", borderRadius: 8, padding: 10, marginBottom: 10,
+    backgroundColor: Colors.successTint, borderRadius: Radius.md, padding: 12, marginBottom: 10,
   },
-  importBannerTxt: { fontFamily: Fonts.family.nowMedium, fontSize: 13, color: "#1a7a4a" },
+  importBannerTxt: { fontFamily: Fonts.family.nowMedium, fontSize: 13, color: Colors.successDark },
 
   emptyBox: { alignItems: "center", paddingVertical: 32 },
   emptyIcon: { fontSize: 36, marginBottom: 8 },
@@ -369,39 +371,42 @@ const s = StyleSheet.create({
 
   articleRow: {
     flexDirection: "row", alignItems: "center", backgroundColor: Colors.surface,
-    borderRadius: 10, padding: 12, marginBottom: 8,
-    shadowColor: "#7a41bb", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1,
+    borderRadius: Radius.lg, padding: 14, marginBottom: 10, ...shadows.sm,
   },
   articleLeft: { flex: 1 },
-  articleNom: { fontFamily: Fonts.family.nowMedium, fontSize: 14, color: Colors.text, marginBottom: 2 },
+  articleNom: { fontFamily: Fonts.family.nowBold, fontSize: 14, color: Colors.text, marginBottom: 2 },
   articleMeta: { fontFamily: Fonts.family.nowRegular, fontSize: 12, color: Colors.textLight },
-  deleteBtn: { padding: 8 },
+  // = Button variant="icon"
+  deleteBtn: {
+    width: 40, height: 40, borderRadius: Radius.sm, borderWidth: 1, borderColor: Colors.border,
+    backgroundColor: Colors.surface, alignItems: "center", justifyContent: "center",
+  },
   deleteBtnTxt: { fontFamily: Fonts.family.nowBold, fontSize: 14, color: Colors.error },
 
   venteRow: {
     flexDirection: "row", alignItems: "center", backgroundColor: Colors.surface,
-    borderRadius: 10, padding: 12, marginBottom: 8,
-    shadowColor: "#7a41bb", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1,
+    borderRadius: Radius.lg, padding: 14, marginBottom: 10, ...shadows.sm,
   },
   venteLeft: { flex: 1 },
-  venteNom: { fontFamily: Fonts.family.nowMedium, fontSize: 13, color: Colors.text },
-  venteMeta: { fontFamily: Fonts.family.nowRegular, fontSize: 11, color: Colors.textLight, marginTop: 2 },
-  ventePrix: { fontFamily: Fonts.family.norwester, fontSize: 16, color: Colors.primary },
+  venteNom: { fontFamily: Fonts.family.nowBold, fontSize: 14, color: Colors.text },
+  venteMeta: { fontFamily: Fonts.family.nowRegular, fontSize: 12, color: Colors.textLight, marginTop: 2 },
+  ventePrix: { fontFamily: Fonts.family.nowBold, fontSize: 15, color: Colors.text },
 
   // Modal
-  overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.4)", justifyContent: "flex-end" },
-  sheet: { backgroundColor: Colors.surface, borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20 },
-  sheetHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: "#ddd", alignSelf: "center", marginBottom: 16 },
-  sheetTitre: { fontFamily: Fonts.family.norwester, fontSize: 18, color: Colors.text, letterSpacing: 1, marginBottom: 16 },
-  fieldLabel: { fontFamily: Fonts.family.nowMedium, fontSize: 12, color: Colors.textLight, marginBottom: 4, marginTop: 8, textTransform: "uppercase" },
+  overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.45)", justifyContent: "flex-end" },
+  sheet: { backgroundColor: Colors.surface, borderTopLeftRadius: Radius.xl, borderTopRightRadius: Radius.xl, padding: 20, ...shadows.sheet },
+  sheetHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: Colors.border, alignSelf: "center", marginBottom: 16 },
+  sheetTitre: { fontFamily: Fonts.family.norwester, fontWeight: "800", fontSize: 20, color: Colors.text, letterSpacing: -0.3, marginBottom: 16 },
+  // = components/Inputs/Field
+  fieldLabel: { fontFamily: Fonts.family.nowMedium, fontSize: 14, color: Colors.text, marginBottom: 6, marginTop: 10 },
   fieldRow: { flexDirection: "row" },
   input: {
-    borderWidth: 1.5, borderColor: Colors.border, borderRadius: 10,
-    paddingHorizontal: 12, paddingVertical: 10,
-    fontFamily: Fonts.family.nowRegular, fontSize: 14, color: Colors.text,
-    backgroundColor: "#fafafa",
+    borderWidth: 1, borderColor: Colors.border, borderRadius: Radius.md,
+    paddingHorizontal: 16, paddingVertical: 12,
+    fontFamily: Fonts.family.nowRegular, fontSize: 16, color: Colors.text,
+    backgroundColor: Colors.surface,
   },
-  confirmBtn: { backgroundColor: Colors.primary, borderRadius: 12, paddingVertical: 14, alignItems: "center", marginTop: 16 },
-  confirmBtnDisabled: { opacity: 0.4 },
-  confirmBtnTxt: { fontFamily: Fonts.family.nowBold, fontSize: 14, color: "#fff" },
+  confirmBtn: { backgroundColor: Colors.text, borderRadius: Radius.md, minHeight: 48, justifyContent: "center", alignItems: "center", marginTop: 16 },
+  confirmBtnDisabled: { opacity: 0.5 },
+  confirmBtnTxt: { fontFamily: Fonts.family.nowBold, fontSize: 15, color: "#fff" },
 });

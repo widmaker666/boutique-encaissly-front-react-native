@@ -358,7 +358,7 @@ export default function ArticlesScreen() {
             >
               <Text style={styles.backTxt}>‹</Text>
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>ARTICLES</Text>
+            <Text style={styles.headerTitle}>Articles</Text>
           </View>
 
           <>

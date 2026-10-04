@@ -158,7 +158,7 @@ export default function ModalInviter({ visible, onClose, creatriceId }: Props) {
                       errorMsg && !email.trim() && s.inputError,
                     ]}
                     placeholder="marie@example.com"
-                    placeholderTextColor="#b0b0b0"
+                    placeholderTextColor={Colors.textLight}
                     value={email}
                     onChangeText={setEmail}
                     onFocus={() => setFocused(true)}
@@ -276,8 +276,8 @@ const localStyles = StyleSheet.create({
     marginBottom: 8,
   },
   boutiqueRowSelected: {
-    borderColor: Colors.primaryLight,
-    backgroundColor: Colors.primary + "08",
+    borderColor: Colors.text,
+    backgroundColor: Colors.primaryTint,
   },
   radio: {
     width: 18,
@@ -288,48 +288,47 @@ const localStyles = StyleSheet.create({
     marginRight: 12,
   },
   radioSelected: {
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primary,
+    borderColor: Colors.text,
+    backgroundColor: Colors.text,
   },
   boutiqueName: {
     fontFamily: Fonts.family.nowRegular,
     fontSize: Fonts.sizes.sm,
-    color: Colors.textLight,
+    color: Colors.text,
   },
   boutiqueNameSelected: {
-    color: Colors.primaryDark,
     fontFamily: Fonts.family.nowMedium,
   },
   noBoutiqueBox: {
-    backgroundColor: "#fff3cd",
+    backgroundColor: Colors.warningTint,
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 12,
     marginTop: 16,
     borderWidth: 1,
-    borderColor: "#ffc10740",
+    borderColor: Colors.warningTint,
   },
   noBoutiqueTxt: {
     fontFamily: Fonts.family.nowRegular,
     fontSize: Fonts.sizes.xs,
-    color: "#856404",
+    color: Colors.warningDark,
     lineHeight: 18,
     textAlign: "center",
   },
   autoBoutiqueBox: {
-    backgroundColor: Colors.primary + "0d",
+    backgroundColor: Colors.primaryTint,
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 10,
     marginTop: 16,
     borderWidth: 1,
-    borderColor: Colors.primary + "30",
+    borderColor: Colors.primaryTint,
   },
   autoBoutiqueLabel: {
     fontFamily: Fonts.family.nowMedium,
     fontSize: 10,
-    color: Colors.primary,
-    letterSpacing: 0.8,
+    color: Colors.primaryDark,
+    letterSpacing: 0.6,
     marginBottom: 2,
   },
   autoBoutiqueName: {
@@ -338,17 +337,17 @@ const localStyles = StyleSheet.create({
     color: Colors.text,
   },
   successBox: {
-    backgroundColor: "#16a34a15",
+    backgroundColor: Colors.successTint,
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 10,
     marginTop: 16,
     borderWidth: 1,
-    borderColor: "#16a34a40",
+    borderColor: Colors.successTint,
   },
   successTxt: {
     fontFamily: Fonts.family.nowRegular,
     fontSize: Fonts.sizes.xs,
-    color: "#16a34a",
+    color: Colors.successDark,
   },
 });

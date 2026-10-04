@@ -145,11 +145,11 @@ export default function CreatriceScreen() {
         ]}
       >
         <View>
-          <Text style={styles.titre}>CREATRICES</Text>
+          <Text style={styles.titre}>Créatrices</Text>
           <Text style={styles.headerSub}>
             {count} créatrice{count > 1 ? "s" : ""} · {user?.plan ?? "FREE"}
           </Text>
-          {isDuo && <DuoModeToggle />}
+          {isDuo && <DuoModeToggle variant="onLight" />}
         </View>
         <TouchableOpacity
           style={styles.addBtn}

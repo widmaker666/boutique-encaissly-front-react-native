@@ -15,6 +15,8 @@ import { evenementService, boutiqueService } from "@/services/api";
 import { useAuthStore } from "@/stores/auth.store";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
+import { Radius } from "@/constants/spacing";
+import { shadows } from "@/styles/utils/shadows.styles";
 
 function fmt(n: number) {
   return (Math.round(n * 100) / 100).toLocaleString("fr-FR", {
@@ -67,8 +69,8 @@ export default function PersonnelRecap({ onSwitchToGerante }: { onSwitchToGerant
       {/* Header */}
       <View style={[s.header, { paddingTop: insets.top + 20 }, onSwitchToGerante && s.headerRow]}>
         <View>
-          <Text style={s.titre}>MA FICHE</Text>
           <Text style={s.sousTitre}>AUCUN ÉVÉNEMENT ACTIF</Text>
+          <Text style={s.titre}>Ma fiche</Text>
         </View>
         {onSwitchToGerante && (
           <TouchableOpacity style={s.switchBtn} onPress={onSwitchToGerante} activeOpacity={0.8}>
@@ -101,7 +103,7 @@ export default function PersonnelRecap({ onSwitchToGerante }: { onSwitchToGerant
 
           {/* Événements */}
           <View style={s.sectionRow}>
-            <Text style={s.sectionTitle}>MES ÉVÉNEMENTS ({events.length})</Text>
+            <Text style={s.sectionTitle}>Mes événements ({events.length})</Text>
             {!showCreateForm && (
               <TouchableOpacity style={s.createBtn} onPress={() => setShowCreateForm(true)} activeOpacity={0.8}>
                 <Text style={s.createBtnTxt}>+ Nouveau</Text>
@@ -178,7 +180,7 @@ export default function PersonnelRecap({ onSwitchToGerante }: { onSwitchToGerant
           {/* Boutiques membres */}
           {bouts.length > 0 && (
             <>
-              <Text style={[s.sectionTitle, { marginTop: 20 }]}>MES BOUTIQUES ({bouts.length})</Text>
+              <Text style={[s.sectionTitle, { marginTop: 20 }]}>Mes boutiques ({bouts.length})</Text>
               {bouts.map((b) => (
                 <View key={b.id} style={s.boutiqueCard}>
                   <Text style={s.boutiqueNom} numberOfLines={1}>{b.nom}</Text>
@@ -200,48 +202,46 @@ export default function PersonnelRecap({ onSwitchToGerante }: { onSwitchToGerant
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
 
+  // Header crème — même DA que le web
   header: {
-    backgroundColor: Colors.primary,
     paddingHorizontal: 20,
-    paddingBottom: 24,
-    alignItems: "center",
+    paddingBottom: 12,
   },
   headerRow: {
     flexDirection: "row",
-    alignItems: "flex-end",
+    alignItems: "flex-start",
     justifyContent: "space-between",
+    gap: 12,
   },
   switchBtn: {
-    backgroundColor: "rgba(255,255,255,0.18)",
-    borderRadius: 20,
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.pill,
     paddingHorizontal: 14,
-    paddingVertical: 7,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.3)",
+    paddingVertical: 8,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
   },
   switchBtnTxt: {
     fontFamily: Fonts.family.nowMedium,
     fontSize: 12,
-    color: "#fff",
+    color: Colors.text,
   },
-  titre: { fontFamily: Fonts.family.norwester, fontSize: 20, color: "#fff", letterSpacing: 2 },
-  sousTitre: { fontFamily: Fonts.family.nowRegular, fontSize: 12, color: "rgba(255,255,255,0.7)", marginTop: 4 },
+  titre: { fontFamily: Fonts.family.norwester, fontWeight: "800", fontSize: 30, color: Colors.text, letterSpacing: -0.5 },
+  sousTitre: { fontFamily: Fonts.family.nowBold, fontSize: 12, color: Colors.primary, letterSpacing: 0.6, marginBottom: 4 },
 
   scroll: { padding: 16 },
 
-  // Bloc "comment vendre"
+  // Bloc "comment vendre" (même rendu que le Dashboard web créatrice)
   howCard: {
-    backgroundColor: "#f0eaf9",
-    borderRadius: 14,
+    backgroundColor: Colors.primaryTint,
+    borderRadius: Radius.lg,
     padding: 16,
     marginBottom: 20,
-    borderLeftWidth: 4,
-    borderLeftColor: Colors.primary,
   },
   howTitle: {
     fontFamily: Fonts.family.nowBold,
     fontSize: 14,
-    color: Colors.primary,
+    color: Colors.primaryDark,
     marginBottom: 12,
   },
   howStep: { flexDirection: "row", alignItems: "flex-start", gap: 10, marginBottom: 8 },
@@ -253,46 +253,46 @@ const s = StyleSheet.create({
   },
   howBulletTxt: { fontFamily: Fonts.family.nowBold, fontSize: 11, color: "#fff" },
   howTxt: { fontFamily: Fonts.family.nowRegular, fontSize: 13, color: Colors.text, flex: 1, lineHeight: 19 },
-  howTxtBold: { fontFamily: Fonts.family.nowBold, color: Colors.primary },
+  howTxtBold: { fontFamily: Fonts.family.nowBold, color: Colors.text },
 
   sectionRow: {
     flexDirection: "row", alignItems: "center", justifyContent: "space-between",
     marginBottom: 10, marginTop: 4,
   },
   sectionTitle: {
-    fontFamily: Fonts.family.nowBold, fontSize: 12, color: Colors.textLight,
-    letterSpacing: 1, textTransform: "uppercase",
+    fontFamily: Fonts.family.norwester, fontWeight: "800", fontSize: Fonts.sizes.lg, color: Colors.text,
+    letterSpacing: -0.3,
   },
+  // = Button primary size="sm"
   createBtn: {
-    paddingHorizontal: 12, paddingVertical: 5,
-    backgroundColor: Colors.primary, borderRadius: 16,
+    paddingHorizontal: 14, minHeight: 36, justifyContent: "center",
+    backgroundColor: Colors.text, borderRadius: Radius.md,
   },
-  createBtnTxt: { fontFamily: Fonts.family.nowMedium, fontSize: 12, color: "#fff" },
+  createBtnTxt: { fontFamily: Fonts.family.nowBold, fontSize: 13, color: "#fff" },
 
   // Formulaire création
   createForm: {
-    backgroundColor: Colors.surface, borderRadius: 12, padding: 14,
-    marginBottom: 12,
-    shadowColor: "#7a41bb", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.07, shadowRadius: 6, elevation: 2,
+    backgroundColor: Colors.surface, borderRadius: Radius.lg, padding: 16,
+    marginBottom: 12, ...shadows.sm,
   },
   createInput: {
-    borderWidth: 1.5, borderColor: Colors.primary, borderRadius: 8,
-    paddingHorizontal: 12, paddingVertical: 10,
-    fontFamily: Fonts.family.nowRegular, fontSize: 14, color: Colors.text,
-    marginBottom: 10,
+    borderWidth: 1, borderColor: Colors.border, borderRadius: Radius.md,
+    paddingHorizontal: 16, paddingVertical: 12,
+    fontFamily: Fonts.family.nowRegular, fontSize: 16, color: Colors.text,
+    marginBottom: 12,
   },
   createFormActions: { flexDirection: "row", gap: 8 },
   createFormCancel: {
-    flex: 1, paddingVertical: 10, borderRadius: 8,
-    borderWidth: 1, borderColor: Colors.border, alignItems: "center",
+    flex: 1, minHeight: 44, borderRadius: Radius.md, justifyContent: "center",
+    borderWidth: 1.5, borderColor: Colors.border, alignItems: "center",
   },
-  createFormCancelTxt: { fontFamily: Fonts.family.nowMedium, fontSize: 13, color: Colors.textLight },
+  createFormCancelTxt: { fontFamily: Fonts.family.nowMedium, fontSize: 14, color: Colors.text },
   createFormConfirm: {
-    flex: 2, paddingVertical: 10, borderRadius: 8,
-    backgroundColor: Colors.primary, alignItems: "center",
+    flex: 2, minHeight: 44, borderRadius: Radius.md, justifyContent: "center",
+    backgroundColor: Colors.text, alignItems: "center",
   },
-  createFormConfirmDisabled: { opacity: 0.4 },
-  createFormConfirmTxt: { fontFamily: Fonts.family.nowBold, fontSize: 13, color: "#fff" },
+  createFormConfirmDisabled: { opacity: 0.5 },
+  createFormConfirmTxt: { fontFamily: Fonts.family.nowBold, fontSize: 14, color: "#fff" },
 
   emptyBox: { alignItems: "center", paddingVertical: 28 },
   emptyIcon: { fontSize: 32, marginBottom: 6 },
@@ -302,25 +302,25 @@ const s = StyleSheet.create({
   // Event card cliquable
   eventCard: {
     flexDirection: "row", alignItems: "center",
-    backgroundColor: Colors.surface, borderRadius: 12, padding: 14, marginBottom: 10,
-    shadowColor: "#7a41bb", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.07, shadowRadius: 6, elevation: 2,
+    backgroundColor: Colors.surface, borderRadius: Radius.lg, padding: 16, marginBottom: 10,
+    ...shadows.sm,
   },
   eventCardLeft: { flex: 1, marginRight: 10 },
   eventNom: { fontFamily: Fonts.family.nowBold, fontSize: 14, color: Colors.text, marginBottom: 2 },
-  eventMeta: { fontFamily: Fonts.family.nowRegular, fontSize: 11, color: Colors.textLight },
+  eventMeta: { fontFamily: Fonts.family.nowRegular, fontSize: 12, color: Colors.textLight },
   eventRight: { alignItems: "flex-end", gap: 6 },
-  eventCa: { fontFamily: Fonts.family.norwester, fontSize: 15, color: Colors.primary },
+  eventCa: { fontFamily: Fonts.family.nowBold, fontSize: 15, color: Colors.text },
   activerBtn: {
-    backgroundColor: Colors.primary, borderRadius: 12,
-    paddingHorizontal: 10, paddingVertical: 4,
+    backgroundColor: Colors.text, borderRadius: Radius.sm,
+    paddingHorizontal: 12, paddingVertical: 6,
   },
-  activerBtnTxt: { fontFamily: Fonts.family.nowBold, fontSize: 11, color: "#fff" },
+  activerBtnTxt: { fontFamily: Fonts.family.nowBold, fontSize: 12, color: "#fff" },
 
   // Boutique card
   boutiqueCard: {
-    backgroundColor: Colors.surface, borderRadius: 12, padding: 14, marginBottom: 10,
-    shadowColor: "#7a41bb", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1,
+    backgroundColor: Colors.surface, borderRadius: Radius.lg, padding: 16, marginBottom: 10,
+    ...shadows.sm,
   },
   boutiqueNom: { fontFamily: Fonts.family.nowBold, fontSize: 14, color: Colors.text, marginBottom: 2 },
-  boutiqueMeta: { fontFamily: Fonts.family.nowRegular, fontSize: 11, color: Colors.textLight },
+  boutiqueMeta: { fontFamily: Fonts.family.nowRegular, fontSize: 12, color: Colors.textLight },
 });

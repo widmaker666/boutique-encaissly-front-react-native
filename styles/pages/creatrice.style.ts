@@ -1,25 +1,11 @@
 import { StyleSheet } from "react-native";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
+import { Radius } from "@/constants/spacing";
+import { shadows } from "@/styles/utils/shadows.styles";
+import { getAvatarColor } from "@/styles/pages/ventes.style";
 
-const AVATAR_COLORS = [
-  "#EDE0F7",
-  "#E0EDFF",
-  "#E0F7EF",
-  "#FFF3E0",
-  "#FCE4EC",
-];
-
-export const getAvatarColor = (index: number) =>
-  AVATAR_COLORS[index % AVATAR_COLORS.length];
-
-const cardShadow = {
-  shadowColor: "#7a41bb",
-  shadowOffset: { width: 0, height: 3 },
-  shadowOpacity: 0.09,
-  shadowRadius: 8,
-  elevation: 3,
-};
+export { getAvatarColor };
 
 export const styles = StyleSheet.create({
   container: {
@@ -33,51 +19,48 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
 
-  // ── HEADER ──────────────────────────────────────
+  // ── HEADER (crème, même DA que le web) ──────────
   header: {
-    backgroundColor: Colors.primary,
     paddingHorizontal: 20,
-    paddingBottom: 24,
+    paddingBottom: 16,
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-end",
+    alignItems: "flex-start",
+    gap: 12,
   },
   titre: {
     fontFamily: Fonts.family.norwester,
     fontWeight: "800" as const,
     fontSize: 30,
-    color: "#FFFFFF",
-    letterSpacing: 2,
+    color: Colors.text,
+    letterSpacing: -0.5,
   },
   headerSub: {
-    fontFamily: Fonts.family.nowLight,
+    fontFamily: Fonts.family.nowRegular,
     fontSize: Fonts.sizes.xs,
-    color: "rgba(255,255,255,0.65)",
+    color: Colors.textLight,
     marginTop: 3,
-    letterSpacing: 0.4,
   },
   duoSwitchBtn: {
-    backgroundColor: "rgba(255,255,255,0.18)",
-    borderRadius: 20,
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.pill,
     paddingHorizontal: 14,
-    paddingVertical: 7,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.32)",
+    paddingVertical: 8,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
   },
   duoSwitchTxt: {
     fontFamily: Fonts.family.nowMedium,
     fontSize: 12,
-    color: "#fff",
+    color: Colors.text,
   },
   addBtn: {
-    backgroundColor: "rgba(255,255,255,0.18)",
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    backgroundColor: Colors.text,
+    width: 44,
+    height: 44,
+    borderRadius: Radius.md,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.32)",
   },
   addBtnTxt: {
     color: "#FFFFFF",
@@ -92,11 +75,11 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: Colors.surface,
     marginHorizontal: 16,
-    marginTop: -16,
     marginBottom: 16,
-    borderRadius: 14,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
     paddingHorizontal: 14,
-    ...cardShadow,
   },
   searchIcon: {
     fontSize: 15,
@@ -104,9 +87,9 @@ export const styles = StyleSheet.create({
   },
   search: {
     flex: 1,
-    paddingVertical: 14,
+    paddingVertical: 12,
     fontFamily: Fonts.family.nowRegular,
-    fontSize: Fonts.sizes.sm,
+    fontSize: Fonts.sizes.md,
     color: Colors.text,
   },
 
@@ -119,23 +102,23 @@ export const styles = StyleSheet.create({
   // ── CARD ────────────────────────────────────────
   card: {
     backgroundColor: Colors.surface,
-    borderRadius: 16,
+    borderRadius: Radius.lg,
     padding: 14,
     marginBottom: 10,
     flexDirection: "row",
     alignItems: "center",
-    ...cardShadow,
+    ...shadows.sm,
   },
   avatar: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+    width: 48,
+    height: 48,
+    borderRadius: Radius.md,
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
   },
   avatarTxt: {
-    color: Colors.primaryDark,
+    color: Colors.text,
     fontFamily: Fonts.family.nowBold,
     fontSize: Fonts.sizes.sm,
     letterSpacing: 0.5,
@@ -146,50 +129,48 @@ export const styles = StyleSheet.create({
   },
   nom: {
     color: Colors.text,
-    fontFamily: Fonts.family.nowMedium,
+    fontFamily: Fonts.family.nowBold,
     fontSize: Fonts.sizes.sm,
     marginBottom: 3,
   },
   meta: {
     color: Colors.textLight,
-    fontFamily: Fonts.family.nowLight,
+    fontFamily: Fonts.family.nowRegular,
     fontSize: Fonts.sizes.xs,
   },
   badge: {
-    backgroundColor: Colors.primaryLight + "22",
-    borderRadius: 20,
+    backgroundColor: Colors.primaryTint,
+    borderRadius: Radius.pill,
     paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderWidth: 1,
-    borderColor: Colors.primaryLight + "55",
+    paddingVertical: 4,
   },
   badgeTxt: {
     color: Colors.primaryDark,
     fontFamily: Fonts.family.nowBold,
-    fontSize: 12,
+    fontSize: 11,
   },
   arrow: {
-    color: Colors.primaryLight,
+    color: Colors.textLight,
     fontSize: 22,
     marginLeft: 8,
   },
   emptyTxt: {
     textAlign: "center",
     color: Colors.textLight,
-    fontFamily: Fonts.family.nowLight,
+    fontFamily: Fonts.family.nowRegular,
     fontSize: Fonts.sizes.sm,
     marginTop: 40,
   },
 
   // ── LOCK FREE ───────────────────────────────────
   lockedBox: {
-    backgroundColor: Colors.primaryLight + "15",
-    borderRadius: 16,
+    backgroundColor: Colors.primaryTint,
+    borderRadius: Radius.lg,
     padding: 22,
     alignItems: "center",
     marginTop: 6,
     borderWidth: 1.5,
-    borderColor: Colors.primaryLight + "40",
+    borderColor: Colors.primaryLight,
     borderStyle: "dashed",
   },
   lockedEmoji: {
@@ -198,21 +179,21 @@ export const styles = StyleSheet.create({
   },
   lockedTxt: {
     color: Colors.primaryDark,
-    fontFamily: Fonts.family.nowMedium,
+    fontFamily: Fonts.family.nowBold,
     fontSize: Fonts.sizes.sm,
     marginBottom: 14,
     textAlign: "center",
   },
   upgradeBtn: {
-    backgroundColor: Colors.primary,
-    borderRadius: 12,
-    paddingVertical: 11,
+    backgroundColor: Colors.text,
+    borderRadius: Radius.md,
+    minHeight: 44,
+    justifyContent: "center",
     paddingHorizontal: 26,
   },
   upgradeTxt: {
     color: "#FFFFFF",
-    fontFamily: Fonts.family.nowMedium,
+    fontFamily: Fonts.family.nowBold,
     fontSize: Fonts.sizes.sm,
-    letterSpacing: 0.3,
   },
 });

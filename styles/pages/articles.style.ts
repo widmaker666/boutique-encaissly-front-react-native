@@ -1,14 +1,8 @@
 import { StyleSheet } from "react-native";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
-
-const cardShadow = {
-  shadowColor: "#7a41bb",
-  shadowOffset: { width: 0, height: 3 },
-  shadowOpacity: 0.09,
-  shadowRadius: 8,
-  elevation: 3,
-};
+import { Radius } from "@/constants/spacing";
+import { shadows } from "@/styles/utils/shadows.styles";
 
 export const styles = StyleSheet.create({
   container: {
@@ -22,11 +16,10 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
 
-  // ── HEADER ──────────────────────────────────────
+  // ── HEADER (crème, même DA que le web) ──────────
   header: {
-    backgroundColor: Colors.primary,
     paddingHorizontal: 20,
-    paddingBottom: 22,
+    paddingBottom: 8,
   },
   headerTop: {
     flexDirection: "row",
@@ -40,16 +33,16 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "rgba(255,255,255,0.18)",
+    width: 44,
+    height: 44,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.surface,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
   },
   backTxt: {
-    color: "#FFFFFF",
+    color: Colors.text,
     fontSize: 22,
     fontFamily: Fonts.family.nowLight,
     lineHeight: 26,
@@ -57,40 +50,37 @@ export const styles = StyleSheet.create({
   headerTitle: {
     fontFamily: Fonts.family.norwester,
     fontWeight: "800" as const,
-    fontSize: 22,
-    color: "#FFFFFF",
-    letterSpacing: 1.5,
+    fontSize: 26,
+    color: Colors.text,
+    letterSpacing: -0.3,
   },
   headerSubtitle: {
-    fontFamily: Fonts.family.nowLight,
+    fontFamily: Fonts.family.nowRegular,
     fontSize: Fonts.sizes.xs,
-    color: "rgba(255,255,255,0.75)",
-    letterSpacing: 0.3,
-    marginLeft: 48, // aligne sous le titre (skip backBtn)
+    color: Colors.textLight,
+    marginLeft: 56, // aligne sous le titre (skip backBtn)
   },
   importBtn: {
-    backgroundColor: "rgba(255,255,255,0.18)",
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    backgroundColor: Colors.surface,
+    width: 44,
+    height: 44,
+    borderRadius: Radius.md,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.32)",
+    borderColor: Colors.border,
     marginRight: 8,
   },
   importBtnTxt: {
     fontSize: 16,
   },
   addBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "rgba(255,255,255,0.22)",
+    width: 44,
+    height: 44,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.text,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.4)",
   },
   addBtnTxt: {
     color: "#FFFFFF",
@@ -108,86 +98,82 @@ export const styles = StyleSheet.create({
   // ── ARTICLE CARD ────────────────────────────────
   articleCard: {
     backgroundColor: Colors.surface,
-    borderRadius: 16,
+    borderRadius: Radius.lg,
     padding: 16,
     marginBottom: 10,
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
-    ...cardShadow,
+    ...shadows.sm,
   },
   articleLeft: {
     flex: 1,
     marginRight: 10,
   },
   articleNom: {
-    fontFamily: Fonts.family.nowMedium,
+    fontFamily: Fonts.family.nowBold,
     fontSize: Fonts.sizes.sm,
     color: Colors.text,
     marginBottom: 4,
   },
   articleDescription: {
-    fontFamily: Fonts.family.nowLight,
+    fontFamily: Fonts.family.nowRegular,
     fontSize: Fonts.sizes.xs,
     color: Colors.textLight,
     marginBottom: 6,
     lineHeight: 16,
   },
   articleStock: {
-    fontFamily: Fonts.family.nowLight,
+    fontFamily: Fonts.family.nowRegular,
     fontSize: Fonts.sizes.xs,
     color: Colors.textLight,
     marginTop: 4,
-    letterSpacing: 0.2,
   },
   prixBadge: {
     alignSelf: "flex-start",
-    backgroundColor: Colors.primary + "18",
-    borderRadius: 12,
+    backgroundColor: Colors.primaryTint,
+    borderRadius: Radius.pill,
     paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderWidth: 1,
-    borderColor: Colors.primary + "44",
+    paddingVertical: 3,
   },
   prixBadgeTxt: {
     fontFamily: Fonts.family.nowBold,
-    fontSize: Fonts.sizes.xs,
+    fontSize: 11,
     color: Colors.primaryDark,
-    letterSpacing: 0.3,
   },
 
-  // ── ACTIONS ARTICLE ─────────────────────────────
+  // ── ACTIONS ARTICLE (= Button variant="icon") ───
   articleActions: {
     flexDirection: "column",
     gap: 8,
     alignItems: "flex-end",
   },
   editBtn: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: Colors.primary + "18",
+    width: 40,
+    height: 40,
+    borderRadius: Radius.sm,
+    backgroundColor: Colors.surface,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: Colors.primary + "44",
+    borderColor: Colors.border,
   },
   editBtnTxt: {
-    fontSize: 13,
-    color: Colors.primaryDark,
+    fontSize: 14,
+    color: Colors.text,
   },
   deleteBtn: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: Colors.error + "18",
+    width: 40,
+    height: 40,
+    borderRadius: Radius.sm,
+    backgroundColor: Colors.surface,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: Colors.error + "44",
+    borderColor: Colors.border,
   },
   deleteBtnTxt: {
-    fontSize: 13,
+    fontSize: 14,
     color: Colors.error,
   },
 
@@ -201,7 +187,7 @@ export const styles = StyleSheet.create({
     marginBottom: 12,
   },
   emptyTxt: {
-    fontFamily: Fonts.family.nowLight,
+    fontFamily: Fonts.family.nowRegular,
     fontSize: Fonts.sizes.sm,
     color: Colors.textLight,
     textAlign: "center",
@@ -215,11 +201,12 @@ export const styles = StyleSheet.create({
   },
   modalSheet: {
     backgroundColor: Colors.surface,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: Radius.xl,
+    borderTopRightRadius: Radius.xl,
     paddingHorizontal: 20,
     paddingTop: 14,
     paddingBottom: 8,
+    ...shadows.sheet,
   },
   modalHandle: {
     width: 40,
@@ -232,29 +219,28 @@ export const styles = StyleSheet.create({
   modalTitle: {
     fontFamily: Fonts.family.norwester,
     fontWeight: "800" as const,
-    fontSize: 18,
-    color: Colors.primaryDark,
-    letterSpacing: 1.2,
+    fontSize: 20,
+    color: Colors.text,
+    letterSpacing: -0.3,
     marginBottom: 20,
   },
+  // Même rendu que components/Inputs/Field
   inputLabel: {
     fontFamily: Fonts.family.nowMedium,
-    fontSize: Fonts.sizes.xs,
-    color: Colors.textLight,
-    letterSpacing: 0.5,
-    marginBottom: 6,
-    textTransform: "uppercase",
-  },
-  input: {
-    borderWidth: 1.5,
-    borderColor: Colors.border,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontFamily: Fonts.family.nowRegular,
     fontSize: Fonts.sizes.sm,
     color: Colors.text,
-    backgroundColor: Colors.background + "80",
+    marginBottom: 6,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: Radius.md,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontFamily: Fonts.family.nowRegular,
+    fontSize: Fonts.sizes.md,
+    color: Colors.text,
+    backgroundColor: Colors.surface,
     marginBottom: 14,
   },
   inputMultiline: {
@@ -262,9 +248,10 @@ export const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
   submitBtn: {
-    backgroundColor: Colors.primary,
-    borderRadius: 14,
-    paddingVertical: 15,
+    backgroundColor: Colors.text,
+    borderRadius: Radius.md,
+    minHeight: 48,
+    justifyContent: "center",
     alignItems: "center",
     marginTop: 4,
     marginBottom: 8,
@@ -273,10 +260,8 @@ export const styles = StyleSheet.create({
     opacity: 0.5,
   },
   submitBtnTxt: {
-    fontFamily: Fonts.family.norwester,
-    fontWeight: "800" as const,
+    fontFamily: Fonts.family.nowBold,
     fontSize: 15,
     color: "#FFFFFF",
-    letterSpacing: 1.2,
   },
 });
