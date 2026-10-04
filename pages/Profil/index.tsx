@@ -16,6 +16,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuthStore } from "@/stores/auth.store";
 import * as WebBrowser from "expo-web-browser";
 import { authService, boutiqueService, evenementService, userService, stripeService } from "@/services/api";
+
+// Passer à true quand Stripe live sera activé (SIRET en cours)
+const PAIEMENT_ACTIF = false;
+const alertPaiement = () => Alert.alert("Bientôt disponible", "Les abonnements ne sont pas encore disponibles : le site et l'application sont en phase de test. Ça arrive très bientôt !");
 import { DuoModeToggle } from "@/components/DuoModeToggle";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
@@ -725,7 +729,7 @@ export default function ProfilScreen() {
               </View>
               <TouchableOpacity
                 style={[s.duoBtn, isUpgradingDuo && { opacity: 0.6 }]}
-                onPress={() => upgradeDuo()}
+                onPress={() => (PAIEMENT_ACTIF ? upgradeDuo() : alertPaiement())}
                 disabled={isUpgradingDuo}
                 activeOpacity={0.85}
               >
@@ -779,7 +783,7 @@ export default function ProfilScreen() {
               </View>
               <TouchableOpacity
                 style={[s.upgradeBtn, isUpgradingPro && { opacity: 0.6 }]}
-                onPress={() => upgradePro()}
+                onPress={() => (PAIEMENT_ACTIF ? upgradePro() : alertPaiement())}
                 disabled={isUpgradingPro}
                 activeOpacity={0.85}
               >
