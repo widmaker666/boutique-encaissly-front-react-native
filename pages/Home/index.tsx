@@ -97,6 +97,10 @@ export default function HomeScreen() {
         >
           <Text style={styles.btnSecondaryText}>Créer un compte</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => router.push("/(auth)/legal")} style={styles.legalLink} activeOpacity={0.7}>
+          <Text style={styles.legalLinkText}>Mentions légales · CGU · Confidentialité</Text>
+        </TouchableOpacity>
       </Animated.View>
     </View>
   );

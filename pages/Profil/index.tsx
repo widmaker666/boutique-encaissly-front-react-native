@@ -223,7 +223,8 @@ export default function ProfilScreen() {
 
   const { mutate: cancelPlan, isPending: isCancelling } = useMutation({
     mutationFn: () => stripeService.cancelSubscription(),
-    onSuccess: async () => {
+    onSuccess: async ({ endsAt }) => {
+      Alert.alert("Résiliation enregistrée", endsAt ? `Résiliation enregistrée : ton abonnement reste actif jusqu'au ${new Date(endsAt).toLocaleDateString("fr-FR")}, puis tu repasseras en plan FREE.` : "Résiliation enregistrée : ton abonnement reste actif jusqu'à la fin de la période payée.");
       const updatedUser = await authService.getProfile();
       setUser(updatedUser);
     },
@@ -300,7 +301,7 @@ export default function ProfilScreen() {
   const handleResilier = () => {
     Alert.alert(
       "Résilier l'abonnement",
-      "Vous allez passer en plan FREE. Vous perdrez l'accès aux fonctionnalités PRO immédiatement. Continuer ?",
+      "Votre abonnement restera actif jusqu'à la fin de la période déjà payée (pas de remboursement au prorata), puis vous repasserez en plan FREE. Continuer ?",
       [
         { text: "Annuler", style: "cancel" },
         { text: "Résilier", style: "destructive", onPress: () => cancelPlan() },
@@ -394,6 +395,14 @@ export default function ProfilScreen() {
 
   // Décale les indices d'animation si CREATRICE a une section boutique
   const cardIdx = (n: number) => (isGerante ? n : n + 1);
+
+  const cgvHint = (
+    <TouchableOpacity onPress={() => router.push("/(auth)/legal")} activeOpacity={0.7} style={{ marginTop: 8 }}>
+      <Text style={s.cgvHint}>
+        Sans engagement, résiliable à tout moment. En vous abonnant, vous acceptez les <Text style={s.cgvLink}>CGV</Text>.
+      </Text>
+    </TouchableOpacity>
+  );
 
   return (
     <ScrollView
@@ -743,6 +752,7 @@ export default function ProfilScreen() {
                   {isUpgradingDuo ? "Ouverture..." : billingPeriod === "annual" ? "Passer en DUO — 129€/an" : "Passer en DUO — 15€/mois"}
                 </Text>
               </TouchableOpacity>
+              {cgvHint}
             </View>
           ) : (
             /* GERANTE ou CREATRICE FREE → upgrade PRO uniquement */
@@ -798,6 +808,7 @@ export default function ProfilScreen() {
                   {isUpgradingPro ? "Ouverture..." : billingPeriod === "annual" ? "Passer à PRO — 79€/an" : "Passer à PRO — 9€/mois"}
                 </Text>
               </TouchableOpacity>
+              {cgvHint}
             </View>
           )}
         </AnimCard>
@@ -842,7 +853,7 @@ export default function ProfilScreen() {
             activeOpacity={0.75}
           >
             <AntDesign name="file" size={13} color={Colors.primary} style={{ marginRight: 6 }} />
-            <Text style={s.legalLinkTxt}>CGU & Politique de confidentialité</Text>
+            <Text style={s.legalLinkTxt}>Informations légales (CGU, CGV, confidentialité)</Text>
           </TouchableOpacity>
         </AnimCard>
 
@@ -1122,6 +1133,13 @@ const s = StyleSheet.create({
     color: Colors.textLight,
   },
 
+  cgvHint: {
+    fontFamily: Fonts.family.nowRegular,
+    fontSize: 11,
+    color: Colors.textLight,
+    textAlign: "center",
+  },
+  cgvLink: { color: Colors.primary, textDecorationLine: "underline" },
   // PRO block
   proBlock: {
     gap: 8,

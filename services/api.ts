@@ -427,7 +427,7 @@ export const stripeService = {
     return data as { url: string };
   },
   cancelSubscription: async () => {
-    const { data } = await api.post('/stripe/cancel');
+    const { data } = await api.post<{ message: string; endsAt: string | null }>('/stripe/cancel');
     return data;
   },
   upgradeDuo: async () => {

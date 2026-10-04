@@ -83,4 +83,11 @@ export const styles = StyleSheet.create({
     fontFamily: Fonts.family.nowMedium,
     fontSize: Fonts.sizes.md,
   },
+  legalLink: { alignSelf: "center", paddingVertical: 10, marginTop: 4 },
+  legalLinkText: {
+    fontFamily: Fonts.family.nowRegular,
+    fontSize: 12,
+    color: Colors.textLight,
+    textDecorationLine: "underline",
+  },
 });

@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { ScrollView, Text, View, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -5,71 +6,63 @@ import { AntDesign } from "@expo/vector-icons";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
 import { Radius } from "@/constants/spacing";
+import { LEGAL_PARTS, LEGAL_UPDATED_AT } from "@/constants/legal";
 
-function Section({ title, children }: { title: string; children: string }) {
-  return (
-    <View style={s.section}>
-      <Text style={s.sectionTitle}>{title}</Text>
-      <Text style={s.sectionBody}>{children}</Text>
-    </View>
-  );
-}
+// Contenu dans constants/legal.ts (partagé à l'identique avec le web).
 
 export default function LegalScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const scrollRef = useRef<ScrollView>(null);
+  const partY = useRef<Record<string, number>>({});
 
   return (
     <View style={[s.container, { paddingTop: insets.top }]}>
       <View style={s.header}>
-        <TouchableOpacity onPress={() => router.back()} style={s.backBtn} activeOpacity={0.7}>
+        <TouchableOpacity onPress={() => router.back()} style={s.backBtn} activeOpacity={0.7} accessibilityLabel="Retour">
           <AntDesign name="arrow-left" size={20} color={Colors.text} />
         </TouchableOpacity>
-        <Text style={s.headerTitle}>CGU & Confidentialité</Text>
+        <View style={{ flexShrink: 1 }}>
+          <Text style={s.eyebrow}>ENCAISSLY</Text>
+          <Text style={s.headerTitle}>Informations légales</Text>
+        </View>
       </View>
 
-      <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
-        <Text style={s.lastUpdate}>Dernière mise à jour : juin 2026</Text>
+      <ScrollView ref={scrollRef} contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
+        <Text style={s.lastUpdate}>Dernière mise à jour : {LEGAL_UPDATED_AT}</Text>
 
-        <Section title="1. Présentation">
-          {`Encaissly est une application mobile de caisse destinée aux boutiques de créateurs. Elle est éditée par Encaissly SAS et permet d'enregistrer des ventes, suivre les commissions des créatrices, et gérer les statistiques d'activité.`}
-        </Section>
+        <View style={s.card}>
+          <Text style={s.tocTitle}>Sommaire</Text>
+          {LEGAL_PARTS.map((p, i) => (
+            <TouchableOpacity
+              key={p.id}
+              onPress={() => scrollRef.current?.scrollTo({ y: partY.current[p.id] ?? 0, animated: true })}
+              activeOpacity={0.7}
+              style={s.tocRow}
+            >
+              <Text style={s.tocLink}>{`${i + 1}. ${p.title}`}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-        <Section title="2. Données collectées">
-          {`En créant un compte, nous collectons :\n• Votre adresse email\n• Votre nom et prénom (facultatifs)\n• Les données liées à votre activité (ventes, montants, créatrices)\n\nCes données sont nécessaires au fonctionnement du service et ne sont jamais vendues à des tiers.`}
-        </Section>
-
-        <Section title="3. Utilisation des données">
-          {`Vos données sont utilisées exclusivement pour :\n• Gérer votre compte et votre abonnement\n• Afficher vos statistiques de vente\n• Vous envoyer des notifications liées à votre activité (si activé)\n• Gérer la facturation via Stripe`}
-        </Section>
-
-        <Section title="4. Hébergement et sécurité">
-          {`Les données sont hébergées en Europe (Neon / AWS eu-central-1). Les mots de passe sont hachés (bcrypt) et ne sont jamais stockés en clair. Les communications sont chiffrées (HTTPS/TLS).`}
-        </Section>
-
-        <Section title="5. Durée de conservation">
-          {`Vos données sont conservées pendant la durée de votre abonnement et 12 mois après sa résiliation, conformément à nos obligations légales. Vous pouvez demander la suppression de votre compte à tout moment.`}
-        </Section>
-
-        <Section title="6. Vos droits (RGPD)">
-          {`Conformément au RGPD, vous disposez des droits suivants :\n• Accès à vos données\n• Rectification de vos données\n• Suppression de votre compte\n• Portabilité de vos données\n• Opposition au traitement\n\nPour exercer ces droits, contactez-nous à : contact.encaissly@gmail.com`}
-        </Section>
-
-        <Section title="7. Cookies et tracking">
-          {`L'application n'utilise pas de cookies de tracking publicitaire. Seules les données strictement nécessaires au fonctionnement sont collectées.`}
-        </Section>
-
-        <Section title="8. Paiements">
-          {`Les paiements sont traités par Stripe, Inc. Encaissly ne stocke jamais vos coordonnées bancaires. Consultez la politique de confidentialité de Stripe sur stripe.com.`}
-        </Section>
-
-        <Section title="9. Modifications">
-          {`Nous pouvons mettre à jour ces conditions. En cas de modification substantielle, vous serez notifié par email ou via l'application. La poursuite de l'utilisation après notification vaut acceptation.`}
-        </Section>
-
-        <Section title="10. Contact">
-          {`Pour toute question relative à vos données ou à ces conditions :\nEmail : contact.encaissly@gmail.com`}
-        </Section>
+        {LEGAL_PARTS.map((part) => (
+          <View
+            key={part.id}
+            style={s.card}
+            onLayout={(e) => {
+              partY.current[part.id] = e.nativeEvent.layout.y;
+            }}
+          >
+            <Text style={s.partTitle}>{part.title}</Text>
+            {part.intro && <Text style={s.partIntro}>{part.intro}</Text>}
+            {part.sections.map((sec) => (
+              <View key={sec.title} style={s.section}>
+                <Text style={s.sectionTitle}>{sec.title}</Text>
+                <Text style={s.sectionBody} selectable>{sec.body}</Text>
+              </View>
+            ))}
+          </View>
+        ))}
 
         <View style={{ height: 40 }} />
       </ScrollView>
@@ -95,27 +88,64 @@ const s = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  eyebrow: {
+    fontFamily: Fonts.family.nowBold,
+    fontSize: 11,
+    color: Colors.primary,
+    letterSpacing: 1,
+  },
   headerTitle: {
     fontFamily: Fonts.family.norwester,
     fontWeight: "800",
     fontSize: 24,
     color: Colors.text,
     letterSpacing: -0.3,
-    flexShrink: 1,
   },
-  content: { padding: 20 },
+  content: { padding: 16, gap: 14 },
   lastUpdate: {
     fontFamily: Fonts.family.nowLight,
     fontSize: 12,
     color: Colors.textLight,
-    marginBottom: 20,
   },
-  section: { marginBottom: 20 },
+  card: {
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.lg,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    padding: 16,
+  },
+  tocTitle: {
+    fontFamily: Fonts.family.nowBold,
+    fontSize: 14,
+    color: Colors.text,
+    marginBottom: 4,
+  },
+  tocRow: { minHeight: 36, justifyContent: "center" },
+  tocLink: {
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: 14,
+    color: Colors.primary,
+  },
+  partTitle: {
+    fontFamily: Fonts.family.norwester,
+    fontWeight: "800",
+    fontSize: 18,
+    color: Colors.text,
+    marginBottom: 8,
+  },
+  partIntro: {
+    fontFamily: Fonts.family.nowRegular,
+    fontSize: 13,
+    color: Colors.textLight,
+    lineHeight: 20,
+    marginBottom: 12,
+  },
+  section: { marginTop: 10 },
   sectionTitle: {
     fontFamily: Fonts.family.nowBold,
     fontSize: 14,
     color: Colors.text,
-    marginBottom: 6,
+    marginBottom: 4,
   },
   sectionBody: {
     fontFamily: Fonts.family.nowRegular,
