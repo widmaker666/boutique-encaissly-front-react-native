@@ -1,22 +1,8 @@
 import { StyleSheet } from "react-native";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
-
-const cardShadow = {
-  shadowColor: "#7a41bb",
-  shadowOffset: { width: 0, height: 3 },
-  shadowOpacity: 0.09,
-  shadowRadius: 8,
-  elevation: 3,
-};
-
-const sheetShadow = {
-  shadowColor: "#000",
-  shadowOffset: { width: 0, height: -6 },
-  shadowOpacity: 0.12,
-  shadowRadius: 16,
-  elevation: 12,
-};
+import { Radius } from "@/constants/spacing";
+import { shadows } from "@/styles/utils/shadows.styles";
 
 export const styles = StyleSheet.create({
   container: {
@@ -94,6 +80,7 @@ export const styles = StyleSheet.create({
     color: Colors.text,
   },
 
+
   // ── BOTTOM SHEET ─────────────────────────────────
   overlay: {
     flex: 1,
@@ -102,10 +89,10 @@ export const styles = StyleSheet.create({
   },
   sheet: {
     backgroundColor: Colors.surface,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: Radius.xl,
+    borderTopRightRadius: Radius.xl,
     maxHeight: "85%",
-    ...sheetShadow,
+    ...shadows.sheet,
   },
   sheetHandle: {
     width: 40,
@@ -127,14 +114,15 @@ export const styles = StyleSheet.create({
   },
   sheetTitre: {
     fontFamily: Fonts.family.norwester,
-    fontSize: 18,
-    color: Colors.primaryDark,
-    letterSpacing: 1,
+    fontWeight: "800",
+    fontSize: 20,
+    color: Colors.text,
+    letterSpacing: -0.3,
   },
   sheetClose: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 36,
+    height: 36,
+    borderRadius: Radius.md,
     backgroundColor: Colors.background,
     alignItems: "center",
     justifyContent: "center",
@@ -142,7 +130,7 @@ export const styles = StyleSheet.create({
   sheetCloseTxt: {
     fontFamily: Fonts.family.nowBold,
     fontSize: 16,
-    color: Colors.textLight,
+    color: Colors.text,
     lineHeight: 20,
   },
   sheetScroll: {
@@ -166,7 +154,7 @@ export const styles = StyleSheet.create({
     marginRight: 10,
   },
   stepBubbleActive: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.text,
   },
   stepBubbleInactive: {
     backgroundColor: Colors.border,
@@ -178,11 +166,11 @@ export const styles = StyleSheet.create({
   },
   stepLabel: {
     fontFamily: Fonts.family.norwester,
-    fontSize: 14,
-    letterSpacing: 1,
+    fontWeight: "800",
+    fontSize: 15,
   },
   stepLabelActive: {
-    color: Colors.primaryDark,
+    color: Colors.text,
   },
   stepLabelInactive: {
     color: Colors.textLight,
@@ -197,8 +185,8 @@ export const styles = StyleSheet.create({
     borderBottomColor: Colors.border,
   },
   creatriceRowSelected: {
-    backgroundColor: Colors.primaryLight + "12",
-    borderRadius: 10,
+    backgroundColor: Colors.primaryTint,
+    borderRadius: Radius.md,
     paddingHorizontal: 8,
     borderBottomWidth: 0,
     marginBottom: 2,
@@ -206,7 +194,7 @@ export const styles = StyleSheet.create({
   creatriceAvatar: {
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: Radius.md,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
@@ -215,7 +203,7 @@ export const styles = StyleSheet.create({
   creatriceAvatarTxt: {
     fontFamily: Fonts.family.nowBold,
     fontSize: 12,
-    color: Colors.primaryDark,
+    color: Colors.text,
     letterSpacing: 0.5,
   },
   creatriceNom: {
@@ -227,7 +215,7 @@ export const styles = StyleSheet.create({
   creatriceArrow: {
     fontFamily: Fonts.family.nowLight,
     fontSize: 18,
-    color: Colors.primaryLight,
+    color: Colors.textLight,
   },
 
   // ── ARTICLES ─────────────────────────────────────
@@ -235,10 +223,10 @@ export const styles = StyleSheet.create({
     marginTop: 16,
   },
   articlesSectionTitle: {
-    fontFamily: Fonts.family.nowMedium,
+    fontFamily: Fonts.family.nowBold,
     fontSize: Fonts.sizes.xs,
     color: Colors.textLight,
-    letterSpacing: 0.8,
+    letterSpacing: 0.6,
     marginBottom: 8,
     textTransform: "uppercase",
   },
@@ -249,8 +237,8 @@ export const styles = StyleSheet.create({
     borderBottomColor: Colors.border,
   },
   articleRowSelected: {
-    backgroundColor: Colors.primary + "08",
-    borderRadius: 10,
+    backgroundColor: Colors.primaryTint,
+    borderRadius: Radius.md,
     borderBottomWidth: 0,
     marginBottom: 2,
     paddingHorizontal: 6,
@@ -272,8 +260,8 @@ export const styles = StyleSheet.create({
     flexShrink: 0,
   },
   checkboxChecked: {
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primary,
+    borderColor: Colors.text,
+    backgroundColor: Colors.text,
   },
   checkboxTick: {
     color: "#FFFFFF",
@@ -290,11 +278,11 @@ export const styles = StyleSheet.create({
   articlePrix: {
     fontFamily: Fonts.family.nowBold,
     fontSize: Fonts.sizes.sm,
-    color: Colors.success,
+    color: Colors.text,
     marginLeft: 8,
   },
   articleStock: {
-    fontFamily: Fonts.family.nowLight,
+    fontFamily: Fonts.family.nowRegular,
     fontSize: 11,
     color: Colors.textLight,
     marginTop: 3,
@@ -308,11 +296,11 @@ export const styles = StyleSheet.create({
     marginLeft: 32,
   },
   qtyBtn: {
-    width: 28,
-    height: 28,
-    borderRadius: 8,
-    backgroundColor: Colors.background,
-    borderWidth: 1.5,
+    width: 36,
+    height: 36,
+    borderRadius: Radius.sm,
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
     borderColor: Colors.border,
     alignItems: "center",
     justifyContent: "center",
@@ -320,7 +308,7 @@ export const styles = StyleSheet.create({
   qtyBtnTxt: {
     fontFamily: Fonts.family.nowBold,
     fontSize: 15,
-    color: Colors.primaryDark,
+    color: Colors.text,
     lineHeight: 20,
   },
   qtyValue: {
@@ -331,18 +319,18 @@ export const styles = StyleSheet.create({
     textAlign: "center",
   },
   articleSelectBtn: {
-    backgroundColor: Colors.primary,
-    borderRadius: 8,
+    backgroundColor: Colors.text,
+    borderRadius: Radius.sm,
     paddingHorizontal: 12,
-    paddingVertical: 5,
+    paddingVertical: 6,
   },
   articleSelectTxt: {
-    fontFamily: Fonts.family.nowMedium,
+    fontFamily: Fonts.family.nowBold,
     fontSize: 11,
     color: "#FFFFFF",
   },
   noArticleTxt: {
-    fontFamily: Fonts.family.nowLight,
+    fontFamily: Fonts.family.nowRegular,
     fontSize: Fonts.sizes.xs,
     color: Colors.textLight,
     marginTop: 8,
@@ -352,7 +340,7 @@ export const styles = StyleSheet.create({
   // ── RÉCAPITULATIF ────────────────────────────────
   recapCard: {
     backgroundColor: Colors.background,
-    borderRadius: 14,
+    borderRadius: Radius.lg,
     padding: 14,
     marginBottom: 16,
   },
@@ -385,44 +373,42 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 12,
     paddingTop: 12,
-    borderTopWidth: 2,
-    borderTopColor: Colors.primary + "30",
+    borderTopWidth: 1.5,
+    borderTopColor: Colors.border,
   },
   totalLabel: {
     fontFamily: Fonts.family.norwester,
-    fontSize: 15,
-    color: Colors.primaryDark,
-    letterSpacing: 1,
+    fontWeight: "800",
+    fontSize: 16,
+    color: Colors.text,
   },
   totalMontant: {
     fontFamily: Fonts.family.norwester,
-    fontSize: 20,
-    color: Colors.primary,
-    letterSpacing: 0.5,
+    fontWeight: "800",
+    fontSize: 22,
+    color: Colors.text,
   },
 
-  // ── FORMULAIRE ───────────────────────────────────
+  // ── FORMULAIRE (même rendu que components/Inputs/Field) ──
   formGroup: {
     marginBottom: 18,
   },
   formLabel: {
     fontFamily: Fonts.family.nowMedium,
-    fontSize: Fonts.sizes.xs,
-    color: Colors.textLight,
-    letterSpacing: 0.8,
-    marginBottom: 7,
-    textTransform: "uppercase",
-  },
-  formInput: {
-    backgroundColor: Colors.background,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 13,
-    fontFamily: Fonts.family.nowRegular,
     fontSize: Fonts.sizes.sm,
     color: Colors.text,
-    borderWidth: 1.5,
-    borderColor: "transparent",
+    marginBottom: 6,
+  },
+  formInput: {
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.md,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontFamily: Fonts.family.nowRegular,
+    fontSize: Fonts.sizes.md,
+    color: Colors.text,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   formInputFocus: {
     borderColor: Colors.primary,
@@ -441,65 +427,72 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     color: Colors.text,
   },
+  // Même rendu que components/Chip (actif = sombre)
   modeChip: {
     flex: 1,
-    paddingVertical: 13,
-    borderRadius: 12,
+    minHeight: 44,
+    paddingVertical: 12,
+    borderRadius: Radius.md,
     alignItems: "center",
+    justifyContent: "center",
     borderWidth: 1.5,
     borderColor: Colors.border,
     backgroundColor: Colors.surface,
   },
   modeChipActive: {
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primary + "12",
+    borderColor: Colors.text,
+    backgroundColor: Colors.text,
   },
   modeChipTxt: {
     fontFamily: Fonts.family.nowMedium,
-    fontSize: Fonts.sizes.xs,
-    color: Colors.textLight,
-    letterSpacing: 0.5,
+    fontSize: Fonts.sizes.sm,
+    color: Colors.text,
   },
   modeChipTxtActive: {
-    color: Colors.primaryDark,
+    color: "#FFFFFF",
   },
 
   // ── ERREUR ───────────────────────────────────────
   errorTxt: {
-    fontFamily: Fonts.family.nowLight,
+    fontFamily: Fonts.family.nowRegular,
     fontSize: 12,
     color: Colors.error,
     marginBottom: 12,
     textAlign: "center" as const,
   },
 
-  // ── SUBMIT ───────────────────────────────────────
+  // ── SUBMIT (même rendu que Button primary / dangerOutline) ──
   submitBtn: {
-    backgroundColor: Colors.primary,
-    borderRadius: 14,
-    paddingVertical: 16,
+    backgroundColor: Colors.text,
+    borderRadius: Radius.md,
+    minHeight: 48,
+    paddingVertical: 14,
     alignItems: "center",
+    justifyContent: "center",
     marginTop: 8,
-    ...cardShadow,
-    shadowOpacity: 0.2,
   },
   submitBtnDisabled: {
     opacity: 0.5,
   },
   submitTxt: {
-    fontFamily: Fonts.family.norwester,
+    fontFamily: Fonts.family.nowBold,
     fontSize: 15,
     color: "#FFFFFF",
-    letterSpacing: 1.5,
   },
   deleteVenteBtn: {
-    paddingVertical: 14,
+    minHeight: 44,
+    paddingVertical: 12,
     alignItems: "center",
-    marginTop: 8,
+    justifyContent: "center",
+    marginTop: 10,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    backgroundColor: Colors.surface,
   },
   deleteVenteTxt: {
     fontFamily: Fonts.family.nowMedium,
-    fontSize: 13,
+    fontSize: 14,
     color: Colors.error,
   },
   backBtn: {
@@ -507,37 +500,37 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 4,
     marginTop: 8,
+    minHeight: 32,
   },
   backBtnTxt: {
-    fontFamily: Fonts.family.nowLight,
-    fontSize: Fonts.sizes.xs,
-    color: Colors.primaryLight,
+    fontFamily: Fonts.family.nowMedium,
+    fontSize: Fonts.sizes.sm,
+    color: Colors.primary,
     marginLeft: 4,
   },
 
   // ── ARTICLE MANUEL ──────────────────────────────
   addManuelBtn: {
     borderWidth: 1.5,
-    borderColor: Colors.primary,
+    borderColor: Colors.border,
     borderStyle: "dashed",
-    borderRadius: 12,
+    borderRadius: Radius.md,
+    minHeight: 44,
     paddingVertical: 12,
     alignItems: "center",
+    justifyContent: "center",
     marginTop: 14,
   },
   addManuelBtnTxt: {
     fontFamily: Fonts.family.nowMedium,
-    fontSize: Fonts.sizes.xs,
-    color: Colors.primary,
-    letterSpacing: 0.5,
+    fontSize: Fonts.sizes.sm,
+    color: Colors.text,
   },
   manuelForm: {
     backgroundColor: Colors.background,
-    borderRadius: 14,
+    borderRadius: Radius.lg,
     padding: 14,
     marginTop: 14,
-    borderWidth: 1.5,
-    borderColor: Colors.primary + "40",
     gap: 10,
   },
   manuelFormRow: {
@@ -546,20 +539,21 @@ export const styles = StyleSheet.create({
   },
   manuelFormInput: {
     backgroundColor: Colors.surface,
-    borderRadius: 10,
+    borderRadius: Radius.md,
     paddingHorizontal: 12,
     paddingVertical: 11,
     fontFamily: Fonts.family.nowRegular,
     fontSize: Fonts.sizes.sm,
     color: Colors.text,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: Colors.border,
     flex: 1,
   },
   manuelFormBtn: {
-    backgroundColor: Colors.primary,
-    borderRadius: 10,
+    backgroundColor: Colors.text,
+    borderRadius: Radius.md,
     paddingHorizontal: 16,
+    minHeight: 44,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -567,15 +561,14 @@ export const styles = StyleSheet.create({
     fontFamily: Fonts.family.nowBold,
     fontSize: Fonts.sizes.xs,
     color: "#FFFFFF",
-    letterSpacing: 0.5,
   },
   articleManuelTag: {
-    fontFamily: Fonts.family.nowMedium,
+    fontFamily: Fonts.family.nowBold,
     fontSize: 10,
-    color: Colors.primary,
-    backgroundColor: Colors.primary + "15",
-    borderRadius: 6,
-    paddingHorizontal: 6,
+    color: Colors.primaryDark,
+    backgroundColor: Colors.primaryTint,
+    borderRadius: Radius.pill,
+    paddingHorizontal: 8,
     paddingVertical: 2,
     marginLeft: 6,
     alignSelf: "center",
@@ -584,8 +577,8 @@ export const styles = StyleSheet.create({
 
   // ── INFO CREATRICE SELECTIONNEE ──────────────────
   selectedCreatriceBanner: {
-    backgroundColor: Colors.primaryLight + "18",
-    borderRadius: 12,
+    backgroundColor: Colors.primaryTint,
+    borderRadius: Radius.md,
     paddingHorizontal: 14,
     paddingVertical: 10,
     flexDirection: "row",
@@ -594,20 +587,21 @@ export const styles = StyleSheet.create({
   },
   selectedCreatriceBannerTxt: {
     fontFamily: Fonts.family.nowMedium,
-    fontSize: Fonts.sizes.xs,
+    fontSize: Fonts.sizes.sm,
     color: Colors.primaryDark,
     flex: 1,
     marginLeft: 8,
   },
 });
 
+// Teintes "soft" de la palette (mêmes que les badges) au lieu de couleurs
+// pastel ad hoc.
 export const AVATAR_COLORS = [
-  "#EDE0F7",
-  "#E0EDFF",
-  "#E0F7EF",
-  "#FFF3E0",
-  "#FCE4EC",
+  Colors.primaryTint,
+  Colors.infoTint,
+  Colors.successTint,
+  Colors.warningTint,
+  Colors.errorTint,
 ];
 
-export const getAvatarColor = (index: number) =>
-  AVATAR_COLORS[index % AVATAR_COLORS.length];
+export const getAvatarColor = (index: number) => AVATAR_COLORS[index % AVATAR_COLORS.length];
