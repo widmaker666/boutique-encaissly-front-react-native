@@ -10,6 +10,7 @@ import {
   Animated,
   StyleSheet,
   Alert,
+  Linking,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -19,6 +20,11 @@ import { authService, boutiqueService, evenementService, userService, stripeServ
 
 // Passer à true quand Stripe live sera activé (SIRET en cours)
 const PAIEMENT_ACTIF = false;
+const CONTACT_EMAIL = "contact.encaissly@gmail.com";
+const ecrireContact = () =>
+  Linking.openURL(`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Encaissly — bug ou suggestion")}`).catch(() =>
+    Alert.alert("Nous contacter", `Écris-nous à ${CONTACT_EMAIL}`),
+  );
 const alertPaiement = () => Alert.alert("Bientôt disponible", "Les abonnements ne sont pas encore disponibles : le site et l'application sont en phase de test. Ça arrive très bientôt !");
 import { DuoModeToggle } from "@/components/DuoModeToggle";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -794,6 +800,22 @@ export default function ProfilScreen() {
               </TouchableOpacity>
             </View>
           )}
+        </AnimCard>
+
+        {/* ── Contact (phase de test) ── */}
+        <Text style={s.sectionTitle}>Un bug ? Une idée ?</Text>
+        <AnimCard index={cardIdx(4)} style={s.card}>
+          <TouchableOpacity style={s.createBoutiqueBtn} onPress={ecrireContact} activeOpacity={0.75}>
+            <AntDesign name="mail" size={14} color={Colors.primary} style={{ marginRight: 8 }} />
+            <View style={{ flex: 1 }}>
+              <Text style={s.createBoutiqueTxt}>Nous écrire</Text>
+              <Text style={s.createBoutiqueDesc}>
+                Encaissly est en phase de test : signale un bug ou propose une amélioration, chaque message est lu.
+              </Text>
+              <Text style={s.createBoutiqueDesc} selectable>{CONTACT_EMAIL}</Text>
+            </View>
+            <AntDesign name="right" size={12} color={Colors.textLight} />
+          </TouchableOpacity>
         </AnimCard>
 
         {/* ── Aide ── */}
