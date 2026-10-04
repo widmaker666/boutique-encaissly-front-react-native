@@ -71,16 +71,16 @@ export const styles = StyleSheet.create({
   },
   btnSecondary: {
     width: "100%",
-    paddingVertical: 15,
-    borderRadius: 16,
+    minHeight: 52,
+    justifyContent: "center",
+    borderRadius: 12,
     alignItems: "center",
     borderWidth: 1.5,
-    borderColor: Colors.primaryLight,
+    borderColor: Colors.border,
   },
   btnSecondaryText: {
-    color: Colors.primary,
+    color: Colors.text,
     fontFamily: Fonts.family.nowMedium,
     fontSize: Fonts.sizes.md,
-    letterSpacing: 0.5,
   },
 });
