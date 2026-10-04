@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { venteService, creatriceService, articleService } from "@/services/api";
 import { DuoModeToggle } from "@/components/DuoModeToggle";
 import { useAuthStore } from "@/stores/auth.store";
@@ -21,6 +21,8 @@ import { Colors } from "@/constants/colors";
 import { styles, getAvatarColor } from "@/styles/pages/ventes.style";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AntDesign } from "@expo/vector-icons";
+import Chip from "@/components/Chip/Chip";
+import Button from "@/components/Buttons/Button";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -907,6 +909,29 @@ function BottomSheetEdit({
 // ── VentesScreen ──────────────────────────────────────────────────────────────
 
 type FilterMode = "TOUT" | "ESPECES" | "CARTE";
+const PAGE_SIZE = 20;
+const MOIS_FR = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+const pad = (n: number) => String(n).padStart(2, "0");
+
+/** Les 6 derniers mois, le plus récent en premier — mois précis uniquement
+ * (chips horizontales), pas de plage libre. Fenêtre plus courte qu'en web
+ * (12) pour rester lisible dans une rangée de chips sur petit écran. */
+function moisOptions() {
+  const now = new Date();
+  const opts: { value: string; label: string }[] = [];
+  for (let i = 0; i < 6; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    opts.push({ value: `${d.getFullYear()}-${pad(d.getMonth() + 1)}`, label: `${MOIS_FR[d.getMonth()].slice(0, 3)} ${d.getFullYear()}` });
+  }
+  return opts;
+}
+
+function moisToRange(mois: string): { dateDebut: string; dateFin: string } {
+  const [y, m] = mois.split("-").map(Number);
+  const debut = new Date(y, m - 1, 1, 0, 0, 0);
+  const fin = new Date(y, m, 0, 23, 59, 59);
+  return { dateDebut: debut.toISOString(), dateFin: fin.toISOString() };
+}
 
 export default function VentesScreen() {
   const insets = useSafeAreaInsets();
@@ -914,6 +939,8 @@ export default function VentesScreen() {
   const activeEvenementId = useAuthStore((state) => state.activeEvenementId);
   const activeEvenementNom = useAuthStore((state) => state.activeEvenementNom);
   const [filter, setFilter] = useState<FilterMode>("TOUT");
+  const [mois, setMois] = useState<string>("");
+  const [creatriceId, setCreatriceId] = useState<string>("");
   const [sheetVisible, setSheetVisible] = useState(false);
   const [editingVente, setEditingVente] = useState<Vente | null>(null);
 
@@ -932,20 +959,44 @@ export default function VentesScreen() {
   const isGerante = user?.role === "GERANTE" || (isDuoScreen && duoModeScreen === "GERANTE");
   const currentMode: "GERANTE" | "CREATRICE" = isGerante ? "GERANTE" : "CREATRICE";
 
+  // Filtre créatrice : uniquement côté gérante (une créatrice voit déjà
+  // uniquement les siennes — pas la peine de se filtrer elle-même).
+  const { data: creatrices } = useQuery<Creatrice[]>({
+    queryKey: ["creatrices"],
+    queryFn: creatriceService.getAll,
+    enabled: isGerante,
+  });
+
+  const dateRange = mois ? moisToRange(mois) : {};
+
   const queryFilters = {
     ...(filter !== "TOUT" ? { modePaiement: filter } : {}),
     ...(activeEvenementId ? { evenementId: activeEvenementId } : {}),
+    ...(isGerante && creatriceId ? { creatriceId } : {}),
+    ...dateRange,
     mode: currentMode,
   };
 
   //- `currentMode` dans la clé : sans ça, basculer gérante/créatrice (DUO)
   //- ne redéclencherait pas la requête et afficherait la liste de l'autre vue.
-  const { data: ventes, isLoading } = useQuery<Vente[]>({
-    queryKey: ["ventes", filter, activeEvenementId ?? "personal", currentMode],
-    queryFn: () => venteService.getAll(queryFilters),
+  const {
+    data,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["ventes", filter, creatriceId, mois, activeEvenementId ?? "personal", currentMode],
+    queryFn: ({ pageParam }) => venteService.getAll({ ...queryFilters, skip: pageParam, take: PAGE_SIZE }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, pages) => {
+      const loaded = pages.reduce((acc, p) => acc + p.data.length, 0);
+      return lastPage.hasMore ? loaded : undefined;
+    },
   });
 
-  const count = ventes?.length ?? 0;
+  const ventes = data?.pages.flatMap((p) => p.data) ?? [];
+  const total = data?.pages[0]?.total ?? 0;
 
   return (
     <View style={styles.container}>
@@ -970,7 +1021,7 @@ export default function VentesScreen() {
         <View>
           <Text style={styles.titre}>VENTES</Text>
           <Text style={styles.headerSub}>
-            {activeEvenementNom ? `🎪 ${activeEvenementNom}` : `${count} vente${count > 1 ? "s" : ""} · ${user?.plan ?? "FREE"}`}
+            {activeEvenementNom ? `🎪 ${activeEvenementNom}` : `${total} vente${total > 1 ? "s" : ""} · ${user?.plan ?? "FREE"}`}
           </Text>
           {isDuoScreen && <DuoModeToggle />}
         </View>
@@ -1004,6 +1055,24 @@ export default function VentesScreen() {
           </TouchableOpacity>
         ))}
       </View>
+
+      {/* Filtre mois — chips horizontales scrollables, mois précis uniquement */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 16, paddingBottom: 8 }}>
+        <Chip active={mois === ""} onPress={() => setMois("")}>Tout l'historique</Chip>
+        {moisOptions().map((o) => (
+          <Chip key={o.value} active={mois === o.value} onPress={() => setMois(o.value)}>{o.label}</Chip>
+        ))}
+      </ScrollView>
+
+      {/* Filtre créatrice — gérante uniquement */}
+      {isGerante && (creatrices?.length ?? 0) > 0 && (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 16, paddingBottom: 12 }}>
+          <Chip active={creatriceId === ""} onPress={() => setCreatriceId("")}>Toutes les créatrices</Chip>
+          {(creatrices ?? []).map((c) => (
+            <Chip key={c.id} active={creatriceId === c.id} onPress={() => setCreatriceId(c.id)}>{c.nom}</Chip>
+          ))}
+        </ScrollView>
+      )}
 
       {/* Liste */}
       {isLoading ? (
@@ -1064,6 +1133,17 @@ export default function VentesScreen() {
                 </Text>
               </View>
             )
+          )}
+          {hasNextPage && (
+            <Button
+              variant="secondary"
+              fullWidth
+              loading={isFetchingNextPage}
+              onPress={() => fetchNextPage()}
+              style={{ marginTop: 4 }}
+            >
+              {`Afficher plus (${ventes.length} / ${total})`}
+            </Button>
           )}
         </ScrollView>
       )}

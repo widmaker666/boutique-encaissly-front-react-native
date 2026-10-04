@@ -54,13 +54,19 @@ export default function EventFiche({ evenementId, evenementNom, onSwitchToGerant
 
   const { data: stats } = useQuery<any>({
     queryKey: ["stats", evenementId],
-    queryFn: () => statsService.getGlobal({ evenementId }),
+    // mode: "CREATRICE" toujours ici, même logique que le web (voir
+    // encaissly-web EventFiche) : cette fiche est intrinsèquement la vue
+    // perso de la créatrice, même pour un compte DUO. Sans ça, le backend
+    // résout un compte GERANTE_CREATRICE comme gérante par défaut et
+    // renvoie les stats de SA BOUTIQUE au lieu de celles de l'événement.
+    queryFn: () => statsService.getGlobal({ evenementId, mode: "CREATRICE" }),
   });
 
-  const { data: recentVentes } = useQuery<any[]>({
+  const { data: ventesRes } = useQuery({
     queryKey: ["ventes", "fiche", evenementId],
-    queryFn: () => venteService.getAll({ evenementId }),
+    queryFn: () => venteService.getAll({ evenementId, mode: "CREATRICE" }),
   });
+  const recentVentes = ventesRes?.data;
 
   const { mutate: addArticle, isPending: isAdding } = useMutation({
     mutationFn: () =>

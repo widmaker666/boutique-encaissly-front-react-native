@@ -55,11 +55,15 @@ export default function MesVentesBoutiqueScreen() {
   const insets = useSafeAreaInsets();
   const boutiqueName = nom ? decodeURIComponent(nom) : "Boutique";
 
-  const { data: ventes, isLoading } = useQuery<Vente[]>({
+  const { data: res, isLoading } = useQuery({
+    // take élevé : vue bornée à une seule boutique, pas de pagination ici —
+    // la limite par défaut (20) côté backend serait une perte de données
+    // silencieuse pour cette vue perso.
     queryKey: ["mes-ventes-boutique", id],
-    queryFn: () => venteService.getAll({ boutiqueId: id }),
+    queryFn: () => venteService.getAll({ boutiqueId: id, take: 200 }),
     enabled: !!id,
   });
+  const ventes: Vente[] = res?.data ?? [];
 
   const count = ventes?.length ?? 0;
   const ca = (ventes ?? []).reduce((acc, v) => acc + v.prixVente, 0);

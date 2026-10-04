@@ -2,7 +2,7 @@ import axios from "axios";
 import { GoogleSignin, statusCodes, isErrorWithCode } from "@react-native-google-signin/google-signin";
 import { API_BASE_URL } from "@/constants/api";
 import { useAuthStore } from "@/stores/auth.store";
-import { User } from "@/types";
+import { User, VenteListResponse } from "@/types";
 
 //- Sélecteur de compte natif (Credential Manager) — aucun navigateur, aucune
 //- redirection, donc aucun risque de casse liée aux restrictions Google sur
@@ -178,8 +178,18 @@ export const venteService = {
     });
     return data;
   },
-  getAll: async (filters?: { creatriceId?: string; modePaiement?: string; evenementId?: string; boutiqueId?: string; mode?: "GERANTE" | "CREATRICE" }) => {
-    const { data } = await api.get("/vente", { params: filters });
+  getAll: async (filters?: {
+    creatriceId?: string;
+    modePaiement?: string;
+    evenementId?: string;
+    boutiqueId?: string;
+    mode?: "GERANTE" | "CREATRICE";
+    dateDebut?: string;
+    dateFin?: string;
+    skip?: number;
+    take?: number;
+  }) => {
+    const { data } = await api.get<VenteListResponse>("/vente", { params: filters });
     return data;
   },
   create: async (dto: {
