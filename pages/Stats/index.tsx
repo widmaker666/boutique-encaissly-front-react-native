@@ -18,6 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 import { statsService, evenementService, boutiqueService } from "@/services/api";
 import type { StatsParams } from "@/services/api";
 import { useAuthStore } from "@/stores/auth.store";
+import PeriodePicker, { formatPeriode } from "@/components/PeriodePicker";
 import { DuoModeToggle } from "@/components/DuoModeToggle";
 import VentesExportButtons from "@/components/VentesExportButtons";
 import { Colors } from "@/constants/colors";
@@ -73,9 +74,6 @@ function AnimCard({
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const MOIS_LABELS = ["Janv", "Févr", "Mars", "Avr", "Mai", "Juin", "Juil", "Août", "Sept", "Oct", "Nov", "Déc"];
-const MOIS_LONGS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
-const ANNEE_MIN = 2024;
 
 const round2 = (n: number | null | undefined): string =>
   (Math.round((n ?? 0) * 100) / 100).toFixed(2);
@@ -144,14 +142,10 @@ export default function StatsScreen() {
       : { type: "all" },
   );
 
-  // Période du résumé : null = tous les mois, sinon "YYYY-MM". `annee` pilote la grille de mois affichée.
-  const now = new Date();
-  const [annee, setAnnee] = useState(now.getFullYear());
+  // Période du résumé : null = tous les mois, sinon "YYYY-MM"
   const [mois, setMois] = useState<string | null>(null);
   const moisParam = mois ?? undefined;
-  const periodeLabel = mois
-    ? `${MOIS_LONGS[Number(mois.slice(5)) - 1]} ${mois.slice(0, 4)}`
-    : "Tous les mois";
+  const periodeLabel = formatPeriode(mois);
 
   const handleDownload = async (path: string, filename: string) => {
     setDownloading(filename);
@@ -352,56 +346,7 @@ export default function StatsScreen() {
       <View style={st.body}>
         {/* ── 2. KPIs grille 2×2 ── */}
         <Text style={st.sectionTitle}>Résumé</Text>
-        {isPro && (
-          <View style={st.periode}>
-            <View style={st.periodeRow}>
-              <TouchableOpacity
-                style={[st.pill, mois === null && st.pillActive]}
-                onPress={() => setMois(null)}
-                activeOpacity={0.75}
-              >
-                <Text style={[st.pillTxt, mois === null && st.pillTxtActive]}>Tous les mois</Text>
-              </TouchableOpacity>
-              <View style={st.yearNav}>
-                <TouchableOpacity
-                  style={st.yearBtn}
-                  disabled={annee <= ANNEE_MIN}
-                  onPress={() => setAnnee(annee - 1)}
-                  accessibilityLabel="Année précédente"
-                >
-                  <Text style={[st.yearArrow, annee <= ANNEE_MIN && st.yearArrowOff]}>‹</Text>
-                </TouchableOpacity>
-                <Text style={st.yearLabel}>{annee}</Text>
-                <TouchableOpacity
-                  style={st.yearBtn}
-                  disabled={annee >= now.getFullYear()}
-                  onPress={() => setAnnee(annee + 1)}
-                  accessibilityLabel="Année suivante"
-                >
-                  <Text style={[st.yearArrow, annee >= now.getFullYear() && st.yearArrowOff]}>›</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View style={st.moisGrid}>
-              {MOIS_LABELS.map((label, i) => {
-                const value = `${annee}-${String(i + 1).padStart(2, "0")}`;
-                const futur = annee === now.getFullYear() && i > now.getMonth();
-                const active = mois === value;
-                return (
-                  <TouchableOpacity
-                    key={value}
-                    style={[st.moisPill, active && st.pillActive, futur && st.moisPillOff]}
-                    disabled={futur}
-                    onPress={() => setMois(value)}
-                    activeOpacity={0.75}
-                  >
-                    <Text style={[st.pillTxt, active && st.pillTxtActive]}>{label}</Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
-        )}
+        {isPro && <PeriodePicker value={mois} onChange={setMois} />}
         <View style={st.cardsGrid}>
           {/* Carte CA avec badge évolution */}
           <AnimCard key="ca" index={0} style={st.card}>
@@ -762,57 +707,6 @@ const st = StyleSheet.create({
   },
   pillTxtActive: {
     color: "#fff",
-  },
-
-  // ── Sélecteur de période ────────────────────────────────────────────────────
-  periode: {
-    gap: 8,
-    marginBottom: 12,
-  },
-  periodeRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  yearNav: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  yearBtn: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  yearArrow: {
-    fontFamily: Fonts.family.nowBold,
-    fontSize: 22,
-    color: Colors.text,
-  },
-  yearArrowOff: {
-    opacity: 0.3,
-  },
-  yearLabel: {
-    fontFamily: Fonts.family.nowBold,
-    fontSize: Fonts.sizes.md,
-    color: Colors.text,
-    minWidth: 44,
-    textAlign: "center",
-  },
-  moisGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  moisPill: {
-    backgroundColor: Colors.surface,
-    borderRadius: Radius.pill,
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-    borderWidth: 1.5,
-    borderColor: Colors.border,
-  },
-  moisPillOff: {
-    opacity: 0.35,
   },
 
   // ── Body ────────────────────────────────────────────────────────────────────

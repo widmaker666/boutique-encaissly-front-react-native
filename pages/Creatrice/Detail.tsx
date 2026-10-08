@@ -11,7 +11,8 @@ import ModalModifier from "@/components/Creatrice/ModalModifier";
 import ModalInviter from "@/components/Creatrice/ModalInviter";
 import VentesExportButtons from "@/components/VentesExportButtons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import PeriodePicker, { formatPeriode } from "@/components/PeriodePicker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { creatriceService } from "@/services/api";
 import { useAuthStore } from "@/stores/auth.store";
@@ -107,13 +108,18 @@ export default function CreatriceDetailScreen() {
 
   const [modalModifier, setModalModifier] = useState(false);
   const [modalInviter, setModalInviter] = useState(false);
+  // Période affichée (stats + ventes) : null = tous les mois, sinon "YYYY-MM" — PRO/DUO
+  const isPro = user?.plan === "PRO" || user?.plan === "DUO";
+  const [mois, setMois] = useState<string | null>(null);
 
   const headerAnim = useRef(new Animated.Value(0)).current;
 
   const { data: creatrice, isLoading } = useQuery<CreatriceDetail>({
-    queryKey: ["creatrice", id],
-    queryFn: () => creatriceService.getOne(id),
+    queryKey: ["creatrice", id, mois],
+    queryFn: () => creatriceService.getOne(id, mois ?? undefined),
     enabled: !!id,
+    // Garde la fiche affichée pendant le chargement d'un autre mois (sinon l'écran clignote)
+    placeholderData: keepPreviousData,
   });
 
   const { mutate: supprimerCreatrice, isPending: isDeleting } = useMutation({
@@ -228,6 +234,7 @@ export default function CreatriceDetailScreen() {
         {/* Stats globales */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Statistiques</Text>
+          {isPro && <PeriodePicker value={mois} onChange={setMois} />}
           <View style={styles.statsGrid}>
             {[
               { label: "Chiffre d'affaires", value: formatMontant(creatrice.stats.ca) },
@@ -273,10 +280,12 @@ export default function CreatriceDetailScreen() {
         {/* Ventes globales */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
-            Ventes ({creatrice.ventes.length})
+            Ventes ({creatrice.ventes.length}){mois ? ` — ${formatPeriode(mois)}` : ""}
           </Text>
           {creatrice.ventes.length === 0 && (
-            <Text style={styles.emptyVentes}>Aucune vente enregistrée.</Text>
+            <Text style={styles.emptyVentes}>
+              {mois ? `Aucune vente en ${formatPeriode(mois)}.` : "Aucune vente enregistrée."}
+            </Text>
           )}
           {groupVentes(creatrice.ventes).map((vente, i) => (
             <AnimCard key={vente.id} index={4 + i} style={styles.venteCard}>

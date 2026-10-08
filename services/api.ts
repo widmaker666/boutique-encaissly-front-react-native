@@ -356,8 +356,8 @@ export const creatriceService = {
     const { data } = await api.get("/creatrice");
     return data;
   },
-  getOne: async (id: string) => {
-    const { data } = await api.get(`/creatrice/${id}`);
+  getOne: async (id: string, mois?: string) => {
+    const { data } = await api.get(`/creatrice/${id}`, { params: mois ? { mois } : {} });
     return data;
   },
   create: async (dto: {
