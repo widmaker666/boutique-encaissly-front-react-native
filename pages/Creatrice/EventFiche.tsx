@@ -15,6 +15,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { articleService, statsService, venteService } from "@/services/api";
 import { Colors } from "@/constants/colors";
+import { MODE_LABEL } from "@/constants/paiement";
 import { Fonts } from "@/constants/fonts";
 import { Radius } from "@/constants/spacing";
 import { shadows } from "@/styles/utils/shadows.styles";
@@ -226,7 +227,7 @@ export default function EventFiche({ evenementId, evenementNom, onSwitchToGerant
                   <Text style={s.venteNom} numberOfLines={1}>
                     {v.nomArticle}{(v.quantite ?? 1) > 1 ? ` × ${v.quantite}` : ""}
                   </Text>
-                  <Text style={s.venteMeta}>{formatDate(v.createdAt)} · {v.modePaiement}</Text>
+                  <Text style={s.venteMeta}>{formatDate(v.createdAt)} · {MODE_LABEL[v.modePaiement as keyof typeof MODE_LABEL] ?? v.modePaiement}</Text>
                 </View>
                 <Text style={s.ventePrix}>{(v.prixVente ?? 0).toFixed(2)} €</Text>
               </View>

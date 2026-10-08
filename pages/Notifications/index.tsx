@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
     ...shadows.sm,
   },
   cardUnread: {
-    backgroundColor: "#f3eaff",
+    backgroundColor: Colors.primaryFaint,
     borderLeftWidth: 3,
     borderLeftColor: Colors.primary,
   },

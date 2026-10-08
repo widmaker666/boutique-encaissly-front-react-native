@@ -458,11 +458,11 @@ export default function ProfilScreen() {
             <Text style={s.badgeTxt}>{isGerante ? "Gérante" : "Créatrice"}</Text>
           </View>
           {isPlanDuo ? (
-            <View style={[s.badge, { backgroundColor: "#eb7f45" }]}>
+            <View style={[s.badge, { backgroundColor: Colors.duo }]}>
               <Text style={s.badgeTxt}>DUO</Text>
             </View>
           ) : (
-            <View style={[s.badge, { backgroundColor: isPro ? "#1a7a4a" : "#666" }]}>
+            <View style={[s.badge, { backgroundColor: isPro ? Colors.successSolid : Colors.neutralSolid }]}>
               <Text style={s.badgeTxt}>{isPro ? "✨ PRO" : "FREE"}</Text>
             </View>
           )}
@@ -644,9 +644,9 @@ export default function ProfilScreen() {
               value={notifEmail}
               onValueChange={handleToggleNotif}
               disabled={isTogglingNotif}
-              trackColor={{ false: "#e0e0e0", true: Colors.primaryLight }}
+              trackColor={{ false: Colors.borderStrong, true: Colors.primaryLight }}
               thumbColor={notifEmail ? Colors.primary : "#f4f3f4"}
-              ios_backgroundColor="#e0e0e0"
+              ios_backgroundColor={Colors.borderStrong}
             />
           </View>
         </AnimCard>
@@ -658,9 +658,9 @@ export default function ProfilScreen() {
           {isPlanDuo ? (
             <View style={s.proBlock}>
               <View style={s.proHeader}>
-                <Text style={[s.proTitle, { color: "#eb7f45" }]}>DUO</Text>
-                <View style={[s.proActiveBadge, { backgroundColor: "#fdf0e8" }]}>
-                  <Text style={[s.proActiveTxt, { color: "#eb7f45" }]}>Actif</Text>
+                <Text style={[s.proTitle, { color: Colors.duo }]}>DUO</Text>
+                <View style={[s.proActiveBadge, { backgroundColor: Colors.duoTint }]}>
+                  <Text style={[s.proActiveTxt, { color: Colors.duo }]}>Actif</Text>
                 </View>
               </View>
               <Text style={s.proDesc}>
@@ -717,7 +717,7 @@ export default function ProfilScreen() {
                   "Historique complet · Exports illimités",
                 ].map((f) => (
                   <View key={f} style={s.featureRow}>
-                    <AntDesign name="check-circle" size={13} color="#eb7f45" style={{ marginRight: 6 }} />
+                    <AntDesign name="check-circle" size={13} color={Colors.duo} style={{ marginRight: 6 }} />
                     <Text style={s.featureTxt}>{f}</Text>
                   </View>
                 ))}
@@ -772,7 +772,7 @@ export default function ProfilScreen() {
                   "PDF sans filigrane",
                 ].map((f) => (
                   <View key={f} style={s.featureRow}>
-                    <AntDesign name="check-circle" size={13} color="#1a7a4a" style={{ marginRight: 6 }} />
+                    <AntDesign name="check-circle" size={13} color={Colors.successSolid} style={{ marginRight: 6 }} />
                     <Text style={s.featureTxt}>{f}</Text>
                   </View>
                 ))}
@@ -1265,7 +1265,7 @@ const s = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
     borderWidth: 1.5,
-    borderColor: "#eb7f45",
+    borderColor: Colors.duo,
   },
   duoHeader: {
     flexDirection: "row",
@@ -1276,7 +1276,7 @@ const s = StyleSheet.create({
   duoTitle: {
     fontFamily: Fonts.family.nowBold,
     fontSize: 16,
-    color: "#c2410c",
+    color: Colors.duo,
   },
   duoDesc: {
     fontFamily: Fonts.family.nowRegular,
@@ -1286,7 +1286,7 @@ const s = StyleSheet.create({
     marginBottom: 14,
   },
   duoBtn: {
-    backgroundColor: "#eb7f45",
+    backgroundColor: Colors.duo,
     borderRadius: Radius.md,
     minHeight: 48,
     alignItems: "center",

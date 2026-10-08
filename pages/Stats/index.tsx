@@ -944,7 +944,7 @@ const st = StyleSheet.create({
     color: Colors.text,
   },
   exportBtnLocked: {
-    backgroundColor: "#faf8f4",
+    backgroundColor: Colors.surfaceHover,
     justifyContent: "space-between",
   },
   exportBtnLabelLocked: {

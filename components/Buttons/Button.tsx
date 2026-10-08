@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     fontSize: Fonts.sizes.xs,
   },
 
-  primary: { backgroundColor: Colors.text, paddingHorizontal: Spacing.xxl, borderWidth: 0 },
+  primary: { backgroundColor: Colors.primary, paddingHorizontal: Spacing.xxl, borderWidth: 0 },
   secondary: { backgroundColor: "transparent", borderWidth: 1.5, borderColor: Colors.border, paddingHorizontal: Spacing.xxl },
   outline: { backgroundColor: "transparent", borderWidth: 1, borderColor: Colors.primary, paddingHorizontal: Spacing.xxl },
   danger: { backgroundColor: Colors.error, borderWidth: 0, paddingHorizontal: Spacing.xxl },
@@ -105,10 +105,10 @@ const sizeStyles = StyleSheet.create({
 });
 
 const pressedStyles = StyleSheet.create({
-  primary: { backgroundColor: "#1c2022" },
+  primary: { backgroundColor: Colors.primaryDark },
   secondary: { borderColor: Colors.text },
   outline: { backgroundColor: Colors.primaryTint },
-  danger: { backgroundColor: "#b32727" },
+  danger: { backgroundColor: Colors.errorDark },
   dangerOutline: { backgroundColor: Colors.errorTint, borderColor: Colors.error },
   link: { opacity: 0.6 },
   icon: { borderColor: Colors.text },

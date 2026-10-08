@@ -14,6 +14,7 @@ import { router, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AntDesign } from "@expo/vector-icons";
 import { Colors } from "@/constants/colors";
+import { MODE_LABEL } from "@/constants/paiement";
 import { DuoModeToggle } from "@/components/DuoModeToggle";
 import Card from "@/components/Cards/Card";
 import ListRow from "@/components/List/ListRow";
@@ -62,7 +63,7 @@ function VenteRow({ vente, showCreatrice }: { vente: any; showCreatrice: boolean
       right={
         <>
           <Text style={styles.rowValue}>{round2(vente.prixVente)} €</Text>
-          <Badge color={vente.modePaiement === "CARTE" ? "info" : "warning"}>{vente.modePaiement}</Badge>
+          <Badge color={vente.modePaiement === "CARTE" ? "info" : "warning"}>{MODE_LABEL[vente.modePaiement as keyof typeof MODE_LABEL] ?? vente.modePaiement}</Badge>
         </>
       }
     />
@@ -371,13 +372,13 @@ export default function DashboardScreen() {
             <View style={styles.kpiRow}>
               <View style={styles.kpiCard}>
                 <Card padding="sm">
-                  <Text style={styles.kpiLabel}>💵 ESPÈCES</Text>
+                  <Text style={styles.kpiLabel}>💵 Espèces</Text>
                   <Text style={styles.kpiValue}>{round2(especes?._sum?.prixVente)} €</Text>
                 </Card>
               </View>
               <View style={styles.kpiCard}>
                 <Card padding="sm">
-                  <Text style={styles.kpiLabel}>💳 CARTE</Text>
+                  <Text style={styles.kpiLabel}>💳 Carte</Text>
                   <Text style={styles.kpiValue}>{round2(carte?._sum?.prixVente)} €</Text>
                 </Card>
               </View>

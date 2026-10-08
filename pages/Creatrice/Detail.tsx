@@ -298,9 +298,9 @@ export default function CreatriceDetailScreen() {
               <View style={styles.venteRight}>
                 <Text style={styles.ventePrix}>{formatMontant(vente.prixVente)}</Text>
                 {vente.modePaiement === "ESPECES" ? (
-                  <View style={styles.badgeEspeces}><Text style={styles.badgeEspecesTxt}>ESPECES</Text></View>
+                  <View style={styles.badgeEspeces}><Text style={styles.badgeEspecesTxt}>Espèces</Text></View>
                 ) : (
-                  <View style={styles.badgeCarte}><Text style={styles.badgeCarteTxt}>CARTE</Text></View>
+                  <View style={styles.badgeCarte}><Text style={styles.badgeCarteTxt}>Carte</Text></View>
                 )}
               </View>
             </AnimCard>

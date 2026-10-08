@@ -24,11 +24,11 @@ export default function Badge({ children, color = "neutral", variant = "soft" }:
 
 const PALETTE: Record<Color, Record<"soft" | "solid", { bg: string; fg: string }>> = {
   primary: { soft: { bg: Colors.primaryTint, fg: Colors.primaryDark }, solid: { bg: Colors.primary, fg: "#fff" } },
-  success: { soft: { bg: Colors.successTint, fg: Colors.successDark }, solid: { bg: "#1a7a4a", fg: "#fff" } },
-  warning: { soft: { bg: Colors.warningTint, fg: Colors.warningDark }, solid: { bg: "#eb7f45", fg: "#fff" } },
+  success: { soft: { bg: Colors.successTint, fg: Colors.successDark }, solid: { bg: Colors.successSolid, fg: "#fff" } },
+  warning: { soft: { bg: Colors.warningTint, fg: Colors.warningDark }, solid: { bg: Colors.duo, fg: "#fff" } },
   error: { soft: { bg: Colors.errorTint, fg: Colors.error }, solid: { bg: Colors.error, fg: "#fff" } },
   info: { soft: { bg: Colors.infoTint, fg: Colors.info }, solid: { bg: Colors.info, fg: "#fff" } },
-  neutral: { soft: { bg: Colors.background, fg: Colors.textLight }, solid: { bg: "#666", fg: "#fff" } },
+  neutral: { soft: { bg: Colors.background, fg: Colors.textLight }, solid: { bg: Colors.neutralSolid, fg: "#fff" } },
 };
 
 const styles = StyleSheet.create({

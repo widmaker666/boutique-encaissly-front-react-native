@@ -18,6 +18,7 @@ import { DuoModeToggle } from "@/components/DuoModeToggle";
 import { useAuthStore } from "@/stores/auth.store";
 import type { Vente, Creatrice, Article, ModePaiement } from "@/types";
 import { Colors } from "@/constants/colors";
+import { MODE_LABEL } from "@/constants/paiement";
 import { styles, getAvatarColor } from "@/styles/pages/ventes.style";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AntDesign } from "@expo/vector-icons";
@@ -620,7 +621,7 @@ function BottomSheetCreation({
                             modePaiement === m && styles.modeChipTxtActive,
                           ]}
                         >
-                          {m === "ESPECES" ? "ESPECES" : "CARTE"}
+                          {MODE_LABEL[m]}
                         </Text>
                       </TouchableOpacity>
                     ))}
@@ -830,7 +831,7 @@ function BottomSheetEdit({
                     }}
                   >
                     <Text style={[styles.modeChipTxt, modePaiement === m && styles.modeChipTxtActive]}>
-                      {m}
+                      {MODE_LABEL[m]}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -1029,7 +1030,7 @@ export default function VentesScreen() {
           <View style={styles.filtersBlock}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsRow}>
               {(["TOUT", "ESPECES", "CARTE"] as FilterMode[]).map((f) => (
-                <Chip key={f} active={filter === f} onPress={() => setFilter(f)}>{f}</Chip>
+                <Chip key={f} active={filter === f} onPress={() => setFilter(f)}>{f === "TOUT" ? "Tout" : MODE_LABEL[f]}</Chip>
               ))}
             </ScrollView>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsRow}>
@@ -1071,7 +1072,7 @@ export default function VentesScreen() {
                   right={
                     <>
                       <Text style={styles.cardPrix}>{v.prixVente.toFixed(2)} €</Text>
-                      <Badge color={v.modePaiement === "CARTE" ? "info" : "warning"}>{v.modePaiement}</Badge>
+                      <Badge color={v.modePaiement === "CARTE" ? "info" : "warning"}>{MODE_LABEL[v.modePaiement]}</Badge>
                     </>
                   }
                 />

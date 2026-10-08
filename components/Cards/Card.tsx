@@ -42,10 +42,12 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.surface,
     borderRadius: Radius.lg,
+    borderWidth: 1,
+    borderColor: Colors.border,
     ...shadows.sm,
   },
   pressed: {
-    backgroundColor: "#faf8f4",
+    backgroundColor: Colors.surfaceHover,
   },
 });
 

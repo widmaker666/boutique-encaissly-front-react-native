@@ -176,7 +176,7 @@ export default function AideScreen() {
                           <View
                             style={[
                               s.badge,
-                              { backgroundColor: item.badge === "PRO" ? "#1a7a4a" : "#eb7f45" },
+                              { backgroundColor: item.badge === "PRO" ? Colors.successSolid : Colors.duo },
                             ]}
                           >
                             <Text style={s.badgeTxt}>{item.badge}</Text>
