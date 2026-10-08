@@ -20,7 +20,7 @@ import { Fonts } from "@/constants/fonts";
 import { Radius } from "@/constants/spacing";
 import { shadows } from "@/styles/utils/shadows.styles";
 
-type Props = { evenementId: string; evenementNom: string; onSwitchToGerante?: () => void };
+type Props = { evenementId: string; evenementNom: string; onSwitchToGerante?: () => void; onBack?: () => void };
 
 function toUpper(str: string) {
   return str.normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase();
@@ -37,7 +37,7 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-export default function EventFiche({ evenementId, evenementNom, onSwitchToGerante }: Props) {
+export default function EventFiche({ evenementId, evenementNom, onSwitchToGerante, onBack }: Props) {
   const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
 
@@ -130,8 +130,13 @@ export default function EventFiche({ evenementId, evenementNom, onSwitchToGerant
   return (
     <View style={s.container}>
       {/* Header violet */}
-      <View style={[s.header, { paddingTop: insets.top + 20 }, onSwitchToGerante && s.headerRow]}>
+      <View style={[s.header, { paddingTop: 16 }, onSwitchToGerante && s.headerRow]}>
         <View>
+          {onBack && (
+            <TouchableOpacity onPress={onBack} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel="Retour aux événements" style={{ marginBottom: 8 }}>
+              <Text style={{ fontFamily: Fonts.family.nowMedium, fontSize: 14, color: Colors.primary }}>‹ Événements</Text>
+            </TouchableOpacity>
+          )}
           <Text style={s.sousTitre}>MA FICHE ÉVÉNEMENT</Text>
           <Text style={s.titre}>{evenementNom}</Text>
         </View>

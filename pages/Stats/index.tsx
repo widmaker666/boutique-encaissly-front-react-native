@@ -19,7 +19,6 @@ import { statsService, evenementService, boutiqueService } from "@/services/api"
 import type { StatsParams } from "@/services/api";
 import { useAuthStore } from "@/stores/auth.store";
 import PeriodePicker, { formatPeriode } from "@/components/PeriodePicker";
-import { DuoModeToggle } from "@/components/DuoModeToggle";
 import VentesExportButtons from "@/components/VentesExportButtons";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
@@ -267,7 +266,7 @@ export default function StatsScreen() {
       <Animated.View
         style={[
           st.header,
-          { paddingTop: insets.top + 20 },
+          { paddingTop: 20 },
           {
             opacity: headerAnim,
             transform: [
@@ -292,7 +291,6 @@ export default function StatsScreen() {
         <Text style={st.headerSub}>
           {isPro ? periodeLabel : `Mois en cours · ${headerSubtitle}`}
         </Text>
-        {isDuo && <DuoModeToggle variant="onLight" />}
       </Animated.View>
 
       {/* ── Filtre événements / boutiques ── */}

@@ -1,44 +1,27 @@
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
 import { useAuthStore } from "@/stores/auth.store";
-import { notificationService, boutiqueService } from "@/services/api";
-import { useQuery } from "@tanstack/react-query";
+import AppHeader from "@/components/AppHeader";
 import { AntDesign } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import type { Boutique } from "@/types";
 
+/** 5 onglets (Accueil · Ventes · Créatrices/Événements · Stats · Plus) + en-tête fixe.
+ * Les autres écrans (Compte, Notifications, Aide, fiches…) restent des routes sans onglet. */
 export default function AppLayout() {
   const user = useAuthStore((s) => s.user);
   const duoMode = useAuthStore((s) => s.duoMode);
   const isDuo = user?.role === "GERANTE_CREATRICE";
   const isGerante = user?.role === "GERANTE" || (isDuo && duoMode === "GERANTE");
 
-  const { data: unreadData } = useQuery({
-    queryKey: ["notifications-count"],
-    queryFn: notificationService.getUnreadCount,
-    refetchInterval: 30000,
-  });
-  const unreadCount: number = unreadData?.count ?? 0;
-
-  //- Onglet "Boutique" — visible seulement si la créatrice est membre d'au
-  //- moins une boutique (invitation acceptée). Même queryKey que Profil pour
-  //- partager le cache, pas de requête réseau en plus.
-  const { data: mesBoutiques } = useQuery<Boutique[]>({
-    queryKey: ["mes-boutiques"],
-    queryFn: () => boutiqueService.getMesBoutiques(),
-    enabled: !isGerante,
-  });
-  const showBoutiqueTab = !isGerante && (mesBoutiques?.length ?? 0) > 0;
-
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: Colors.text,
-        tabBarInactiveTintColor: Colors.textLight,
+        tabBarActiveTintColor: "#fff",
+        tabBarInactiveTintColor: Colors.darkText,
         tabBarStyle: {
-          backgroundColor: Colors.surface,
-          borderTopColor: Colors.border,
+          backgroundColor: Colors.dark,
+          borderTopColor: Colors.darkLine,
           borderTopWidth: 1,
         },
         tabBarLabelStyle: {
@@ -50,39 +33,33 @@ export default function AppLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Dashboard",
-          headerShown: false,
-          tabBarIcon: ({ color }) => (
-            <AntDesign name="home" size={24} color={color} />
+          title: "Accueil",
+          headerShown: true,
+          header: () => <AppHeader />,
+          tabBarIcon: ({ color, focused }) => (
+            <AntDesign name="home" size={24} color={focused ? Colors.primaryLight : color} />
           ),
-          tabBarBadge: unreadCount > 0 ? unreadCount : undefined,
         }}
       />
       <Tabs.Screen
         name="ventes"
         options={{
           title: "Ventes",
-          tabBarIcon: ({ color }) => (
-            <AntDesign name="shopping-cart" size={24} color={color} />
+          headerShown: true,
+          header: () => <AppHeader />,
+          tabBarIcon: ({ color, focused }) => (
+            <AntDesign name="shopping-cart" size={24} color={focused ? Colors.primaryLight : color} />
           ),
         }}
       />
       <Tabs.Screen
         name="creatrice"
         options={{
-          title: isGerante ? "Créatrices" : "Ma fiche",
-          tabBarIcon: ({ color }) => (
-            <AntDesign name={isGerante ? "team" : "idcard"} size={24} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="boutique-membre"
-        options={{
-          title: "Boutique",
-          href: showBoutiqueTab ? undefined : null,
-          tabBarIcon: ({ color }) => (
-            <AntDesign name="shop" size={24} color={color} />
+          title: isGerante ? "Créatrices" : "Événements",
+          headerShown: true,
+          header: () => <AppHeader />,
+          tabBarIcon: ({ color, focused }) => (
+            <AntDesign name={isGerante ? "team" : "calendar"} size={24} color={focused ? Colors.primaryLight : color} />
           ),
         }}
       />
@@ -90,20 +67,26 @@ export default function AppLayout() {
         name="stats"
         options={{
           title: "Stats",
-          tabBarIcon: ({ color }) => (
-            <AntDesign name="bar-chart" size={24} color={color} />
+          headerShown: true,
+          header: () => <AppHeader />,
+          tabBarIcon: ({ color, focused }) => (
+            <AntDesign name="bar-chart" size={24} color={focused ? Colors.primaryLight : color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="profil"
+        name="plus"
         options={{
-          title: "Profil",
-          tabBarIcon: ({ color }) => (
-            <AntDesign name="user" size={24} color={color} />
+          title: "Plus",
+          headerShown: true,
+          header: () => <AppHeader />,
+          tabBarIcon: ({ color, focused }) => (
+            <AntDesign name="ellipsis" size={24} color={focused ? Colors.primaryLight : color} />
           ),
         }}
       />
+      {/* Écrans sans onglet : atteints depuis « Plus », l'Accueil ou les listes */}
+      <Tabs.Screen name="profil" options={{ href: null }} />
       <Tabs.Screen name="notifications" options={{ href: null }} />
       <Tabs.Screen name="aide" options={{ href: null }} />
       <Tabs.Screen name="boutique/[id]" options={{ href: null }} />

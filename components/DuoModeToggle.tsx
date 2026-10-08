@@ -5,13 +5,13 @@ import { Colors } from "@/constants/colors";
 
 /** `onLight` pour les écrans déjà migrés vers la nouvelle DA (header crème),
  * `onDark` (défaut) pour les headers violets pas encore migrés. */
-export function DuoModeToggle({ variant = "onDark" }: { variant?: "onDark" | "onLight" }) {
+export function DuoModeToggle({ variant = "onDark" }: { variant?: "onDark" | "onLight" | "onDarkBar" }) {
   const duoMode = useAuthStore((s) => s.duoMode);
   const setDuoMode = useAuthStore((s) => s.setDuoMode);
-  const v = variant === "onLight" ? light : dark;
+  const v = variant === "onLight" ? light : variant === "onDarkBar" ? darkBar : dark;
 
   return (
-    <View style={[s.container, v.container]}>
+    <View style={[s.container, v.container, variant === "onDarkBar" && s.inBar]}>
       {(["GERANTE", "CREATRICE"] as const).map((mode) => {
         const active = duoMode === mode;
         return (
@@ -39,6 +39,9 @@ const s = StyleSheet.create({
     marginTop: 12,
     alignSelf: "flex-start",
   },
+  inBar: {
+    marginTop: 0,
+  },
   btn: {
     paddingHorizontal: 14,
     paddingVertical: 6,
@@ -54,6 +57,13 @@ const dark = StyleSheet.create({
   container: { backgroundColor: "rgba(255,255,255,0.15)" },
   btnActive: { backgroundColor: "#fff" },
   txt: { color: "rgba(255,255,255,0.75)" },
+  txtActive: { color: Colors.primary },
+});
+
+const darkBar = StyleSheet.create({
+  container: { backgroundColor: "rgba(255,255,255,0.1)" },
+  btnActive: { backgroundColor: "#fff" },
+  txt: { color: Colors.darkText },
   txtActive: { color: Colors.primary },
 });
 

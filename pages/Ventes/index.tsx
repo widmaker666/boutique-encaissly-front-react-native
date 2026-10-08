@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { venteService, creatriceService, articleService } from "@/services/api";
-import { DuoModeToggle } from "@/components/DuoModeToggle";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useAuthStore } from "@/stores/auth.store";
 import type { Vente, Creatrice, Article, ModePaiement } from "@/types";
 import { Colors } from "@/constants/colors";
@@ -923,6 +923,10 @@ export default function VentesScreen() {
   const [mois, setMois] = useState<string>("");
   const [creatriceId, setCreatriceId] = useState<string>("");
   const [sheetVisible, setSheetVisible] = useState(false);
+
+  //- Arrivée depuis le bouton « + Vente » de l'Accueil (?nouvelle=1) : ouvre directement le formulaire
+  const { nouvelle } = useLocalSearchParams<{ nouvelle?: string }>();
+  const routerVentes = useRouter();
   const [editingVente, setEditingVente] = useState<Vente | null>(null);
 
   const headerAnim = useRef(new Animated.Value(0)).current;
@@ -938,6 +942,12 @@ export default function VentesScreen() {
   const isDuoScreen = user?.role === "GERANTE_CREATRICE";
   const duoModeScreen = useAuthStore((state) => state.duoMode);
   const isGerante = user?.role === "GERANTE" || (isDuoScreen && duoModeScreen === "GERANTE");
+
+  useEffect(() => {
+    if (nouvelle !== "1") return;
+    if (isGerante || activeEvenementId) setSheetVisible(true);
+    routerVentes.setParams({ nouvelle: undefined });
+  }, [nouvelle]);
   const currentMode: "GERANTE" | "CREATRICE" = isGerante ? "GERANTE" : "CREATRICE";
 
   // Filtre créatrice : uniquement côté gérante (une créatrice voit déjà
@@ -985,7 +995,7 @@ export default function VentesScreen() {
       <Animated.View
         style={[
           styles.header,
-          { paddingTop: insets.top + 16 },
+          { paddingTop: 16 },
           {
             opacity: headerAnim,
             transform: [
@@ -1005,7 +1015,6 @@ export default function VentesScreen() {
           <Text style={styles.headerSub}>
             {activeEvenementNom ? `🎪 ${activeEvenementNom}` : `${total} vente${total > 1 ? "s" : ""} · ${user?.plan ?? "FREE"}`}
           </Text>
-          {isDuoScreen && <DuoModeToggle variant="onLight" />}
         </View>
         <Button
           size="sm"

@@ -17,9 +17,7 @@ import { Colors } from "@/constants/colors";
 import { styles, getAvatarColor } from "@/styles/pages/creatrice.style";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ModalCreation from "@/components/Creatrice/ModalCreation";
-import { DuoModeToggle } from "@/components/DuoModeToggle";
-import EventFiche from "@/pages/Creatrice/EventFiche";
-import PersonnelRecap from "@/pages/Creatrice/PersonnelRecap";
+import Evenements from "@/pages/Creatrice/Evenements";
 
 function AnimCard({
   children,
@@ -102,12 +100,9 @@ export default function CreatriceScreen() {
     ]).start();
   }, [isGerante]);
 
-  // ── CREATRICE pure : EventFiche ou PersonnelRecap
+  // ── CREATRICE : onglet Événements (liste, activation, fiche)
   if (!isGerante) {
-    if (activeEvenementId) {
-      return <EventFiche evenementId={activeEvenementId} evenementNom={activeEvenementNom ?? ""} />;
-    }
-    return <PersonnelRecap />;
+    return <Evenements />;
   }
 
   if (isLoading)
@@ -130,7 +125,7 @@ export default function CreatriceScreen() {
       <Animated.View
         style={[
           styles.header,
-          { paddingTop: insets.top + 16 },
+          { paddingTop: 16 },
           {
             opacity: headerAnim,
             transform: [
@@ -149,7 +144,6 @@ export default function CreatriceScreen() {
           <Text style={styles.headerSub}>
             {count} créatrice{count > 1 ? "s" : ""} · {user?.plan ?? "FREE"}
           </Text>
-          {isDuo && <DuoModeToggle variant="onLight" />}
         </View>
         <TouchableOpacity
           style={styles.addBtn}
