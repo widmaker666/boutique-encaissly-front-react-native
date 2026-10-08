@@ -149,6 +149,8 @@ export type StatsParams = {
   evenementId?: string;
   boutiqueId?: string;
   mode?: "GERANTE" | "CREATRICE";
+  //- "YYYY-MM" — absent = tous les mois (ignoré côté serveur pour FREE)
+  mois?: string;
 };
 
 export const statsService = {
@@ -164,8 +166,10 @@ export const statsService = {
     const { data } = await api.get("/stats/top-articles", { params: params ?? {} });
     return data;
   },
-  getParCreatrice: async (mode?: "GERANTE" | "CREATRICE") => {
-    const { data } = await api.get("/stats/par-creatrice", { params: mode ? { mode } : {} });
+  getParCreatrice: async (mode?: "GERANTE" | "CREATRICE", mois?: string) => {
+    const { data } = await api.get("/stats/par-creatrice", {
+      params: { ...(mode ? { mode } : {}), ...(mois ? { mois } : {}) },
+    });
     return data;
   },
 };
