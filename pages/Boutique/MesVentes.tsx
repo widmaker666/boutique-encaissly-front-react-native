@@ -44,7 +44,17 @@ export default function MesVentesBoutiqueScreen() {
     // la limite par défaut (20) côté backend serait une perte de données
     // silencieuse pour cette vue perso.
     queryKey: ["mes-ventes-boutique", id],
-    queryFn: () => venteService.getAll({ boutiqueId: id, take: 200 }),
+    queryFn: async () => {
+      //- Le serveur plafonne une page à 100 ventes (take > 100 = erreur 400, écran vide) :
+      //- on lit l'historique complet de cette boutique par blocs de 100.
+      const toutes: Vente[] = [];
+      for (let skip = 0; ; skip += 100) {
+        const page = await venteService.getAll({ boutiqueId: id, skip, take: 100 });
+        toutes.push(...page.data);
+        if (!page.hasMore) break;
+      }
+      return { data: toutes };
+    },
     enabled: !!id,
   });
   const ventes: Vente[] = res?.data ?? [];
