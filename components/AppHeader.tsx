@@ -1,4 +1,4 @@
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -28,7 +28,10 @@ export default function AppHeader() {
 
   return (
     <View style={[s.bar, { paddingTop: insets.top + 8 }]}>
-      <Text style={s.logo}>Encaissly</Text>
+      <View style={s.brand}>
+        <Image source={require("@/assets/icon.png")} style={s.brandIcon} accessibilityIgnoresInvertColors />
+        <Text style={s.logo}>Encaissly</Text>
+      </View>
 
       <View style={s.right}>
         {isDuo && <DuoModeToggle variant="onDarkBar" />}
@@ -60,6 +63,17 @@ const s = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     gap: 12,
+  },
+  brand: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    flexShrink: 1,
+  },
+  brandIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
   },
   logo: {
     fontFamily: Fonts.family.norwester,
