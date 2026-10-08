@@ -16,7 +16,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuthStore } from "@/stores/auth.store";
 import * as WebBrowser from "expo-web-browser";
-import { authService, boutiqueService, evenementService, userService, stripeService } from "@/services/api";
+import { authService, userService, stripeService } from "@/services/api";
 
 // Passer à true quand Stripe live sera activé (SIRET en cours)
 const PAIEMENT_ACTIF = false;
@@ -26,7 +26,6 @@ const ecrireContact = () =>
     Alert.alert("Nous contacter", `Écris-nous à ${CONTACT_EMAIL}`),
   );
 const alertPaiement = () => Alert.alert("Bientôt disponible", "Les abonnements ne sont pas encore disponibles : le site et l'application sont en phase de test. Ça arrive très bientôt !");
-import { DuoModeToggle } from "@/components/DuoModeToggle";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { Colors } from "@/constants/colors";
@@ -122,6 +121,12 @@ function EditField({
   );
 }
 
+const TABS = [
+  { key: "profil", label: "Profil" },
+  { key: "abonnement", label: "Abonnement" },
+  { key: "aide", label: "Aide & légal" },
+] as const;
+
 export default function ProfilScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -130,6 +135,7 @@ export default function ProfilScreen() {
   const logout = useAuthStore((state) => state.logout);
   const setUser = useAuthStore((state) => state.setUser);
 
+  const [tab, setTab] = useState<(typeof TABS)[number]["key"]>("profil");
   const [notifEmail, setNotifEmail] = useState(user?.notificationsEmail ?? false);
   const [isEditing, setIsEditing] = useState(false);
   const [editPrenom, setEditPrenom] = useState(user?.prenom ?? "");
@@ -165,26 +171,9 @@ export default function ProfilScreen() {
     }).start();
   }, []);
 
-  //- Événements de la CREATRICE (ses propres événements/marchés)
-  const { data: mesEvenements } = useQuery<any[]>({
-    queryKey: ["mes-evenements"],
-    queryFn: () => evenementService.getAll(),
-    enabled: !isGerante,
-  });
-
-  //- Boutiques dont la CREATRICE est membre (invitée par une GERANTE)
-  const { data: mesBoutiques } = useQuery<Boutique[]>({
-    queryKey: ["mes-boutiques"],
-    queryFn: () => boutiqueService.getMesBoutiques(),
-    enabled: !isGerante,
-  });
-
-  const evenements: any[] = mesEvenements ?? [];
-  const memberBoutiques: Boutique[] = mesBoutiques ?? [];
   //- DUO débloque les mêmes fonctionnalités que PRO (plan payant à part
   //- entière) — isPro reste volontairement "PRO uniquement" plus bas pour
   //- l'affichage du badge/CTA, donc on ajoute isPlanDuo ici explicitement
-  const canCreateEvent = isPro || isPlanDuo || evenements.length < 1;
 
   const { mutate: saveProfile, isPending: isSaving } = useMutation({
     mutationFn: () => userService.updateProfile({ nom: editNom || undefined, prenom: editPrenom || undefined }),
@@ -271,19 +260,6 @@ export default function ProfilScreen() {
     },
     onError: () => {
       Alert.alert("Erreur", "Impossible d'ouvrir la page de paiement DUO.");
-    },
-  });
-
-  const { mutate: creerEvenement, isPending: isCreatingEvenement } = useMutation({
-    mutationFn: () => evenementService.creerMonEvenement(boutiqueNom.trim()),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["mes-evenements"] });
-      queryClient.invalidateQueries({ queryKey: ["creatrices"] });
-      setShowCreateBoutique(false);
-      setBoutiqueNom("");
-    },
-    onError: () => {
-      Alert.alert("Erreur", "Impossible de créer l'événement.");
     },
   });
 
@@ -415,7 +391,7 @@ export default function ProfilScreen() {
       <Animated.View
         style={[
           s.header,
-          { paddingTop: insets.top + 24 },
+          { paddingTop: 20 },
           {
             opacity: headerAnim,
             transform: [
@@ -467,106 +443,28 @@ export default function ProfilScreen() {
             </View>
           )}
         </View>
-        {isDuo && <DuoModeToggle variant="onLight" />}
       </Animated.View>
 
       <View style={s.body}>
 
-        {/* ── Mes événements (CREATRICE seulement) ── */}
-        {!isGerante && (
+        {/* ── Sous-onglets du compte ── */}
+        <View style={s.tabs} accessibilityRole="tablist">
+          {TABS.map((t) => (
+            <TouchableOpacity
+              key={t.key}
+              style={[s.tab, tab === t.key && s.tabActive]}
+              onPress={() => setTab(t.key)}
+              activeOpacity={0.8}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: tab === t.key }}
+            >
+              <Text style={[s.tabTxt, tab === t.key && s.tabTxtActive]}>{t.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {tab === "profil" && (
           <>
-            <Text style={s.sectionTitle}>Mes événements</Text>
-            <View style={s.card}>
-
-              {/* Liste des événements */}
-              {evenements.map((ev, i) => (
-                <View key={ev.id}>
-                  {i > 0 && <View style={s.divider} />}
-                  <InfoRow icon="calendar" label={ev.nom} value={
-                    new Date(ev.dateDebut).toLocaleDateString("fr-FR", { month: "short", year: "numeric" })
-                  } />
-                </View>
-              ))}
-
-              {/* Boutiques dont la créatrice est membre (invitée) */}
-              {memberBoutiques.length > 0 && (
-                <>
-                  {evenements.length > 0 && <View style={s.divider} />}
-                  {memberBoutiques.map((boutique, i) => (
-                    <View key={boutique.id}>
-                      {i > 0 && <View style={s.divider} />}
-                      <InfoRow icon="team" label="Membre de" value={boutique.nom} />
-                    </View>
-                  ))}
-                </>
-              )}
-
-              {/* Séparateur si du contenu existe au-dessus */}
-              {(evenements.length > 0 || memberBoutiques.length > 0) && <View style={s.divider} />}
-
-              {/* Formulaire création ou nudge PRO */}
-              {canCreateEvent ? (
-                showCreateBoutique ? (
-                  <>
-                    <Text style={s.createBoutiqueLabel}>Nom de l'événement</Text>
-                    <TextInput
-                      style={s.editInput}
-                      value={boutiqueNom}
-                      onChangeText={setBoutiqueNom}
-                      placeholder="Ex : Marché de Noël 2025"
-                      placeholderTextColor={Colors.textLight}
-                      autoFocus
-                      returnKeyType="done"
-                    />
-                    <View style={[s.editActions, { marginTop: 12 }]}>
-                      <TouchableOpacity
-                        style={s.cancelBtn}
-                        onPress={() => { setShowCreateBoutique(false); setBoutiqueNom(""); }}
-                        activeOpacity={0.75}
-                      >
-                        <Text style={s.cancelBtnTxt}>Annuler</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={[s.saveBtn, (!boutiqueNom.trim() || isCreatingEvenement) && { opacity: 0.5 }]}
-                        onPress={() => creerEvenement()}
-                        disabled={!boutiqueNom.trim() || isCreatingEvenement}
-                        activeOpacity={0.85}
-                      >
-                        <Text style={s.saveBtnTxt}>
-                          {isCreatingEvenement ? "..." : "Créer"}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </>
-                ) : (
-                  <TouchableOpacity
-                    style={s.createBoutiqueBtn}
-                    onPress={() => setShowCreateBoutique(true)}
-                    activeOpacity={0.75}
-                  >
-                    <AntDesign name="plus" size={14} color={Colors.text} style={{ marginRight: 8 }} />
-                    <View style={{ flex: 1 }}>
-                      <Text style={s.createBoutiqueTxt}>Créer un événement</Text>
-                      <Text style={s.createBoutiqueDesc}>
-                        Marché, foire, vide-grenier — gérez articles, ventes et stats par événement
-                      </Text>
-                    </View>
-                    <AntDesign name="right" size={12} color={Colors.textLight} />
-                  </TouchableOpacity>
-                )
-              ) : (
-                <View style={s.createBoutiqueBtn}>
-                  <AntDesign name="lock" size={14} color={Colors.textLight} style={{ marginRight: 8 }} />
-                  <Text style={[s.createBoutiqueDesc, { flex: 1 }]}>
-                    Plan FREE · 1 événement max. Passez à PRO pour en créer davantage.
-                  </Text>
-                </View>
-              )}
-
-            </View>
-          </>
-        )}
-
         {/* ── Mon compte ── */}
         <Text style={s.sectionTitle}>Mon compte</Text>
 
@@ -651,6 +549,11 @@ export default function ProfilScreen() {
           </View>
         </AnimCard>
 
+          </>
+        )}
+
+        {tab === "abonnement" && (
+          <>
         {/* ── Abonnement ── */}
         <Text style={s.sectionTitle}>Abonnement</Text>
 
@@ -813,6 +716,11 @@ export default function ProfilScreen() {
           )}
         </AnimCard>
 
+          </>
+        )}
+
+        {tab === "aide" && (
+          <>
         {/* ── Contact (phase de test) ── */}
         <Text style={s.sectionTitle}>Un bug ? Une idée ?</Text>
         <AnimCard index={cardIdx(4)} style={s.card}>
@@ -857,6 +765,11 @@ export default function ProfilScreen() {
           </TouchableOpacity>
         </AnimCard>
 
+          </>
+        )}
+
+        {tab === "profil" && (
+          <>
         {/* ── Déconnexion ── */}
         <AnimCard index={cardIdx(5)} style={{ marginTop: 8 }}>
           <TouchableOpacity style={s.logoutBtn} onPress={handleLogout} activeOpacity={0.85}>
@@ -879,6 +792,9 @@ export default function ProfilScreen() {
           </TouchableOpacity>
         </AnimCard>
 
+          </>
+        )}
+
         <Text style={s.footer}>
           Encaissly · La caisse intelligente des boutiques de créateurs
         </Text>
@@ -888,6 +804,21 @@ export default function ProfilScreen() {
 }
 
 const s = StyleSheet.create({
+  tabs: {
+    flexDirection: "row",
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.pill,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    padding: 3,
+    marginTop: 16,
+    marginBottom: 4,
+  },
+  tab: { flex: 1, minHeight: 38, alignItems: "center", justifyContent: "center", borderRadius: Radius.pill },
+  tabActive: { backgroundColor: Colors.primary },
+  tabTxt: { fontFamily: Fonts.family.nowMedium, fontSize: 12.5, color: Colors.textLight },
+  tabTxtActive: { fontFamily: Fonts.family.nowBold, color: "#fff" },
+
   container: {
     flex: 1,
     backgroundColor: Colors.background,

@@ -18,16 +18,13 @@ import { useQuery } from "@tanstack/react-query";
 import { statsService, evenementService, boutiqueService } from "@/services/api";
 import type { StatsParams } from "@/services/api";
 import { useAuthStore } from "@/stores/auth.store";
+import { router } from "expo-router";
 import PeriodePicker, { formatPeriode } from "@/components/PeriodePicker";
-import VentesExportButtons from "@/components/VentesExportButtons";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
 import { shadows } from "@/styles/utils/shadows.styles";
 import { Radius } from "@/constants/spacing";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import * as FileSystem from "expo-file-system/legacy";
-import * as Sharing from "expo-sharing";
-import { API_BASE_URL } from "@/constants/api";
 
 // ── AnimCard ─────────────────────────────────────────────────────────────────
 
@@ -77,47 +74,6 @@ function AnimCard({
 const round2 = (n: number | null | undefined): string =>
   (Math.round((n ?? 0) * 100) / 100).toFixed(2);
 
-// ── Export helper ─────────────────────────────────────────────────────────────
-
-const MIME: Record<string, string> = {
-  pdf: "application/pdf",
-  csv: "text/csv",
-  xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-};
-
-async function downloadAndShare(
-  path: string,
-  filename: string,
-  token: string | null,
-) {
-  if (!token) return;
-  const ext = filename.split(".").pop() ?? "pdf";
-  const fileUri = `${FileSystem.documentDirectory}${filename}`;
-  try {
-    const result = await FileSystem.downloadAsync(
-      `${API_BASE_URL}${path}`,
-      fileUri,
-      { headers: { Authorization: `Bearer ${token}` } },
-    );
-    if (result.status === 200) {
-      const canShare = await Sharing.isAvailableAsync();
-      if (canShare) {
-        await Sharing.shareAsync(result.uri, {
-          mimeType: MIME[ext] ?? "application/octet-stream",
-          dialogTitle: "Ouvrir ou enregistrer le document",
-          UTI: ext === "pdf" ? "com.adobe.pdf" : undefined,
-        });
-      } else {
-        Alert.alert("Document prêt", `Fichier sauvegardé : ${filename}`);
-      }
-    } else {
-      Alert.alert("Erreur", "Impossible de générer le document.");
-    }
-  } catch {
-    Alert.alert("Erreur", "Une erreur est survenue lors du téléchargement.");
-  }
-}
-
 // ── Screen ────────────────────────────────────────────────────────────────────
 
 export default function StatsScreen() {
@@ -134,7 +90,6 @@ export default function StatsScreen() {
   //- entière, pas une variante de FREE) — le nom réel du plan reste affiché
   //- correctement plus bas via user?.plan, pas via ce flag
   const isPro = user?.plan === "PRO" || user?.plan === "DUO";
-  const [downloading, setDownloading] = useState<string | null>(null);
   const [selectedFilter, setSelectedFilter] = useState<Filter>(() =>
     activeEvenementId
       ? { type: "event", id: activeEvenementId, nom: activeEvenementNom ?? "" }
@@ -145,12 +100,6 @@ export default function StatsScreen() {
   const [mois, setMois] = useState<string | null>(null);
   const moisParam = mois ?? undefined;
   const periodeLabel = formatPeriode(mois);
-
-  const handleDownload = async (path: string, filename: string) => {
-    setDownloading(filename);
-    await downloadAndShare(path, filename, accessToken);
-    setDownloading(null);
-  };
 
   const headerAnim = useRef(new Animated.Value(0)).current;
 
@@ -528,108 +477,16 @@ export default function StatsScreen() {
             )}
           </>
         )}
-        {/* ── 7. Export ── */}
-        <Text style={st.sectionTitle}>Téléchargements</Text>
-        <AnimCard index={20} style={st.exportCard}>
-          {/* PDF — disponible pour tous */}
-          <ExportBtn
-            label="📄 Rapport PDF"
-            sublabel="Toujours disponible"
-            loading={downloading === "rapport.pdf"}
-            onPress={() =>
-              handleDownload(
-                isGerante ? "/export/pdf/boutique" : "/export/pdf",
-                "rapport.pdf",
-              )
-            }
-          />
-
-          {/* CSV */}
-          {isPro ? (
-            <ExportBtn
-              label="📊 Export CSV"
-              sublabel="Ouvrir dans Excel / Sheets"
-              loading={downloading === "export.csv"}
-              onPress={() =>
-                handleDownload(
-                  isGerante ? "/export/csv/boutique" : "/export/csv",
-                  "export.csv",
-                )
-              }
-            />
-          ) : (
-            <LockedExportBtn label="📊 Export CSV" />
-          )}
-
-          {/* Excel */}
-          {isPro ? (
-            <ExportBtn
-              label="📗 Export Excel"
-              sublabel="Fichier .xlsx mis en forme"
-              loading={downloading === "export.xlsx"}
-              onPress={() =>
-                handleDownload(
-                  isGerante ? "/export/excel/boutique" : "/export/excel",
-                  "export.xlsx",
-                )
-              }
-            />
-          ) : (
-            <LockedExportBtn label="📗 Export Excel" />
-          )}
-        </AnimCard>
-
-        {/* Détail des ventes de toutes les créatrices, mois par mois — vue gérante uniquement */}
-        {isGerante && (
-          <>
-            <Text style={st.sectionTitle}>Ventes des créatrices</Text>
-            <VentesExportButtons filenameBase="ventes-boutique" />
-          </>
-        )}
+        <TouchableOpacity
+          style={{ alignSelf: "flex-start", paddingVertical: 12 }}
+          onPress={() => router.push("/(app)/documents")}
+          activeOpacity={0.8}
+          accessibilityRole="button"
+        >
+          <Text style={{ fontFamily: Fonts.family.nowMedium, fontSize: Fonts.sizes.sm, color: Colors.primary }}>Exporter en PDF, Excel ou CSV →</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
-  );
-}
-
-// ── Sous-composants export ─────────────────────────────────────────────────────
-
-function ExportBtn({
-  label,
-  sublabel,
-  loading,
-  onPress,
-}: {
-  label: string;
-  sublabel: string;
-  loading: boolean;
-  onPress: () => void;
-}) {
-  return (
-    <TouchableOpacity
-      style={st.exportBtn}
-      activeOpacity={0.75}
-      onPress={onPress}
-      disabled={loading}
-    >
-      <View style={{ flex: 1 }}>
-        <Text style={st.exportBtnLabel}>{label}</Text>
-        <Text style={st.exportBtnSub}>{sublabel}</Text>
-      </View>
-      {loading ? (
-        <ActivityIndicator size="small" color={Colors.primary} />
-      ) : (
-        <Text style={st.exportBtnArrow}>↓</Text>
-      )}
-    </TouchableOpacity>
-  );
-}
-
-function LockedExportBtn({ label }: { label: string }) {
-  return (
-    <View style={[st.exportBtn, st.exportBtnLocked]}>
-      <Text style={st.exportBtnLabelLocked}>🔒 {label}</Text>
-      <Text style={st.exportBtnLockedBadge}>PRO</Text>
-    </View>
   );
 }
 

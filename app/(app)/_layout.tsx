@@ -86,7 +86,8 @@ export default function AppLayout() {
         }}
       />
       {/* Écrans sans onglet : atteints depuis « Plus », l'Accueil ou les listes */}
-      <Tabs.Screen name="profil" options={{ href: null }} />
+      <Tabs.Screen name="documents" options={{ href: null, headerShown: true, header: () => <AppHeader /> }} />
+      <Tabs.Screen name="profil" options={{ href: null, headerShown: true, header: () => <AppHeader /> }} />
       <Tabs.Screen name="notifications" options={{ href: null }} />
       <Tabs.Screen name="aide" options={{ href: null }} />
       <Tabs.Screen name="boutique/[id]" options={{ href: null }} />

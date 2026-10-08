@@ -9,13 +9,14 @@ import {
 } from "react-native";
 import ModalModifier from "@/components/Creatrice/ModalModifier";
 import ModalInviter from "@/components/Creatrice/ModalInviter";
-import VentesExportButtons from "@/components/VentesExportButtons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { keepPreviousData, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import PeriodePicker, { formatPeriode } from "@/components/PeriodePicker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { creatriceService } from "@/services/api";
 import { useAuthStore } from "@/stores/auth.store";
+import { Colors } from "@/constants/colors";
+import { Fonts } from "@/constants/fonts";
 import type { CreatriceDetail, VenteDetail } from "@/types";
 import { styles } from "@/styles/pages/creatriceDetail.style";
 
@@ -266,14 +267,17 @@ export default function CreatriceDetailScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Export des ventes de cette créatrice, mois par mois — vue gérante uniquement */}
+        {/* Export des ventes de cette créatrice — écran Documents, déjà réglé sur elle (vue gérante) */}
         {isGeranteView && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Récupérer ses ventes</Text>
-            <VentesExportButtons
-              creatriceId={creatrice.id}
-              filenameBase={`ventes-${creatrice.nom.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
-            />
+            <Text style={styles.sectionTitle}>Documents</Text>
+            <TouchableOpacity
+              onPress={() => router.push(`/(app)/documents?creatriceId=${creatrice.id}`)}
+              activeOpacity={0.8}
+              accessibilityRole="button"
+            >
+              <Text style={{ fontFamily: Fonts.family.nowMedium, fontSize: Fonts.sizes.sm, color: Colors.primary }}>Récupérer ses ventes (PDF, Excel, CSV) →</Text>
+            </TouchableOpacity>
           </View>
         )}
 

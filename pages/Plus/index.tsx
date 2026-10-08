@@ -35,6 +35,7 @@ export default function PlusScreen() {
   };
 
   const rows: Row[] = [
+    { icon: "file-text", label: "Documents", onPress: () => router.push("/(app)/documents") },
     { icon: "bell", label: "Notifications", onPress: () => router.push("/(app)/notifications"), badge: unread },
     { icon: "user", label: "Compte", onPress: () => router.push("/(app)/profil") },
     { icon: "question-circle", label: "Aide", onPress: () => router.push("/(app)/aide") },

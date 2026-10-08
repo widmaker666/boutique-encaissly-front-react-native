@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   View,
   Text,
@@ -10,43 +9,12 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import * as FileSystem from "expo-file-system/legacy";
-import * as Sharing from "expo-sharing";
 import { statsService } from "@/services/api";
 import { useAuthStore } from "@/stores/auth.store";
-import { API_BASE_URL } from "@/constants/api";
-import VentesExportButtons from "@/components/VentesExportButtons";
 import { Colors } from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
 import { Radius } from "@/constants/spacing";
 import { shadows } from "@/styles/utils/shadows.styles";
-
-const MIME: Record<string, string> = {
-  pdf: "application/pdf",
-  excel: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  csv: "text/csv",
-};
-
-async function downloadAndShare(path: string, filename: string, token: string | null) {
-  if (!token) return;
-  const ext = filename.split(".").pop() ?? "pdf";
-  const fileUri = `${FileSystem.documentDirectory}${filename}`;
-  try {
-    const result = await FileSystem.downloadAsync(path, fileUri, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (result.status === 200) {
-      const canShare = await Sharing.isAvailableAsync();
-      if (canShare) {
-        await Sharing.shareAsync(result.uri, {
-          mimeType: MIME[ext] ?? "application/octet-stream",
-          dialogTitle: "Ouvrir ou enregistrer le document",
-          UTI: ext === "pdf" ? "com.adobe.pdf" : undefined,
-        });
-      }
-    }
-  } catch {}
-}
 
 function fmt(n: number | null | undefined) {
   return (Math.round((n ?? 0) * 100) / 100).toLocaleString("fr-FR", {
@@ -69,8 +37,6 @@ export default function BoutiqueDetailScreen() {
   //- entière, pas une variante de FREE)
   const isPro = user?.plan === "PRO" || user?.plan === "DUO";
 
-  const [downloading, setDownloading] = useState<string | null>(null);
-
   const boutiqueName = nom ? decodeURIComponent(nom) : "Boutique";
 
   const { data: stats, isLoading } = useQuery<any>({
@@ -83,15 +49,6 @@ export default function BoutiqueDetailScreen() {
   const nbVentes = stats?.stats._count ?? 0;
   const commissions = stats?.totalCommissions ?? 0;
   const netBoutique = ca - commissions;
-
-  const handleDownload = async (type: "pdf" | "excel" | "csv") => {
-    const ext = type === "excel" ? "xlsx" : type;
-    const filename = `boutique-${boutiqueName.toLowerCase().replace(/\s+/g, "-")}.${ext}`;
-    const path = `${API_BASE_URL}/export/${type}/boutique?boutiqueId=${id}`;
-    setDownloading(type);
-    await downloadAndShare(path, filename, accessToken);
-    setDownloading(null);
-  };
 
   return (
     <View style={s.container}>
@@ -129,76 +86,14 @@ export default function BoutiqueDetailScreen() {
           </View>
         )}
 
-        {/* Export */}
-        <Text style={[s.sectionTitle, { marginTop: 8 }]}>Exporter les stats</Text>
-
         <TouchableOpacity
-          style={[s.exportBtn, downloading === "pdf" && s.exportBtnLoading]}
-          activeOpacity={0.85}
-          onPress={() => handleDownload("pdf")}
-          disabled={!!downloading}
+          style={{ alignSelf: "flex-start", paddingVertical: 12 }}
+          onPress={() => router.push("/(app)/documents")}
+          activeOpacity={0.8}
+          accessibilityRole="button"
         >
-          {downloading === "pdf" ? (
-            <ActivityIndicator size="small" color="#fff" />
-          ) : (
-            <>
-              <Text style={s.exportIcon}>📄</Text>
-              <View style={s.exportInfo}>
-                <Text style={s.exportLabel}>Rapport PDF</Text>
-                <Text style={s.exportSub}>Résumé complet · Gratuit</Text>
-              </View>
-              <Text style={s.exportArrow}>›</Text>
-            </>
-          )}
+          <Text style={{ fontFamily: Fonts.family.nowMedium, fontSize: Fonts.sizes.sm, color: Colors.primary }}>Exporter en PDF, Excel ou CSV →</Text>
         </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[s.exportBtn, !isPro && s.exportBtnLocked, downloading === "excel" && s.exportBtnLoading]}
-          activeOpacity={isPro ? 0.85 : 1}
-          onPress={() => isPro && handleDownload("excel")}
-          disabled={!isPro || !!downloading}
-        >
-          {downloading === "excel" ? (
-            <ActivityIndicator size="small" color="#fff" />
-          ) : (
-            <>
-              <Text style={s.exportIcon}>📊</Text>
-              <View style={s.exportInfo}>
-                <Text style={[s.exportLabel, !isPro && s.exportLabelLocked]}>Export Excel</Text>
-                <Text style={s.exportSub}>{isPro ? "Toutes les ventes · .xlsx" : "Disponible en PRO"}</Text>
-              </View>
-              {!isPro ? <Text style={s.lockIcon}>🔒</Text> : <Text style={s.exportArrow}>›</Text>}
-            </>
-          )}
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[s.exportBtn, !isPro && s.exportBtnLocked, downloading === "csv" && s.exportBtnLoading]}
-          activeOpacity={isPro ? 0.85 : 1}
-          onPress={() => isPro && handleDownload("csv")}
-          disabled={!isPro || !!downloading}
-        >
-          {downloading === "csv" ? (
-            <ActivityIndicator size="small" color="#fff" />
-          ) : (
-            <>
-              <Text style={s.exportIcon}>📋</Text>
-              <View style={s.exportInfo}>
-                <Text style={[s.exportLabel, !isPro && s.exportLabelLocked]}>Export CSV</Text>
-                <Text style={s.exportSub}>{isPro ? "Compatible tableur · .csv" : "Disponible en PRO"}</Text>
-              </View>
-              {!isPro ? <Text style={s.lockIcon}>🔒</Text> : <Text style={s.exportArrow}>›</Text>}
-            </>
-          )}
-        </TouchableOpacity>
-
-        {/* Détail des ventes de toutes les créatrices de cette boutique, mois par mois */}
-        <Text style={[s.sectionTitle, { marginTop: 12 }]}>Ventes des créatrices</Text>
-        <VentesExportButtons
-          boutiqueId={id}
-          filenameBase={`ventes-${boutiqueName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
-        />
-
         <View style={{ height: insets.bottom + 24 }} />
       </ScrollView>
     </View>
