@@ -30,7 +30,16 @@ export default function PlusScreen() {
   const handleLogout = () => {
     Alert.alert("Se déconnecter", "Tu vas être déconnectée de l'application.", [
       { text: "Annuler", style: "cancel" },
-      { text: "Se déconnecter", style: "destructive", onPress: () => logout() },
+      {
+        text: "Se déconnecter",
+        style: "destructive",
+        //- Même séquence que l'écran Compte : vider la session PUIS revenir à la connexion
+        //- (le layout racine ne redirige vers la connexion que s'il est rechargé)
+        onPress: () => {
+          logout();
+          router.replace("/(auth)/login");
+        },
+      },
     ]);
   };
 
