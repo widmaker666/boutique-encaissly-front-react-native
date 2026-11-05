@@ -19,14 +19,21 @@ updates:
       prefix: "chore(deps)"
     labels:
       - dependencies
-    # Expo impose des versions précises par SDK (expo install --fix) :
-    # react / react-native ne montent qu'avec un changement de SDK, fait à la main.
+    # Expo impose des versions précises par SDK (npx expo install --fix) :
+    # tout ce qui est lié au SDK ne change que lors d'un changement de SDK, fait à la main.
     ignore:
       - dependency-name: react
-        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: react-dom
       - dependency-name: react-native
-        update-types: ["version-update:semver-major", "version-update:semver-minor"]
       - dependency-name: expo
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "expo-*"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "react-native-*"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "@types/react"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
     groups:
       # Une seule PR pour toutes les mises à jour minor/patch
