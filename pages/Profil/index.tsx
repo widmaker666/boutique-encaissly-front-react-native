@@ -641,7 +641,7 @@ export default function ProfilScreen() {
                   activeOpacity={0.8}
                 >
                   <Text style={[s.periodTxt, billingPeriod === "annual" && s.periodTxtActive]}>
-                    Annuel · 129€ 🏷️
+                    Annuel · 130€ 🏷️
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -652,7 +652,7 @@ export default function ProfilScreen() {
                 activeOpacity={0.85}
               >
                 <Text style={s.duoBtnTxt}>
-                  {isUpgradingDuo ? "Ouverture..." : billingPeriod === "annual" ? "Passer en DUO — 129€/an" : "Passer en DUO — 15€/mois"}
+                  {isUpgradingDuo ? "Ouverture..." : billingPeriod === "annual" ? "Passer en DUO — 130€/an" : "Passer en DUO — 15€/mois"}
                 </Text>
               </TouchableOpacity>
               {cgvHint}
